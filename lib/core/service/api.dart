@@ -5,7 +5,6 @@ import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/data_model/login_response.dart';
-import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:http/http.dart' as http;
@@ -34,26 +33,25 @@ class Api {
       String time,
       bool timeAccurate) async {
     print(register);
-    var response = await client.post(
-      register,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({
-        "firstName": name,
-        "lastName": lname,
-        "email": email,
-        "password": password,
-        "phoneNumber": phone,
-        "gender": (gender == Gender.male) ? MALE : FEMALE,
-        "city": location,
-        "state": state,
-        "country": country,
-        "dateOfBirth": dob,
-        "birthTime": time,
-        "accurateTime": timeAccurate,
-      }),
-    );
-    print('the response registration ${response.body} ${response.statusCode}');
     try {
+      var response = await client.post(
+        register,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "firstName": name,
+          "lastName": lname,
+          "email": email,
+          "password": password,
+          "phoneNumber": phone,
+          "gender": (gender == Gender.male) ? MALE : FEMALE,
+          "city": location,
+          "state": state,
+          "country": country,
+          "dateOfBirth": dob,
+          "birthTime": time,
+          "accurateTime": timeAccurate,
+        }),
+      );
       switch (response.statusCode) {
         case 200:
           print('case 200');
@@ -62,7 +60,8 @@ class Api {
           print('case 409');
           return UserModel.fromError(jsonDecode(response.body));
         default:
-          return UserModel.error(error: "K error aako ho yo");
+          return UserModel.error(
+              error: "Something went wrong. Please try again");
       }
     } catch (e) {
       print('we are here');
@@ -91,8 +90,9 @@ class Api {
     }
   }
 
-  Future<MessageModel> askQuestion(int userId, String question,
+  Future<Map<String, dynamic>> askQuestion(int userId, String question,
       {int prevQuestionId}) async {
+    return null;
     print(askQuestionUrl);
     print(userId);
     print(question);
@@ -114,10 +114,10 @@ class Api {
         ),
       );
       print('the ask question response ${response.statusCode}${response.body}');
-      return MessageModel.fromJson(jsonDecode(response.body));
+      return jsonDecode(response.body);
     } catch (e) {
       print('the response exception $e}');
-      return MessageModel.withError(e.toString());
+      return null;
     }
   }
 

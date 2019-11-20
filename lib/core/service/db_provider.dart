@@ -6,6 +6,23 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+const String ID = "id";
+const String USER_ID = "userId";
+const String FIRST_NAME = "firstName";
+const String LAST_NAME = "lastName";
+const String EMAIL = "email";
+const String PHONE = "phoneNumber";
+const String GENDER = "gender";
+const String CITY = "city";
+const String STATE = "state";
+const String COUNTRY = "country";
+const String ROLE = "role";
+const String DOB = "dateOfBirth";
+const String BIRTH_TIME = "birthTime";
+const String ACC_TIME = "accurateTime";
+
+
+
 class DbProvider {
   Database db;
 
@@ -25,28 +42,31 @@ class DbProvider {
       Batch batch = database.batch();
       batch.execute(""" 
        create table if not exists user(
-         id integer primary key not null,
-         userId integer,
-         firstName text,
-         lastName text,
-         email text,
-         phoneNumber text,
-         gender text,
-         city text,
-         state text,
-         country text,
-         role text,
-         dateOfBirth text,
-         birthTime text,
-         accurateTime integer
+         $ID integer primary key not null,
+         $USER_ID integer,
+         $FIRST_NAME text,
+         $LAST_NAME text,
+         $EMAIL text,
+         $PHONE text,
+         $GENDER text,
+         $CITY text,
+         $STATE text,
+         $COUNTRY text,
+         $ROLE text,
+         $DOB text,
+         $BIRTH_TIME text,
+         $ACC_TIME integer
         )""");
       batch.execute(""" 
        create table if not exists messages(
-         id integer primary key not null,
-         message text,
-         sent integer,
-         status text,
-         questionId integer
+         $ID integer primary key not null,
+         $MESSAGE text,
+         $SENT integer,
+         $STATUS text,
+         $QUESTION_ID integer,
+         $CREATED_AT integer,
+         $UPDATED_AT integer,
+         $ASTROLOGER_ID integer
         )""");
       await batch.commit();
     }, onUpgrade: (database, int oldVersion, int newVersion) async {
@@ -139,7 +159,8 @@ class DbProvider {
   Future<int> updateQuestionStatus(int questionId, String statusV) async {
     final db = await database;
     int _id = await db.rawUpdate(
-        "UPDATE messages SET status = ? WHERE questionId = ?", [statusV, questionId]);
+        "UPDATE messages SET status = ? WHERE questionId = ?",
+        [statusV, questionId]);
     return _id;
   }
 }

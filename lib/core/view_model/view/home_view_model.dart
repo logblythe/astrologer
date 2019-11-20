@@ -1,6 +1,5 @@
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
-import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/material.dart';

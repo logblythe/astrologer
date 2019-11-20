@@ -1,4 +1,5 @@
 import 'package:astrologer/core/view_model/view/home_view_model.dart';
+import 'package:astrologer/core/view_model/view/ideas_view.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/route_paths.dart';
 import 'package:astrologer/ui/shared/theme_stream.dart';
@@ -40,10 +41,10 @@ class _HomeViewState extends State<HomeView> {
       'title': 'Birth Profile',
       'action': Icons.check_circle,
     },
-    {
-      'title': 'Astrologers',
-    },
+    {'title': 'Astrologers'},
+    {'title': 'Ideas to ask'},
   ];
+
 
   void _getToken() async {
     fcmToken = await _fcm.getToken();
@@ -57,7 +58,7 @@ class _HomeViewState extends State<HomeView> {
     _getToken();
     _fcm.configure(
       onMessage: (Map<String, dynamic> message) async =>
-           _onNotificationReceived(message),
+          _onNotificationReceived(message),
       onLaunch: (Map<String, dynamic> message) async =>
           _onNotificationReceived(message),
       onResume: (Map<String, dynamic> message) async =>
@@ -143,7 +144,12 @@ class _HomeViewState extends State<HomeView> {
                       userDetailsKey: _formKey,
                       themeStream: widget.themeStream,
                     ),
-                    AstrologersView()
+                    AstrologersView(),
+                    IdeasView(
+                      onTap: () {
+                        _pageController.jumpToPage(0);
+                      },
+                    ),
                   ],
                   scrollDirection: Axis.horizontal,
                   onPageChanged: (page) {
@@ -211,9 +217,14 @@ class _HomeViewState extends State<HomeView> {
             },
           ),
           ListTile(
-              title: Text('Question price',
-                  style: Theme.of(context).textTheme.body2),
-              leading: Icon(Icons.check_circle)),
+            title:
+                Text('What to ask?', style: Theme.of(context).textTheme.body2),
+            leading: Icon(Icons.check_circle),
+            onTap: () {
+              _pageController.jumpToPage(3);
+              Navigator.pop(context);
+            },
+          ),
           ListTile(
               title: Text('Help &, Settings',
                   style: TextStyle(color: Theme.of(context).disabledColor))),

@@ -39,7 +39,6 @@ dependencies:
   streamqflite:
   square_in_app_payments:
 
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

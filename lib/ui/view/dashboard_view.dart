@@ -1,6 +1,6 @@
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/view_model/view/dashboard_view_model.dart';
-import 'package:astrologer/core/view_model/widgets/cart_item.dart';
+import 'package:astrologer/ui/widgets/cart_item.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,12 +26,12 @@ class _DashboardViewState extends State<DashboardView>
       userService: Provider.of(context),
       sharedPrefHelper: Provider.of(context),
     );
+    _messageController = TextEditingController();
   }
 
   @override
   void initState() {
     super.initState();
-    _messageController = TextEditingController();
     _messageFocusNode = FocusNode();
   }
 
@@ -40,8 +40,12 @@ class _DashboardViewState extends State<DashboardView>
     super.build(context);
     return BaseWidget(
       model: _dashboardViewModel,
-      onModelReady: (model) => model.init(),
+      onModelReady: (DashboardViewModel model) => model.init(),
       builder: (context, DashboardViewModel model, child) {
+        _messageController
+          ..text = model.messageBox
+          ..selection =
+              TextSelection.collapsed(offset: _messageController.text.length);
         return GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Container(
@@ -99,6 +103,9 @@ class _DashboardViewState extends State<DashboardView>
         child: Row(children: [
           Expanded(
             child: TextField(
+              onChanged: (text) {
+                model.addMsgToSink(text, false);
+              },
               focusNode: _messageFocusNode,
               controller: _messageController,
               decoration: InputDecoration(

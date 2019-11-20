@@ -82,4 +82,11 @@ class UserModel {
         "birthTime": birthTime,
         "accurateTime": accurateTime ? 1 : 0,
       };
+
+  @override
+  String toString() {
+    return toMapForDb().toString();
+  }
+
+
 }

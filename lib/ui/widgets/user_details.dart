@@ -77,21 +77,19 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             children: <Widget>[
               model is SignUpViewModel
                   ? Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text(
-                  "Ahem Brahmasmi",
-                  style: TextStyle(
-                    color: Theme
-                        .of(context)
-                        .primaryColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 32.0,
-                  ),
-                ),
-              )
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text(
+                        "Ahem Brahmasmi",
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 32.0,
+                        ),
+                      ),
+                    )
                   : Center(
-                child: CircularImage(),
-              ),
+                      child: CircularImage(),
+                    ),
               _nameRow(),
               model is SignUpViewModel ? _phoneTextField() : SizedBox.shrink(),
               model is SignUpViewModel ? _emailTextField() : SizedBox.shrink(),
@@ -269,12 +267,8 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
               icon: Icon(
                 Icons.remove_red_eye,
                 color: !model.obscureText
-                    ? Theme
-                    .of(context)
-                    .primaryColor
-                    : Theme
-                    .of(context)
-                    .disabledColor,
+                    ? Theme.of(context).primaryColor
+                    : Theme.of(context).disabledColor,
               ),
               onPressed: () => model.toggleObscureText(),
             ),
@@ -338,7 +332,8 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
                   setState(() {
                     if (selectedTime != null) {
                       time = selectedTime;
-                      _timeController.text = time.format(context);
+                      _timeController.text = DateFormat("hh:mm a").format(
+                          DateFormat("HH:mm").parse(time.format(context)));
                     }
                   });
                 },
@@ -389,9 +384,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             hint: Text('Select Country'),
             underline: Container(
               color: _countryDropDownValid
-                  ? Theme
-                  .of(context)
-                  .disabledColor
+                  ? Theme.of(context).disabledColor
                   : Colors.red,
               height: 1,
               width: double.infinity,
@@ -477,56 +470,54 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
         child: model.busy
             ? CircularProgressIndicator()
             : Container(
-          width: MediaQuery
-              .of(context)
-              .size
-              .width / 1.5,
-          margin: EdgeInsets.all(16.0),
-          child: RaisedButton(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(32)),
-            padding: EdgeInsets.all(22.0),
-            child: Text(
-              'Register',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16.0,
+                width: MediaQuery.of(context).size.width / 1.5,
+                margin: EdgeInsets.all(16.0),
+                child: RaisedButton(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32)),
+                  padding: EdgeInsets.all(22.0),
+                  child: Text(
+                    'Register',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  onPressed: () async {
+                    if (validateForm()) {
+                      formKey.currentState.save();
+                      var response = await model.register(
+                          selectedGender,
+                          _nameController.text.split(" ")[0],
+                          _nameController.text.split(" ")[1] != null
+                              ? _nameController.text.split(" ")[1]
+                              : '',
+                          DateFormat("yyyy-MM-d").format(
+                              DateFormat('MMM d, yyyy')
+                                  .parse(_dateController.text)),
+                          DateFormat("HH:mm").format(DateFormat("hh:mm a")
+                              .parse(_timeController.text)),
+                          _timeAccurate,
+                          _country,
+                          _locationController.text,
+                          _emailController.text,
+                          _passwordController.text,
+                          _phoneController.text,
+                          _stateController.text,
+                          fcmToken);
+                      if (response.errorMessage == null) {
+                        Navigator.pushReplacementNamed(
+                            context, RoutePaths.home);
+                      } else {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          content: Text(response.errorMessage),
+                        ));
+                      }
+                    }
+                  },
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
-            ),
-            onPressed: () async {
-              if (validateForm()) {
-                formKey.currentState.save();
-                var response = await model.register(
-                    selectedGender,
-                    _nameController.text.split(" ")[0],
-                    _nameController.text.split(" ")[1] ?? '',
-                    DateFormat("yyyy-MM-d").format(
-                        DateFormat('MMM d, yyyy').parse(_dateController.text)),
-                    DateFormat("HH:mm").format(DateFormat("hh:mm a")
-                        .parse(_timeController.text)),
-                    _timeAccurate,
-                    _country,
-                    _locationController.text,
-                    _emailController.text,
-                    _passwordController.text,
-                    _phoneController.text,
-                    _stateController.text,
-                    fcmToken);
-                if (response.errorMessage == null) {
-                  Navigator.pushReplacementNamed(
-                      context, RoutePaths.home);
-                } else {
-                  Scaffold.of(context).showSnackBar(SnackBar(
-                    content: Text(response.errorMessage),
-                  ));
-                }
-              }
-            },
-            color: Theme
-                .of(context)
-                .primaryColor,
-          ),
-        ),
       ),
     );
   }
@@ -543,7 +534,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             city: _locationController.text,
             state: _stateController.text,
             country: _country,
-            dateOfBirth: _dateController.text,
+            dateOfBirth: DateFormat("yyyy-MM-d").format(DateFormat('MMM d, yyyy').parse(_dateController.text)),
             birthTime: DateFormat("HH:mm")
                 .format(DateFormat("hh:mm a").parse(_timeController.text)),
             accurateTime: _timeAccurate),
@@ -603,8 +594,8 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
       _locationController.text = user.city;
       _timeController.text = DateFormat("hh:mm a")
           .format(DateFormat("HH:mm").parse(user.birthTime));
-      _dateController.text =
-          DateFormat.yMMMd().format(DateFormat("MMM d, yyyy").parse(user.dateOfBirth));
+      _dateController.text = DateFormat.yMMMd()
+          .format(DateFormat("yyyy-MM-d").parse(user.dateOfBirth));
       _emailController.text = user.email;
       _phoneController.text = user.phoneNumber;
       _stateController.text = user.state;

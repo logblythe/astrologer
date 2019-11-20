@@ -18,6 +18,14 @@ class DashboardViewModel extends BaseViewModel {
   int userId;
   MessageModel _message;
   bool _googlePayEnabled = false;
+  String _messageBox;
+
+  String get messageBox => _messageBox;
+
+  Stream<MessageAndUpdate> get nMsgStream => _homeService.nStream;
+
+  void addMsgToSink(message, update) =>
+      _homeService.addMsgToSink(message, update);
 
   LoginResponse get loginResponse => _userService.loginResponse;
 
@@ -35,6 +43,10 @@ class DashboardViewModel extends BaseViewModel {
 
   init() async {
     setBusy(true);
+    nMsgStream.listen((MessageAndUpdate data) {
+      _messageBox = data.message;
+      if (data.update) notifyListeners();
+    });
     userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
     await _homeService.init(
         welcomeMessage: loginResponse?.welcomeMessage, userId: userId);

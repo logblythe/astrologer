@@ -2,6 +2,7 @@ import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
+import 'package:rxdart/rxdart.dart';
 
 class HomeService {
   final DbProvider _dbProvider;
@@ -9,6 +10,13 @@ class HomeService {
   List<MessageModel> _messages;
   List<AstrologerModel> _astrologers;
   int _id;
+
+  PublishSubject<MessageAndUpdate> _newMessage = PublishSubject();
+
+  Stream<MessageAndUpdate> get nStream => _newMessage.stream;
+
+  addMsgToSink(String message, update) =>
+      _newMessage.sink.add(MessageAndUpdate(message, update));
 
   HomeService({DbProvider db, Api api})
       : _dbProvider = db,
@@ -33,6 +41,7 @@ class HomeService {
 
   Future<void> addMessage(MessageModel message, int userId) async {
     print('add new message');
+    message.createdAt = DateTime.now().millisecondsSinceEpoch;
     _id = await _dbProvider.addMessage(message);
     print('newly inserted id is $_id');
     _messages.add(message);
@@ -41,20 +50,20 @@ class HomeService {
   Future<void> askQuestion(MessageModel message, int userId) async {
     print('lets ask now');
     //    int prevQuesId = await _db.getUnclearedQuestionId();
-    MessageModel messageResponse = await _api.askQuestion(
+    Map<String, dynamic> messageResponse = await _api.askQuestion(
       userId,
       message.message,
 //      prevQuestionId: prevQuesId,
     );
-    if (messageResponse.error == null) {
-      message.status = messageResponse.status;
-      message.questionId = messageResponse.questionId;
-      print('message response updated');
+    if (messageResponse == null) {
+      print('message response error ');
+      message.status = NOT_DELIVERED;
     } else {
-      print('message response error ${messageResponse.error}');
-      message.status = "Not Delivered";
+      message.status = messageResponse['questionStatus'];
+      message.questionId = messageResponse['engQuesId'];
+      print('message response updated');
     }
-    _dbProvider.updateMessage(message, _id);
+    await _dbProvider.updateMessage(message, _id);
   }
 
   Future<void> updateQuestionStatusN(int questionId, String status) async {
@@ -66,9 +75,18 @@ class HomeService {
     }
   }
 
-  void dispose() {}
+  void dispose() {
+//    _newMessage.close();
+  }
 
   fetchAstrologers() async {
     if (_astrologers == null) _astrologers = await _api.fetchAstrologers();
   }
+}
+
+class MessageAndUpdate {
+  String message;
+  bool update;
+
+  MessageAndUpdate(this.message, this.update);
 }
