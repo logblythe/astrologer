@@ -19,31 +19,6 @@ class _DashboardViewState extends State<DashboardView>
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _dashboardViewModel = DashboardViewModel(
-      homeService: Provider.of(context),
-      userService: Provider.of(context),
-      sharedPrefHelper: Provider.of(context),
-    );
-    _messageController = TextEditingController();
-    _messageFocusNode
-      ..addListener(() {
-        if (_messageFocusNode.hasFocus) {
-          _dashboardViewModel.showSendBtn = true;
-        } else {
-          _dashboardViewModel.showSendBtn = false;
-        }
-      });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _messageFocusNode = FocusNode();
-  }
-
-  @override
   Widget build(BuildContext context) {
     super.build(context);
     return BaseWidget(
@@ -155,16 +130,41 @@ class _DashboardViewState extends State<DashboardView>
   }
 
   void addMessage(DashboardViewModel model) async {
+    var message = _messageController.text;
+    _messageController.clear();
     if (model.googlePayEnabled) {
       _listKey.currentState
           .insertItem(0, duration: Duration(milliseconds: 500));
-      await model.addMessage(
-          MessageModel(message: _messageController.text, sent: true));
-      _messageController.clear();
+      await model.addMessage(MessageModel(message: message, sent: true));
     } else {
       Scaffold.of(context)
           .showSnackBar(SnackBar(content: Text("Google pay is not available")));
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _dashboardViewModel = DashboardViewModel(
+      homeService: Provider.of(context),
+      userService: Provider.of(context),
+      sharedPrefHelper: Provider.of(context),
+    );
+    _messageController = TextEditingController();
+    _messageFocusNode
+      ..addListener(() {
+        if (_messageFocusNode.hasFocus) {
+          _dashboardViewModel.showSendBtn = true;
+        } else {
+          _dashboardViewModel.showSendBtn = false;
+        }
+      });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _messageFocusNode = FocusNode();
   }
 
   @override
