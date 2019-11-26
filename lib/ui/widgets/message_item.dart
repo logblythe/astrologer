@@ -2,8 +2,8 @@ import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class CardItem extends StatelessWidget {
-  const CardItem(
+class MessageItem extends StatelessWidget {
+  const MessageItem(
       {Key key,
       @required this.animation,
       this.onTap,

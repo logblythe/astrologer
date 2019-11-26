@@ -19,6 +19,14 @@ class DashboardViewModel extends BaseViewModel {
   MessageModel _message;
   bool _googlePayEnabled = false;
   String _messageBox;
+  bool _showSendBtn = false;
+
+  bool get showSendBtn => _showSendBtn;
+
+  set showSendBtn(bool value) {
+    _showSendBtn = value;
+    notifyListeners();
+  }
 
   String get messageBox => _messageBox;
 
