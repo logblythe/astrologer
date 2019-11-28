@@ -36,8 +36,6 @@ dependencies:
   firebase_core:
   firebase_messaging:
   flutter_local_notifications:
-  streamqflite:
-  square_in_app_payments:
 
 dev_dependencies:
   flutter_test:

@@ -76,7 +76,7 @@ class HomeService {
   }
 
   void dispose() {
-//    _newMessage.close();
+    _newMessage.close();
   }
 
   fetchAstrologers() async {
