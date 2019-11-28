@@ -49,7 +49,7 @@ class _MyAppState extends State<MyApp> {
                   ? ThemeData.dark()
                   : ThemeData.light(),
               debugShowCheckedModeBanner: false,
-              home: widget.token == null ? LoginView() : HomeView(),
+              home: /*widget.token == null ? LoginView() :*/ HomeView(),
               onGenerateRoute: (settings) =>
                   Router.generateRoute(settings, widget.theme),
 //              initialRoute: RoutePaths.login, //commenting this cause it shows black screen initially

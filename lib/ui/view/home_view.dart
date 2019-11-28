@@ -8,8 +8,10 @@ import 'package:astrologer/ui/widgets/user_details.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 
 import 'astrologers_view.dart';
 import 'dashboard_view.dart';
@@ -31,6 +33,7 @@ class _HomeViewState extends State<HomeView> {
   final FirebaseMessaging _fcm = FirebaseMessaging();
   HomeViewModel _homeViewModel;
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  List<IAPItem> _iaps = [];
 
   final List<Map<String, dynamic>> _children = [
     {
@@ -44,7 +47,6 @@ class _HomeViewState extends State<HomeView> {
     {'title': 'Astrologers'},
     {'title': 'Ideas to ask'},
   ];
-
 
   void _getToken() async {
     fcmToken = await _fcm.getToken();
@@ -64,6 +66,7 @@ class _HomeViewState extends State<HomeView> {
       onResume: (Map<String, dynamic> message) async =>
           _onNotificationReceived(message),
     );
+    _initIAPs();
   }
 
   void _onNotificationReceived(Map<String, dynamic> message) async {
@@ -109,6 +112,10 @@ class _HomeViewState extends State<HomeView> {
         onModelReady: (model) {},
         builder: (context, model, _) {
           return Scaffold(
+              floatingActionButton: FloatingActionButton(
+                onPressed: _purchase,
+                child: Icon(Icons.monetization_on),
+              ),
               backgroundColor: Theme.of(context).primaryColor,
               drawer: _buildDrawer(),
               appBar: AppBar(
@@ -317,5 +324,38 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
     );
+  }
+
+  void _initIAPs() async {
+    print('Init iaps');
+    var _purchaseInstance = FlutterInappPurchase.instance;
+    var result = await _purchaseInstance.initConnection;
+    print("Established IAP Connection..." + result);
+    try {
+      print('purchase instance');
+      _iaps = await _purchaseInstance.getProducts(["666"]);
+      print('purchase instance ${_iaps.length}');
+      for (var i = 0; i < _iaps.length; ++i) {
+        print("the title ${_iaps[i].title}");
+        print("the price ${_iaps[i].price}");
+      }
+    } catch (e) {
+      print('we have error');
+    }
+  }
+
+  void _purchase() async {
+    PurchasedItem _purchasedItem;
+    print('the product id is ${_iaps[0].productId}');
+    try {
+      _purchasedItem = await FlutterInappPurchase.instance
+          .requestPurchase(_iaps[0].productId);
+    } catch (e) {
+      PlatformException p = e as PlatformException;
+      print(p.code);
+      print(p.message);
+      print(p.details);
+    }
+    print('Purchase success ${_purchasedItem.productId}');
   }
 }

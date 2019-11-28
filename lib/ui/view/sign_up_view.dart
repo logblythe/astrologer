@@ -18,6 +18,7 @@ class SignUpView extends StatefulWidget {
 class _SignUpViewState extends State<SignUpView> with ValidationMixing {
   @override
   Widget build(BuildContext context) {
+
     return BaseWidget(
       model: SignUpViewModel(userService: Provider.of(context)),
       builder: (context, SignUpViewModel model, child) {
@@ -27,8 +28,9 @@ class _SignUpViewState extends State<SignUpView> with ValidationMixing {
               child: Container(
                 alignment: Alignment.center,
                 child: SingleChildScrollView(
-                    padding: EdgeInsets.all(8.0),
-                    child: UserDetails(model: model)),
+                  padding: EdgeInsets.all(8.0),
+                  child: UserDetails(model: model),
+                ),
               ),
             ),
           ),
