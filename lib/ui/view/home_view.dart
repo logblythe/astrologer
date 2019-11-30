@@ -45,7 +45,6 @@ class _HomeViewState extends State<HomeView> {
     {'title': 'Ideas to ask'},
   ];
 
-
   void _getToken() async {
     fcmToken = await _fcm.getToken();
     print('the token is $fcmToken');

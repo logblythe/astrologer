@@ -2,6 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const String KEY_USER_ID = "key_user_id";
 const String KEY_TOKEN = "key_token";
+const String KEY_FREE_QUES_COUNT = "key_free_question_count";
 
 class SharedPrefHelper {
   SharedPreferences _sharedPreferences;
@@ -27,5 +28,4 @@ class SharedPrefHelper {
     var sharedPref = await sharedPreferences;
     return sharedPref.getInt(key);
   }
-
 }

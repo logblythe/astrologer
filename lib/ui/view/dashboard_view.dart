@@ -132,14 +132,8 @@ class _DashboardViewState extends State<DashboardView>
   void addMessage(DashboardViewModel model) async {
     var message = _messageController.text;
     _messageController.clear();
-    if (model.googlePayEnabled) {
-      _listKey.currentState
-          .insertItem(0, duration: Duration(milliseconds: 500));
-      await model.addMessage(MessageModel(message: message, sent: true));
-    } else {
-      Scaffold.of(context)
-          .showSnackBar(SnackBar(content: Text("Google pay is not available")));
-    }
+    _listKey.currentState.insertItem(0, duration: Duration(milliseconds: 500));
+    await model.addMessage(MessageModel(message: message, sent: true));
   }
 
   @override

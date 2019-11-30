@@ -32,9 +32,12 @@ class LoginResponse {
       this.user});
 
   LoginResponse fromJson(Map<String, dynamic> json) {
-    if (status == UN_PROCESSABLE_ENTITY || status == UN_AUTHORIZED) {
-      return LoginResponse.withError(message);
+    if (json['status'] == UN_PROCESSABLE_ENTITY ||
+        json['status'] == UN_AUTHORIZED) {
+      print('inside if');
+      return LoginResponse.withError(json['message']);
     }
+    print('outside if');
     return LoginResponse(
       status: json['status'],
       error: json['error'],
@@ -46,5 +49,5 @@ class LoginResponse {
     );
   }
 
-  factory LoginResponse.withError(String error) => LoginResponse(error: error);
+  LoginResponse.withError(String error) : error = error;
 }

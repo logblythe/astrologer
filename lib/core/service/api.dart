@@ -52,6 +52,7 @@ class Api {
           "accurateTime": timeAccurate,
         }),
       );
+      print('Registration response ${jsonDecode(response.body)}');
       switch (response.statusCode) {
         case 200:
           print('case 200');
@@ -80,11 +81,8 @@ class Api {
           {'email': email, 'password': password, 'deviceToken': fcmToken},
         ),
       );
-      print('the response login ${response.statusCode}${response.body}');
-      if (jsonDecode(response.body)['status'] == UN_PROCESSABLE_ENTITY) {
-        return LoginResponse.withError(jsonDecode(response.body)['message']);
-      }
-      return LoginResponse.fromJson(jsonDecode(response.body));
+      print('LOGIN RESPONSE ${response.statusCode}${response.body}');
+      return LoginResponse().fromJson(jsonDecode(response.body));
     } on SocketException catch (e) {
       return LoginResponse.withError(e.message);
     }

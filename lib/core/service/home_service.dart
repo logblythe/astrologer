@@ -47,9 +47,13 @@ class HomeService {
     _messages.add(message);
   }
 
-  Future<void> askQuestion(MessageModel message, int userId) async {
+  Future<Null> askQuestion(
+      MessageModel message, int userId, bool isFree) async {
     print('lets ask now');
     //    int prevQuesId = await _db.getUnclearedQuestionId();
+    if (!isFree) {
+      return;
+    }
     Map<String, dynamic> messageResponse = await _api.askQuestion(
       userId,
       message.message,

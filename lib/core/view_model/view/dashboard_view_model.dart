@@ -12,7 +12,6 @@ class DashboardViewModel extends BaseViewModel {
   SharedPrefHelper _sharedPrefHelper;
   int userId;
   MessageModel _message;
-  bool _googlePayEnabled = false;
   String _messageBox;
   bool _showSendBtn = false;
 
@@ -34,8 +33,6 @@ class DashboardViewModel extends BaseViewModel {
 
   List<MessageModel> get messages => _homeService.messages?.reversed?.toList();
 
-  bool get googlePayEnabled => _googlePayEnabled;
-
   DashboardViewModel(
       {@required HomeService homeService,
       @required UserService userService,
@@ -51,6 +48,9 @@ class DashboardViewModel extends BaseViewModel {
       if (data.update) notifyListeners();
     });
     userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
+    if (loginResponse?.welcomeMessage != null) {
+      _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, 1);
+    }
     await _homeService.init(
         welcomeMessage: loginResponse?.welcomeMessage, userId: userId);
     setBusy(false);
@@ -58,8 +58,13 @@ class DashboardViewModel extends BaseViewModel {
 
   Future<void> addMessage(MessageModel message) async {
     setBusy(true);
+    int _freeCount = _sharedPrefHelper.getInteger(KEY_FREE_QUES_COUNT);
     await _homeService.addMessage(message, userId);
-    await _homeService.askQuestion(_message, userId);
+    if (_freeCount > 0) {
+      await _homeService.askQuestion(_message, userId, true);
+      _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, --_freeCount);
+    }
+    await _homeService.askQuestion(_message, userId, false);
     setBusy(false);
   }
 

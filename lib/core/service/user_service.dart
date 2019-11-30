@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
@@ -29,7 +31,9 @@ class UserService {
 
   Future<LoginResponse> performLogin(String email, String password) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    _loginResponse = await _api.performLogin(email, password, fcmToken);
+    LoginResponse _loginResponse =
+        await _api.performLogin(email, password, fcmToken);
+    print('error is ${_loginResponse.error}');
     if (_loginResponse.error == null) {
       await _db.addUser(_loginResponse.user);
       await sharedPreferences.setString(KEY_TOKEN, _loginResponse.token);
@@ -55,7 +59,7 @@ class UserService {
       String state,
       String fcmToken) async {
     print('time and date $time $dob');
-    var userModel = await _api.registerUser(
+    UserModel userModel = await _api.registerUser(
       gender,
       name,
       lname,
@@ -69,7 +73,9 @@ class UserService {
       time,
       timeAccurate,
     );
-    await performLogin(email, password);
+    if (userModel.errorMessage == null) {
+      await performLogin(email, password);
+    }
     return userModel;
   }
 }

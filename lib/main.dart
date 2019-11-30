@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/utils/shared_pref_helper.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final ThemeStream theme = ThemeStream();
   final SharedPreferences sharedPref = await SharedPreferences.getInstance();
   final String token = sharedPref.getString(KEY_TOKEN);
@@ -44,6 +45,7 @@ class _MyAppState extends State<MyApp> {
                   : ThemeData.light(),
               debugShowCheckedModeBanner: false,
               home: widget.token == null ? LoginView() : HomeView(),
+//              home: HomeView(),
               onGenerateRoute: (settings) =>
                   Router.generateRoute(settings, widget.theme),
 //              initialRoute: RoutePaths.login, //commenting this cause it shows black screen initially

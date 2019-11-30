@@ -489,7 +489,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
                       var response = await model.register(
                           selectedGender,
                           _nameController.text.split(" ")[0],
-                          _nameController.text.split(" ")[1] != null
+                          _nameController.text.split(" ").length > 1
                               ? _nameController.text.split(" ")[1]
                               : '',
                           DateFormat("yyyy-MM-d").format(
@@ -534,7 +534,8 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             city: _locationController.text,
             state: _stateController.text,
             country: _country,
-            dateOfBirth: DateFormat("yyyy-MM-d").format(DateFormat('MMM d, yyyy').parse(_dateController.text)),
+            dateOfBirth: DateFormat("yyyy-MM-d")
+                .format(DateFormat('MMM d, yyyy').parse(_dateController.text)),
             birthTime: DateFormat("HH:mm")
                 .format(DateFormat("hh:mm a").parse(_timeController.text)),
             accurateTime: _timeAccurate),
