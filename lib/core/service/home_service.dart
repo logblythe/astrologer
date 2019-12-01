@@ -2,6 +2,8 @@ import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomeService {
@@ -10,17 +12,29 @@ class HomeService {
   List<MessageModel> _messages;
   List<AstrologerModel> _astrologers;
   int _id;
+  List<IAPItem> _iaps;
+  FlutterInappPurchase _iap;
 
   PublishSubject<MessageAndUpdate> _newMessage = PublishSubject();
 
   Stream<MessageAndUpdate> get nStream => _newMessage.stream;
+
+  FlutterInappPurchase get iap => _iap;
+
+  List<IAPItem> get iaps => _iaps;
+
+  set iaps(List<IAPItem> value) {
+    _iaps = value;
+  }
 
   addMsgToSink(String message, update) =>
       _newMessage.sink.add(MessageAndUpdate(message, update));
 
   HomeService({DbProvider db, Api api})
       : _dbProvider = db,
-        _api = api;
+        _api = api {
+    _iap = FlutterInappPurchase.instance;
+  }
 
   List<MessageModel> get messages =>
       _messages == null ? _messages : List.from(_messages);
@@ -39,21 +53,19 @@ class HomeService {
     }
   }
 
-  Future<void> addMessage(MessageModel message, int userId) async {
-    print('add new message');
+  Future<int> addMessage(MessageModel message, int userId) async {
     message.createdAt = DateTime.now().millisecondsSinceEpoch;
     _id = await _dbProvider.addMessage(message);
-    print('newly inserted id is $_id');
+    message.id = _id;
     _messages.add(message);
+    return _id;
   }
 
   Future<Null> askQuestion(
-      MessageModel message, int userId, bool isFree) async {
-    print('lets ask now');
+      MessageModel message, int userId, bool isFree, bool shouldCharge) async {
     //    int prevQuesId = await _db.getUnclearedQuestionId();
-    if (!isFree) {
-      return;
-    }
+    if (!isFree && shouldCharge) await _purchase();
+    print('After purchase');
     Map<String, dynamic> messageResponse = await _api.askQuestion(
       userId,
       message.message,
@@ -63,11 +75,12 @@ class HomeService {
       print('message response error ');
       message.status = NOT_DELIVERED;
     } else {
-      message.status = messageResponse['questionStatus'];
+      message.status = messageResponse['questionStatus'] ?? DELIVERED;
       message.questionId = messageResponse['engQuesId'];
       print('message response updated');
     }
     await _dbProvider.updateMessage(message, _id);
+    return;
   }
 
   Future<void> updateQuestionStatusN(int questionId, String status) async {
@@ -79,12 +92,38 @@ class HomeService {
     }
   }
 
-  void dispose() {
-    _newMessage.close();
+  Future<void> updateQuestionStatusById(int id, String status) async {
+    print('Status $status $id');
+    for (int i = 0; i < _messages.length; i++) {
+      print('at $i ${_messages[i].toMapForDb()}');
+      if (_messages[i].id == id) {
+        print('inside $i ${_messages[i].toMapForDb()}');
+        _messages[i].status = status;
+        await _dbProvider.updateQuestionStatusById(id, status);
+      }
+    }
   }
+
+  void dispose() {}
 
   fetchAstrologers() async {
     if (_astrologers == null) _astrologers = await _api.fetchAstrologers();
+  }
+
+  Future<Null> _purchase() async {
+    PurchasedItem _purchasedItem;
+    print('the product id is ${_iaps[0].productId}');
+    try {
+      _purchasedItem = await _iap.requestPurchase(_iaps[0].productId);
+      _iap.consumePurchaseAndroid(_purchasedItem.purchaseToken);
+    } catch (e) {
+      PlatformException p = e as PlatformException;
+      print("exception ${p.code}");
+      print("exception ${p.message}");
+      print("exception ${p.details}");
+    }
+    print('Purchase success ${_purchasedItem.productId}');
+    return;
   }
 }
 

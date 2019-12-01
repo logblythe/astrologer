@@ -90,7 +90,6 @@ class Api {
 
   Future<Map<String, dynamic>> askQuestion(int userId, String question,
       {int prevQuestionId}) async {
-    return null;
     print(askQuestionUrl);
     print(userId);
     print(question);

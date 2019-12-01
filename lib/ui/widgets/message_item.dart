@@ -118,25 +118,35 @@ class MessageItem extends StatelessWidget {
                     width: 8,
                     child: CircularProgressIndicator(strokeWidth: 1.0),
                   )
-                : Wrap(
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    direction: Axis.vertical,
-                    children: <Widget>[
-                      message.status == NOT_DELIVERED
-                          ? Icon(
-                              Icons.warning,
-                              color: Colors.redAccent,
-                            )
-                          : SizedBox.shrink(),
-                      Text(message.status,
-                          style: TextStyle(
-                              color: message.status == NOT_DELIVERED
-                                  ? Colors.red
-                                  : Colors.black87,
-                              fontSize: 8,
-                              fontWeight: FontWeight.bold))
-                    ],
-                  )
+                : _getStatusWidget()
             : SizedBox.shrink());
+  }
+
+  Wrap _getStatusWidget() {
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      direction: Axis.vertical,
+      children: <Widget>[
+        _getStatusIcon(),
+        Text(message.status,
+            style: TextStyle(
+                color: message.status == NOT_DELIVERED
+                    ? Colors.red
+                    : Colors.black87,
+                fontSize: 8,
+                fontWeight: FontWeight.bold))
+      ],
+    );
+  }
+
+  Widget _getStatusIcon() {
+    switch (message.status) {
+      case NOT_DELIVERED:
+        return Icon(Icons.warning, color: Colors.redAccent);
+      case DELIVERED:
+        return Icon(Icons.check_circle, color: Colors.greenAccent);
+      default:
+        return SizedBox.shrink();
+    }
   }
 }

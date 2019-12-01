@@ -1,4 +1,3 @@
-import 'package:astrologer/core/constants/what_to_ask.dart' show ideas;
 import 'package:astrologer/core/view_model/view/idea_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/widgets/idea_item.dart';
@@ -23,28 +22,40 @@ class IdeasView extends StatelessWidget {
               topRight: Radius.circular(32),
             ),
           ),
-          child: _buildIdeas(context, model),
+          child: Column(
+            children: <Widget>[
+              _buildHeader(context),
+              Expanded(child: _buildIdeas(context, model)),
+            ],
+          ),
         );
       },
     );
   }
 
-  _buildHeader() {
-    return Text(
-        'There are some question samples to inspire you with ideas what type and kind of questions you may ask. Of course, there are imaginary questins, our customer data is strictly confidential.');
+  Widget _buildHeader(context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Text(
+        'There are some question samples to inspire you with ideas what type and kind of questions you may ask. Of course, there are imaginary questins, our customer data is strictly confidential.',
+        style: Theme.of(context).textTheme.subhead,
+      ),
+    );
   }
 
   Widget _buildIdeas(BuildContext context, IdeaViewModel model) {
-    return ListView.separated(
-        shrinkWrap: true,
-        itemBuilder: (_, index) => IdeaItem(
-              ideas[index],
+    return model.busy
+        ? Center(child: CircularProgressIndicator())
+        : ListView.builder(
+            shrinkWrap: true,
+            itemCount: model.ideas.length,
+            itemBuilder: (_, index) => IdeaItem(
+              model.ideas[index],
               onTap: (idea) {
                 model.addMessageToSink(idea);
                 onTap();
               },
             ),
-        separatorBuilder: (_, int) => Divider(),
-        itemCount: ideas.length);
+          );
   }
 }

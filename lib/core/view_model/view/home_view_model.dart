@@ -3,11 +3,18 @@ import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 
 class HomeViewModel extends BaseViewModel {
   final HomeService _homeService;
   SharedPrefHelper _sharedPrefHelper;
   int userId;
+
+  List<IAPItem> get iaps => _homeService.iaps;
+
+  set iaps(List<IAPItem> value) {
+    _homeService.iaps = value;
+  }
 
   HomeViewModel(
       {@required HomeService homeService,
@@ -23,7 +30,7 @@ class HomeViewModel extends BaseViewModel {
   }
 
   Future<void> onNotificationReceived(Map<String, dynamic> message) async {
-     updateQuestionStatusN(message);
+    updateQuestionStatusN(message);
     if (message['data']['message'] != null) {
       await addMessage(message);
     }

@@ -534,8 +534,9 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             city: _locationController.text,
             state: _stateController.text,
             country: _country,
-            dateOfBirth: DateFormat("yyyy-MM-d")
-                .format(DateFormat('MMM d, yyyy').parse(_dateController.text)),
+            /*dateOfBirth: DateFormat("yyyy-MM-d")
+                .format(DateFormat('MMM d, yyyy').parse(_dateController.text)),*/
+            dateOfBirth: _dateController.text,
             birthTime: DateFormat("HH:mm")
                 .format(DateFormat("hh:mm a").parse(_timeController.text)),
             accurateTime: _timeAccurate),
@@ -595,8 +596,9 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
       _locationController.text = user.city;
       _timeController.text = DateFormat("hh:mm a")
           .format(DateFormat("HH:mm").parse(user.birthTime));
-      _dateController.text = DateFormat.yMMMd()
-          .format(DateFormat("yyyy-MM-d").parse(user.dateOfBirth));
+      _dateController.text = user.dateOfBirth;
+      /* _dateController.text = DateFormat.yMMMd()
+          .format(DateFormat("yyyy-MM-d").parse(user.dateOfBirth));*/
       _emailController.text = user.email;
       _phoneController.text = user.phoneNumber;
       _stateController.text = user.state;

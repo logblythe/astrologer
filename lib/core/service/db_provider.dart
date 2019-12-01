@@ -21,8 +21,6 @@ const String DOB = "dateOfBirth";
 const String BIRTH_TIME = "birthTime";
 const String ACC_TIME = "accurateTime";
 
-
-
 class DbProvider {
   Database db;
 
@@ -42,7 +40,7 @@ class DbProvider {
       Batch batch = database.batch();
       batch.execute(""" 
        create table if not exists user(
-         $ID integer primary key not null,
+         $ID integer primary key autoincrement,
          $USER_ID integer,
          $FIRST_NAME text,
          $LAST_NAME text,
@@ -84,6 +82,7 @@ class DbProvider {
   }
 
   Future<int> addUser(UserModel user) async {
+    print('user details ${user.toMapForDb()}');
     final db = await database;
     return db.insert(
       'user',
@@ -115,7 +114,7 @@ class DbProvider {
 
   Future<int> addMessage(MessageModel message) async {
     final db = await database;
-    print('message is ${message.toString()}');
+    print('new message is ${message.toString()}');
     return db.insert(
       'messages',
       message.toMapForDb(),
@@ -161,6 +160,14 @@ class DbProvider {
     int _id = await db.rawUpdate(
         "UPDATE messages SET status = ? WHERE questionId = ?",
         [statusV, questionId]);
+    return _id;
+  }
+
+  Future<int> updateQuestionStatusById(int id, String statusV) async {
+    final db = await database;
+    int _id = await db.rawUpdate(
+        "UPDATE messages SET status = ? WHERE $ID = ?", [statusV, id]);
+    print(_id);
     return _id;
   }
 }

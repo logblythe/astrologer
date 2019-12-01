@@ -2,6 +2,7 @@ const String UNCLEAR = "unclear";
 const String CLEAR = "clear";
 const String UNASSIGNED = "unassigned";
 const String NOT_DELIVERED = "Not delivered";
+const String DELIVERED = "Delivered";
 
 const String ID = "id";
 const String MESSAGE = "message";
@@ -57,6 +58,7 @@ class MessageModel {
         QUESTION_ID: questionId,
         CREATED_AT: createdAt,
         ASTROLOGER_ID: astrologerId,
+        ID: id,
       };
 
   MessageModel.fromDb(Map<String, dynamic> json)

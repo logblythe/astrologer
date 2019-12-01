@@ -1,5 +1,5 @@
 import 'package:astrologer/core/view_model/view/home_view_model.dart';
-import 'package:astrologer/core/view_model/view/ideas_view.dart';
+import 'package:astrologer/ui/view/ideas_view.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/route_paths.dart';
 import 'package:astrologer/ui/shared/theme_stream.dart';
@@ -8,6 +8,7 @@ import 'package:astrologer/ui/widgets/user_details.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
@@ -99,6 +100,7 @@ class _HomeViewState extends State<HomeView> {
       homeService: Provider.of(context),
       sharedPrefHelper: Provider.of(context),
     );
+    _initIAPs(_homeViewModel);
   }
 
   @override
@@ -199,9 +201,9 @@ class _HomeViewState extends State<HomeView> {
               style: Theme.of(context).textTheme.body2,
             ),
             leading: Icon(Icons.message),
-            onTap: () {
-              _pageController.jumpToPage(0);
+            onTap: () async {
               Navigator.pop(context);
+              _pageController.jumpToPage(0);
             },
           ),
           ListTile(
@@ -210,18 +212,21 @@ class _HomeViewState extends State<HomeView> {
               style: Theme.of(context).textTheme.body2,
             ),
             leading: Icon(Icons.people),
-            onTap: () {
-              _pageController.jumpToPage(2);
+            onTap: () async {
               Navigator.pop(context);
+              _pageController.jumpToPage(2);
             },
           ),
           ListTile(
             title:
                 Text('What to ask?', style: Theme.of(context).textTheme.body2),
-            leading: Icon(Icons.check_circle),
-            onTap: () {
-              _pageController.jumpToPage(3);
+            leading: Icon(
+              Icons.check_circle,
+              color: Theme.of(context).primaryColor,
+            ),
+            onTap: () async{
               Navigator.pop(context);
+              _pageController.jumpToPage(3);
             },
           ),
           ListTile(
@@ -316,5 +321,23 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
     );
+  }
+
+  void _initIAPs(HomeViewModel model) async {
+    print('Init iaps');
+    var _purchaseInstance = FlutterInappPurchase.instance;
+    var result = await _purchaseInstance.initConnection;
+    print("Established IAP Connection..." + result);
+    try {
+      print('purchase instance');
+      model.iaps = await _purchaseInstance.getProducts(["666"]);
+      print('purchase instance ${model.iaps.length}');
+      for (var i = 0; i < model.iaps.length; ++i) {
+        print("the title ${model.iaps[i].title}");
+        print("the price ${model.iaps[i].price}");
+      }
+    } catch (e) {
+      print('we have error');
+    }
   }
 }

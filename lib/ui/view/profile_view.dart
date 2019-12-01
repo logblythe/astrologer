@@ -27,24 +27,19 @@ class _ProfileViewState extends State<ProfileView> {
       builder: (context, ProfileViewModel model, child) {
         return Container(
           decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(32),
-                topRight: Radius.circular(32),
-              )),
-          child: ClipRRect(
+            color: Colors.white,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(32),
               topRight: Radius.circular(32),
             ),
-            child: model.busy
-                ? Center(child: CircularProgressIndicator())
-                : UserDetails<ProfileViewModel>(
-                    key: widget.userDetailsKey,
-                    user: model.user,
-                    model: model,
-                  ),
           ),
+          child: model.busy
+              ? Center(child: CircularProgressIndicator())
+              : UserDetails<ProfileViewModel>(
+                  key: widget.userDetailsKey,
+                  user: model.user,
+                  model: model,
+                ),
         );
       },
     );

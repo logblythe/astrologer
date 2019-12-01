@@ -36,6 +36,10 @@ dependencies:
   firebase_core:
   firebase_messaging:
   flutter_local_notifications:
+  flutter_inapp_purchase:
+  sticky_headers:
+  expandable:
+
 
 dev_dependencies:
   flutter_test:

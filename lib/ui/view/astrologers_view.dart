@@ -28,7 +28,7 @@ class AstrologersView extends StatelessWidget {
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
                           'Our astrologers are genuine professionals trained to treat astrology like a sacred science. In their own lives in Nepal, they are known to combine simple, honest living with high thinking',
-                          style: Theme.of(context).textTheme.title,
+                          style: Theme.of(context).textTheme.subhead,
                         ),
                       ),
                       Divider(),
@@ -48,20 +48,21 @@ class AstrologersView extends StatelessWidget {
 
   ListView _buildListView(AstrologerViewModel model) {
     return ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: model.astrologers.length,
-        itemBuilder: (context, index) {
-          AstrologerModel _astrologer = model.astrologers[index];
-          return ListTile(
-            leading: CircleAvatar(
-              radius: 24.0,
-              backgroundImage: NetworkImage(_astrologer.profileImageUrl ??
-                  'https://via.placeholder.com/150'),
-              backgroundColor: Colors.transparent,
-            ),
-            title: Text("${_astrologer.firstName} ${_astrologer.lastName}"),
-          );
-        });
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: model.astrologers.length,
+      itemBuilder: (context, index) {
+        AstrologerModel _astrologer = model.astrologers[index];
+        return ListTile(
+          leading: CircleAvatar(
+            radius: 24.0,
+            backgroundImage: NetworkImage(_astrologer.profileImageUrl ??
+                'https://via.placeholder.com/150'),
+            backgroundColor: Colors.transparent,
+          ),
+          title: Text("${_astrologer.firstName} ${_astrologer.lastName}"),
+        );
+      },
+    );
   }
 }

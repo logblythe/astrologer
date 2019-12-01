@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/data_model/login_response.dart';

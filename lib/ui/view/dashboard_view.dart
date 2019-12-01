@@ -130,10 +130,10 @@ class _DashboardViewState extends State<DashboardView>
   }
 
   void addMessage(DashboardViewModel model) async {
-    var message = _messageController.text;
-    _messageController.clear();
+    var _message = MessageModel(message: _messageController.text, sent: true);
     _listKey.currentState.insertItem(0, duration: Duration(milliseconds: 500));
-    await model.addMessage(MessageModel(message: message, sent: true));
+    await model.addMessage(_message);
+    await model.askQuestion(_message);
   }
 
   @override
@@ -144,7 +144,6 @@ class _DashboardViewState extends State<DashboardView>
       userService: Provider.of(context),
       sharedPrefHelper: Provider.of(context),
     );
-    _messageController = TextEditingController();
     _messageFocusNode
       ..addListener(() {
         if (_messageFocusNode.hasFocus) {
@@ -158,6 +157,7 @@ class _DashboardViewState extends State<DashboardView>
   @override
   void initState() {
     super.initState();
+    _messageController = TextEditingController();
     _messageFocusNode = FocusNode();
   }
 
