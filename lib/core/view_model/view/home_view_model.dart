@@ -1,5 +1,7 @@
 import 'package:astrologer/core/data_model/message_model.dart';
+import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
+import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +9,19 @@ import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 
 class HomeViewModel extends BaseViewModel {
   final HomeService _homeService;
+  final UserService _userService;
   SharedPrefHelper _sharedPrefHelper;
   int userId;
+  int _index = 0;
+
+  int get index => _index;
+
+  UserModel get userModel => _userService.user;
+
+  set index(int value) {
+    _index = value;
+    notifyListeners();
+  }
 
   List<IAPItem> get iaps => _homeService.iaps;
 
@@ -18,8 +31,10 @@ class HomeViewModel extends BaseViewModel {
 
   HomeViewModel(
       {@required HomeService homeService,
+      @required UserService userService,
       @required SharedPrefHelper sharedPrefHelper})
       : _homeService = homeService,
+        _userService = userService,
         _sharedPrefHelper = sharedPrefHelper;
 
   Future<int> getUserId() async {
@@ -28,6 +43,8 @@ class HomeViewModel extends BaseViewModel {
     }
     return userId;
   }
+
+  getLoggedInUser() => _userService.getLoggedInUser();
 
   Future<void> onNotificationReceived(Map<String, dynamic> message) async {
     updateQuestionStatusN(message);

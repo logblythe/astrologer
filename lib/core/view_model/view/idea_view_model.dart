@@ -10,10 +10,18 @@ class IdeaViewModel extends BaseViewModel {
   IdeaViewModel({@required HomeService homeService})
       : _homeService = homeService;
 
-  List<IdeaModel> get ideas => ideaModelList;
+  List<IdeaModel> get ideas => _homeService.ideas;
 
   addMessageToSink(String message) {
     _homeService.addMsgToSink(message, true);
+  }
+
+  fetchIdeas() async {
+    setBusy(true);
+    _homeService.fetchIdeas();
+    Future.delayed(Duration(seconds: 1)).then((_) {
+      setBusy(false);
+    });
   }
 
   @override
@@ -21,5 +29,4 @@ class IdeaViewModel extends BaseViewModel {
     super.dispose();
     _homeService.dispose();
   }
-
 }

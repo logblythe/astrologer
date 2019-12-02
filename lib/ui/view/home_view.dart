@@ -4,6 +4,7 @@ import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/route_paths.dart';
 import 'package:astrologer/ui/shared/theme_stream.dart';
 import 'package:astrologer/ui/view/profile_view.dart';
+import 'package:astrologer/ui/widgets/profile_dialog.dart';
 import 'package:astrologer/ui/widgets/user_details.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
@@ -26,7 +27,6 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   String fcmToken;
-  int _index = 0;
   PageController _pageController;
   static GlobalKey<UserDetailsState> _formKey = GlobalKey();
   final FirebaseMessaging _fcm = FirebaseMessaging();
@@ -97,6 +97,7 @@ class _HomeViewState extends State<HomeView> {
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: onSelectNotification);
     _homeViewModel = HomeViewModel(
+      userService: Provider.of(context),
       homeService: Provider.of(context),
       sharedPrefHelper: Provider.of(context),
     );
@@ -106,92 +107,132 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return BaseWidget<HomeViewModel>(
-        model: _homeViewModel,
-        onModelReady: (model) {},
-        builder: (context, model, _) {
-          return Scaffold(
-              backgroundColor: Theme.of(context).primaryColor,
-              drawer: _buildDrawer(),
-              appBar: AppBar(
-                centerTitle: true,
-                elevation: 0,
-                title: Text(_children[_index]['title']),
-                actions: <Widget>[
-                  IconButton(
-                    icon: Icon(_children[_index]['action']),
-                    onPressed: () async {
-                      switch (_index) {
-                        case 0:
-                          _pageController.jumpToPage(1);
-                          break;
-
-                        case 1:
-                          if (await _formKey.currentState.updateUser()) {
-                            _pageController.jumpToPage(0);
-                          }
-                          break;
-                      }
-                    },
-                  )
-                ],
-              ),
-              body: WillPopScope(
-                child: PageView(
-                  physics: NeverScrollableScrollPhysics(),
-                  controller: _pageController,
-                  children: [
-                    DashboardView(),
-                    ProfileView(
-                      userDetailsKey: _formKey,
-                      themeStream: widget.themeStream,
-                    ),
-                    AstrologersView(),
-                    IdeasView(
-                      onTap: () {
-                        _pageController.jumpToPage(0);
-                      },
-                    ),
-                  ],
-                  scrollDirection: Axis.horizontal,
-                  onPageChanged: (page) {
-                    setState(() {
-                      _index = page;
-                    });
-                  },
-                ),
-                onWillPop: _onWillPop,
-              ));
-        });
+      model: _homeViewModel,
+      onModelReady: (_homeViewModel) => _homeViewModel.getLoggedInUser(),
+      builder: (context, HomeViewModel model, _) => Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
+        drawer: _buildDrawer(model),
+        appBar: AppBar(
+          centerTitle: true,
+          elevation: 0,
+          title: Text(_children[model.index]['title']),
+          actions: <Widget>[_buildIconButton(model)],
+        ),
+        body: _buildWillPopScope(model),
+      ),
+    );
   }
 
-  Drawer _buildDrawer() {
+  IconButton _buildIconButton(HomeViewModel model) {
+    return IconButton(
+      icon: Icon(_children[model.index]['action']),
+      onPressed: () async {
+        switch (model.index) {
+          case 0:
+            showDialog(
+              context: context,
+              builder: (context) => ProfileDialog(userModel: model.userModel),
+            );
+//            _onDrawerTap(model, 1, shouldPop: false);
+            break;
+          case 1:
+            if (await _formKey.currentState.updateUser()) {
+              _onDrawerTap(model, 0, shouldPop: false);
+            }
+            break;
+        }
+      },
+    );
+  }
+
+  WillPopScope _buildWillPopScope(HomeViewModel model) {
+    return WillPopScope(
+      onWillPop: () {
+        if (model.index != 0) {
+          _pageController.jumpTo(0);
+          return null;
+        } else {
+          return showDialog(
+                context: context,
+                builder: (context) => new AlertDialog(
+                  title: new Text('Are you sure?'),
+                  content: new Text('Do you want to exit an App'),
+                  actions: <Widget>[
+                    new FlatButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop(false);
+                        var androidPlatformChannelSpecifics =
+                            AndroidNotificationDetails('your channel id',
+                                'your channel name', 'your channel description',
+                                importance: Importance.Max,
+                                priority: Priority.High,
+                                ticker: 'ticker');
+                        var iOSPlatformChannelSpecifics =
+                            IOSNotificationDetails();
+                        var platformChannelSpecifics = NotificationDetails(
+                            androidPlatformChannelSpecifics,
+                            iOSPlatformChannelSpecifics);
+                        await flutterLocalNotificationsPlugin.show(
+                            0,
+                            'plain title',
+                            'plain body',
+                            platformChannelSpecifics,
+                            payload: 'item x');
+                      },
+                      child: new Text('No'),
+                    ),
+                    new FlatButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: new Text('Yes'),
+                    ),
+                  ],
+                ),
+              ) ??
+              false;
+        }
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16), topRight: Radius.circular(16)),
+        child: PageView(
+          physics: NeverScrollableScrollPhysics(),
+          controller: _pageController,
+          children: [
+            DashboardView(),
+            ProfileView(
+              userDetailsKey: _formKey,
+              themeStream: widget.themeStream,
+            ),
+            AstrologersView(),
+            IdeasView(onTap: () => _onDrawerTap(model, 0, shouldPop: false)),
+          ],
+          scrollDirection: Axis.horizontal,
+        ),
+      ),
+    );
+  }
+
+  Drawer _buildDrawer(HomeViewModel model) {
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
           Container(height: 80, color: Theme.of(context).primaryColor),
           Container(
-              color: Theme.of(context).primaryColor,
-              child: ListTile(
-                  title: Text(
-                    'Free questions',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  trailing: Text(
-                    '0',
-                    style: TextStyle(color: Colors.white),
-                  ))),
+            color: Theme.of(context).primaryColor,
+            child: ListTile(
+              title:
+                  Text('Free questions', style: TextStyle(color: Colors.white)),
+              trailing: Text('0', style: TextStyle(color: Colors.white)),
+            ),
+          ),
           Container(
               color: Colors.grey,
               child: ListTile(
-                  title: Text(
-                    'Question price',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  trailing: Text(
-                    '\$0.99',
-                    style: TextStyle(color: Colors.white),
-                  ))),
+                title: Text('Question price',
+                    style: TextStyle(color: Colors.white)),
+                trailing: Text('\$0.99', style: TextStyle(color: Colors.white)),
+              )),
           ListTile(
               title: Text('About Astrology',
                   style: TextStyle(color: Theme.of(context).disabledColor))),
@@ -201,10 +242,7 @@ class _HomeViewState extends State<HomeView> {
               style: Theme.of(context).textTheme.body2,
             ),
             leading: Icon(Icons.message),
-            onTap: () async {
-              Navigator.pop(context);
-              _pageController.jumpToPage(0);
-            },
+            onTap: () => _onDrawerTap(model, 0),
           ),
           ListTile(
             title: Text(
@@ -212,10 +250,7 @@ class _HomeViewState extends State<HomeView> {
               style: Theme.of(context).textTheme.body2,
             ),
             leading: Icon(Icons.people),
-            onTap: () async {
-              Navigator.pop(context);
-              _pageController.jumpToPage(2);
-            },
+            onTap: () => _onDrawerTap(model, 2),
           ),
           ListTile(
             title:
@@ -224,10 +259,7 @@ class _HomeViewState extends State<HomeView> {
               Icons.check_circle,
               color: Theme.of(context).primaryColor,
             ),
-            onTap: () async{
-              Navigator.pop(context);
-              _pageController.jumpToPage(3);
-            },
+            onTap: () => _onDrawerTap(model, 3),
           ),
           ListTile(
               title: Text('Help &, Settings',
@@ -253,45 +285,10 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Future<bool> _onWillPop() {
-    if (_index != 0) {
-      _pageController.jumpTo(0);
-      return null;
-    } else {
-      return showDialog(
-            context: context,
-            builder: (context) => new AlertDialog(
-              title: new Text('Are you sure?'),
-              content: new Text('Do you want to exit an App'),
-              actions: <Widget>[
-                new FlatButton(
-                  onPressed: () async {
-                    Navigator.of(context).pop(false);
-                    var androidPlatformChannelSpecifics =
-                        AndroidNotificationDetails('your channel id',
-                            'your channel name', 'your channel description',
-                            importance: Importance.Max,
-                            priority: Priority.High,
-                            ticker: 'ticker');
-                    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-                    var platformChannelSpecifics = NotificationDetails(
-                        androidPlatformChannelSpecifics,
-                        iOSPlatformChannelSpecifics);
-                    await flutterLocalNotificationsPlugin.show(0, 'plain title',
-                        'plain body', platformChannelSpecifics,
-                        payload: 'item x');
-                  },
-                  child: new Text('No'),
-                ),
-                new FlatButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: new Text('Yes'),
-                ),
-              ],
-            ),
-          ) ??
-          false;
-    }
+  void _onDrawerTap(HomeViewModel model, int index, {bool shouldPop = true}) {
+    model.index = index;
+    _pageController.jumpToPage(index);
+    if (shouldPop) Navigator.pop(context);
   }
 
   Future onSelectNotification(String payload) async {

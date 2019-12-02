@@ -1,4 +1,6 @@
+import 'package:astrologer/core/constants/what_to_ask.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
+import 'package:astrologer/core/data_model/idea_model.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
@@ -14,6 +16,7 @@ class HomeService {
   int _id;
   List<IAPItem> _iaps;
   FlutterInappPurchase _iap;
+  List<IdeaModel> _ideas;
 
   PublishSubject<MessageAndUpdate> _newMessage = PublishSubject();
 
@@ -22,6 +25,8 @@ class HomeService {
   FlutterInappPurchase get iap => _iap;
 
   List<IAPItem> get iaps => _iaps;
+
+  get ideas => _ideas;
 
   set iaps(List<IAPItem> value) {
     _iaps = value;
@@ -32,17 +37,22 @@ class HomeService {
 
   HomeService({DbProvider db, Api api})
       : _dbProvider = db,
-        _api = api {
-    _iap = FlutterInappPurchase.instance;
-  }
+        _api = api;
 
-  List<MessageModel> get messages =>
-      _messages == null ? _messages : List.from(_messages);
+  List<MessageModel> get messages => _messages;
 
   List<AstrologerModel> get astrologers => _astrologers;
 
+  Future<void> fetchIdeas() async {
+    if (_ideas == null) {
+      _ideas = [];
+      _ideas.addAll(ideaModelList);
+    }
+  }
+
   Future<void> init({String welcomeMessage, int userId}) async {
     _messages = [];
+    _iap = FlutterInappPurchase.instance;
     if (welcomeMessage != null) {
       addMessage(MessageModel(message: welcomeMessage, sent: false), userId);
     } else {

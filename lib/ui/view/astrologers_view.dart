@@ -1,6 +1,9 @@
+import 'package:astrologer/core/constants/what_to_ask.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/view_model/view/astrologer_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
+import 'package:astrologer/ui/shared/ui_helpers.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,56 +16,126 @@ class AstrologersView extends StatelessWidget {
       builder: (context, model, child) {
         return Container(
           decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(32),
-                topRight: Radius.circular(32),
-              )),
-          child: model.busy
-              ? const Center(child: const CircularProgressIndicator())
-              : (model.astrologers == null || model.astrologers.isEmpty)
-                  ? const Center(
-                      child: const Text('No astrologer found at the moment'))
-                  : ListView(children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          'Our astrologers are genuine professionals trained to treat astrology like a sacred science. In their own lives in Nepal, they are known to combine simple, honest living with high thinking',
-                          style: Theme.of(context).textTheme.subhead,
-                        ),
-                      ),
-                      Divider(),
-                      ListTile(
-                          title: Text(
-                            'Why astrologers?',
-                            style: Theme.of(context).textTheme.body1,
-                          ),
-                          leading: Icon(Icons.people)),
-                      Divider(),
-                      _buildListView(model),
-                    ]),
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16),
+              topRight: Radius.circular(16),
+            ),
+          ),
+          child: ListView(
+            children: <Widget>[
+              _buildHeader(context),
+              _buildCard(context),
+              _buildAstrologerList(model, context),
+            ],
+          ),
         );
       },
     );
   }
 
-  ListView _buildListView(AstrologerViewModel model) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: model.astrologers.length,
-      itemBuilder: (context, index) {
-        AstrologerModel _astrologer = model.astrologers[index];
-        return ListTile(
-          leading: CircleAvatar(
-            radius: 24.0,
-            backgroundImage: NetworkImage(_astrologer.profileImageUrl ??
-                'https://via.placeholder.com/150'),
-            backgroundColor: Colors.transparent,
-          ),
-          title: Text("${_astrologer.firstName} ${_astrologer.lastName}"),
-        );
-      },
+  Widget _buildHeader(context) {
+    return Card(
+      margin: EdgeInsets.all(12.0),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: 200,
+              child: ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                child: Image.asset(
+                  'assets/images/crystal_ball.gif',
+                  fit: BoxFit.fitWidth,
+                ),
+              ),
+            ),
+            UIHelper.verticalSpaceMedium,
+            Text(
+              'Our astrologers are genuine professionals trained to treat astrology like a sacred science. In their own lives in Nepal, they are known to combine simple, honest living with high thinking',
+              style: Theme.of(context).textTheme.subhead,
+              softWrap: true,
+            ),
+          ],
+        ),
+      ),
     );
+  }
+
+  Card _buildCard(BuildContext context) {
+    return Card(
+      semanticContainer: false,
+      margin: EdgeInsets.all(12.0),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ExpandablePanel(
+          header: Row(
+            children: <Widget>[
+              Image.asset('assets/images/fortune_teller.png'),
+              Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Text(
+                  'Why COSMOS?',
+                  style: Theme.of(context).textTheme.headline,
+                ),
+              ),
+            ],
+          ),
+          expanded: Text(
+            whyCosmos,
+            style: TextStyle(height: 1.5),
+          ),
+          hasIcon: false,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAstrologerList(AstrologerViewModel model, BuildContext context) {
+    return model.busy
+        ? const Center(child: const CircularProgressIndicator())
+        : (model.astrologers == null || model.astrologers.isEmpty)
+            ? const Center(
+                child: const Text('No astrologer found at the moment'))
+            : Card(
+                margin: EdgeInsets.all(12),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: Colors.grey[200]),
+                      child: Text(
+                        'Our Astrologers',
+                        style: Theme.of(context).textTheme.caption,
+                      ),
+                    ),
+                    ListView.separated(
+                      separatorBuilder: (context, index) =>
+                          index == model.astrologers.length - 1
+                              ? Container()
+                              : Divider(),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: model.astrologers.length,
+                      itemBuilder: (context, index) {
+                        AstrologerModel _astrologer = model.astrologers[index];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            radius: 20.0,
+                            backgroundImage: NetworkImage(
+                                _astrologer.profileImageUrl ??
+                                    'https://via.placeholder.com/150'),
+                            backgroundColor: Colors.transparent,
+                          ),
+                          title: Text(
+                              "${_astrologer.firstName} ${_astrologer.lastName}"),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              );
   }
 }

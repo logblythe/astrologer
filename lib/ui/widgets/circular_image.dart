@@ -22,7 +22,7 @@ class _CircularImageState extends State<CircularImage> {
   Widget build(BuildContext context) {
     return InkWell(
       child: CircleAvatar(
-        radius: 64,
+        radius: 56,
         child: _image == null
             ? Icon(Icons.person)
             : Container(

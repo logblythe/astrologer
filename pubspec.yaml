@@ -39,6 +39,7 @@ dependencies:
   flutter_inapp_purchase:
   sticky_headers:
   expandable:
+  random_color:
 
 
 dev_dependencies:
@@ -56,6 +57,9 @@ flutter:
 
   assets:
     - assets/images/splash_image.jpg
+    - assets/images/idea.gif
+    - assets/images/crystal_ball.gif
+    - assets/images/fortune_teller.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

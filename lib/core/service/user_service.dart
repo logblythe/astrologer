@@ -12,10 +12,14 @@ class UserService {
   final Api _api;
   final DbProvider _db;
   LoginResponse _loginResponse;
+  UserModel _user;
+
   String fcmToken;
   final FirebaseMessaging _fcm = FirebaseMessaging();
 
   LoginResponse get loginResponse => _loginResponse;
+  UserModel get user => _user;
+
 
   UserService({Api api, DbProvider dbProvider})
       : _api = api,
@@ -42,6 +46,11 @@ class UserService {
   }
 
   Future<bool> userExists() => _db.userExists();
+
+  Future<UserModel> getLoggedInUser() async {
+    _user = await _db.getLoggedInUser();
+    return _user;
+  }
 
   Future<UserModel> register(
       Gender gender,

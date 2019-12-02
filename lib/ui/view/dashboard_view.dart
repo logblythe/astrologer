@@ -35,8 +35,8 @@ class _DashboardViewState extends State<DashboardView>
             decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32))),
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16))),
             child: model.messages == null
                 ? const Center(child: const CircularProgressIndicator())
                 : Column(
