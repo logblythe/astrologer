@@ -10,7 +10,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 
 import 'astrologers_view.dart';
@@ -26,36 +25,25 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  String fcmToken;
   PageController _pageController;
   static GlobalKey<UserDetailsState> _formKey = GlobalKey();
   final FirebaseMessaging _fcm = FirebaseMessaging();
   HomeViewModel _homeViewModel;
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   final List<Map<String, dynamic>> _children = [
     {
       'title': 'Dashboard',
       'action': Icons.person_pin,
     },
-    {
-      'title': 'Birth Profile',
-      'action': Icons.check_circle,
-    },
+    {'title': 'Birth Profile'},
     {'title': 'Astrologers'},
     {'title': 'Ideas to ask'},
   ];
-
-  void _getToken() async {
-    fcmToken = await _fcm.getToken();
-    print('the token is $fcmToken');
-  }
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
-    _getToken();
     _fcm.configure(
       onMessage: (Map<String, dynamic> message) async =>
           _onNotificationReceived(message),
@@ -68,38 +56,16 @@ class _HomeViewState extends State<HomeView> {
 
   void _onNotificationReceived(Map<String, dynamic> message) async {
     await _homeViewModel.onNotificationReceived(message);
-    /* showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          content: ListTile(
-            title: Text(message['data']['title']),
-            subtitle: Text(message['data']['body']),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Ok'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
-        ));*/
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
-    var initializationSettingsAndroid =
-        new AndroidInitializationSettings('app_icon');
-    var initializationSettingsIOS = new IOSInitializationSettings(
-        onDidReceiveLocalNotification: onDidReceiveLocalNotification);
-    var initializationSettings = new InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
-    flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: onSelectNotification);
     _homeViewModel = HomeViewModel(
       userService: Provider.of(context),
       homeService: Provider.of(context),
       sharedPrefHelper: Provider.of(context),
+      localNotificationHelper: Provider.of(context),
     );
     _initIAPs(_homeViewModel);
   }
@@ -109,17 +75,20 @@ class _HomeViewState extends State<HomeView> {
     return BaseWidget<HomeViewModel>(
       model: _homeViewModel,
       onModelReady: (_homeViewModel) => _homeViewModel.getLoggedInUser(),
-      builder: (context, HomeViewModel model, _) => Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
-        drawer: _buildDrawer(model),
-        appBar: AppBar(
-          centerTitle: true,
-          elevation: 0,
-          title: Text(_children[model.index]['title']),
-          actions: <Widget>[_buildIconButton(model)],
-        ),
-        body: _buildWillPopScope(model),
-      ),
+      builder: (context, HomeViewModel model, _) =>
+          Scaffold(
+            backgroundColor: Theme
+                .of(context)
+                .primaryColor,
+            drawer: _buildDrawer(model),
+            appBar: AppBar(
+              centerTitle: true,
+              elevation: 0,
+              title: Text(_children[model.index]['title']),
+              actions: <Widget>[_buildIconButton(model)],
+            ),
+            body: _buildWillPopScope(model),
+          ),
     );
   }
 
@@ -133,7 +102,6 @@ class _HomeViewState extends State<HomeView> {
               context: context,
               builder: (context) => ProfileDialog(userModel: model.userModel),
             );
-//            _onDrawerTap(model, 1, shouldPop: false);
             break;
           case 1:
             if (await _formKey.currentState.updateUser()) {
@@ -153,41 +121,26 @@ class _HomeViewState extends State<HomeView> {
           return null;
         } else {
           return showDialog(
-                context: context,
-                builder: (context) => new AlertDialog(
-                  title: new Text('Are you sure?'),
-                  content: new Text('Do you want to exit an App'),
-                  actions: <Widget>[
-                    new FlatButton(
-                      onPressed: () async {
-                        Navigator.of(context).pop(false);
-                        var androidPlatformChannelSpecifics =
-                            AndroidNotificationDetails('your channel id',
-                                'your channel name', 'your channel description',
-                                importance: Importance.Max,
-                                priority: Priority.High,
-                                ticker: 'ticker');
-                        var iOSPlatformChannelSpecifics =
-                            IOSNotificationDetails();
-                        var platformChannelSpecifics = NotificationDetails(
-                            androidPlatformChannelSpecifics,
-                            iOSPlatformChannelSpecifics);
-                        await flutterLocalNotificationsPlugin.show(
-                            0,
-                            'plain title',
-                            'plain body',
-                            platformChannelSpecifics,
-                            payload: 'item x');
-                      },
-                      child: new Text('No'),
-                    ),
-                    new FlatButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: new Text('Yes'),
-                    ),
-                  ],
+            context: context,
+            builder: (context) =>
+            new AlertDialog(
+              title: new Text('Are you sure?'),
+              content: new Text('Do you want to exit an App'),
+              actions: <Widget>[
+                new FlatButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop(false);
+                    model.showLocalNotification("title", "body");
+                  },
+                  child: new Text('No'),
                 ),
-              ) ??
+                new FlatButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: new Text('Yes'),
+                ),
+              ],
+            ),
+          ) ??
               false;
         }
       },
@@ -217,12 +170,16 @@ class _HomeViewState extends State<HomeView> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          Container(height: 80, color: Theme.of(context).primaryColor),
+          Container(height: 80, color: Theme
+              .of(context)
+              .primaryColor),
           Container(
-            color: Theme.of(context).primaryColor,
+            color: Theme
+                .of(context)
+                .primaryColor,
             child: ListTile(
               title:
-                  Text('Free questions', style: TextStyle(color: Colors.white)),
+              Text('Free questions', style: TextStyle(color: Colors.white)),
               trailing: Text('0', style: TextStyle(color: Colors.white)),
             ),
           ),
@@ -235,11 +192,16 @@ class _HomeViewState extends State<HomeView> {
               )),
           ListTile(
               title: Text('About Astrology',
-                  style: TextStyle(color: Theme.of(context).disabledColor))),
+                  style: TextStyle(color: Theme
+                      .of(context)
+                      .disabledColor))),
           ListTile(
             title: Text(
               'Dashboard',
-              style: Theme.of(context).textTheme.body2,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .body2,
             ),
             leading: Icon(Icons.message),
             onTap: () => _onDrawerTap(model, 0),
@@ -247,23 +209,33 @@ class _HomeViewState extends State<HomeView> {
           ListTile(
             title: Text(
               'Astrologers',
-              style: Theme.of(context).textTheme.body2,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .body2,
             ),
             leading: Icon(Icons.people),
             onTap: () => _onDrawerTap(model, 2),
           ),
           ListTile(
             title:
-                Text('What to ask?', style: Theme.of(context).textTheme.body2),
+            Text('What to ask?', style: Theme
+                .of(context)
+                .textTheme
+                .body2),
             leading: Icon(
               Icons.check_circle,
-              color: Theme.of(context).primaryColor,
+              color: Theme
+                  .of(context)
+                  .primaryColor,
             ),
             onTap: () => _onDrawerTap(model, 3),
           ),
           ListTile(
               title: Text('Help &, Settings',
-                  style: TextStyle(color: Theme.of(context).disabledColor))),
+                  style: TextStyle(color: Theme
+                      .of(context)
+                      .disabledColor))),
           ListTile(
               title: Text('Customer support'), leading: Icon(Icons.people)),
           ListTile(title: Text('How yodha works'), leading: Icon(Icons.people)),
@@ -279,19 +251,25 @@ class _HomeViewState extends State<HomeView> {
           ListTile(
               title: Text(
                   'Our mission is to make Vedic astrology accssible to all people to help them attain positive changes in their lives.',
-                  style: Theme.of(context).textTheme.body1)),
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .body1)),
         ],
       ),
     );
   }
 
   void _onDrawerTap(HomeViewModel model, int index, {bool shouldPop = true}) {
+    FocusScope.of(context).unfocus();
     model.index = index;
-    _pageController.jumpToPage(index);
-    if (shouldPop) Navigator.pop(context);
+    _pageController.jumpToPage(model.index);
+    if (shouldPop) {
+      Navigator.pop(context);
+    }
   }
 
-  Future onSelectNotification(String payload) async {
+/*Future onSelectNotification(String payload) async {
     if (payload != null) {
       debugPrint('notification payload: ' + payload);
     }
@@ -318,7 +296,7 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
     );
-  }
+}*/
 
   void _initIAPs(HomeViewModel model) async {
     print('Init iaps');

@@ -2,6 +2,7 @@ import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
+import 'package:astrologer/core/utils/local_notification_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/material.dart';
@@ -10,9 +11,28 @@ import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 class HomeViewModel extends BaseViewModel {
   final HomeService _homeService;
   final UserService _userService;
-  SharedPrefHelper _sharedPrefHelper;
+  final SharedPrefHelper _sharedPrefHelper;
+  final LocalNotificationHelper _localNotificationHelper;
   int userId;
   int _index = 0;
+
+  HomeViewModel(
+      {@required HomeService homeService,
+      @required UserService userService,
+      @required SharedPrefHelper sharedPrefHelper,
+      @required LocalNotificationHelper localNotificationHelper})
+      : _homeService = homeService,
+        _userService = userService,
+        _localNotificationHelper = localNotificationHelper,
+        _sharedPrefHelper = sharedPrefHelper {
+    _localNotificationHelper.onSelectionNotification = (payload) {
+      print('hello world');
+    };
+    _localNotificationHelper.onReceiveLocalNotification =
+        (id, title, body, payload) {
+      print("hello world 2");
+    };
+  }
 
   int get index => _index;
 
@@ -28,14 +48,6 @@ class HomeViewModel extends BaseViewModel {
   set iaps(List<IAPItem> value) {
     _homeService.iaps = value;
   }
-
-  HomeViewModel(
-      {@required HomeService homeService,
-      @required UserService userService,
-      @required SharedPrefHelper sharedPrefHelper})
-      : _homeService = homeService,
-        _userService = userService,
-        _sharedPrefHelper = sharedPrefHelper;
 
   Future<int> getUserId() async {
     if (userId == null) {
@@ -73,5 +85,9 @@ class HomeViewModel extends BaseViewModel {
         ),
         userId);
     setBusy(false);
+  }
+
+  showLocalNotification(String title, String body) async {
+    await _localNotificationHelper.showNotification(title: title, body: body);
   }
 }

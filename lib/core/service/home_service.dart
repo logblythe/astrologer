@@ -57,8 +57,8 @@ class HomeService {
       addMessage(MessageModel(message: welcomeMessage, sent: false), userId);
     } else {
       List<MessageModel> messagesFromDb = await _dbProvider.getAllMessages();
-      messagesFromDb
-          .forEach((msg) => print('message status ${msg.id} ${msg.status}'));
+      messagesFromDb.forEach((msg) =>
+          print('message status ${msg.id} ${msg.status} ${msg.questionId}'));
       _messages.addAll(messagesFromDb);
     }
   }

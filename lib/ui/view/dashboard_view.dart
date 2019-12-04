@@ -37,14 +37,12 @@ class _DashboardViewState extends State<DashboardView>
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(16),
                     topRight: Radius.circular(16))),
-            child: model.messages == null
-                ? const Center(child: const CircularProgressIndicator())
-                : Column(
-                    children: <Widget>[
-                      buildListMessage(model),
-                      buildInput(model),
-                    ],
-                  ),
+            child: Column(
+              children: <Widget>[
+                buildListMessage(model),
+                buildInput(model),
+              ],
+            ),
           ),
         );
       },
@@ -53,28 +51,30 @@ class _DashboardViewState extends State<DashboardView>
 
   Widget buildListMessage(DashboardViewModel model) {
     return Expanded(
-      child: ClipRRect(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(32),
-          topRight: Radius.circular(32),
-        ),
-        child: AnimatedList(
-          key: _listKey,
-          initialItemCount: model.messages.length,
-          reverse: true,
-          shrinkWrap: true,
-          padding: EdgeInsets.all(8.0),
-          itemBuilder: (context, index, animation) {
-            MessageModel _message = model.messages[index];
-            return MessageItem(
-              message: _message,
-              animation: animation,
-              item: index,
-              onTap: () {},
-            );
-          },
-        ),
-      ),
+      child: model.busy
+          ? const Center(child: const CircularProgressIndicator())
+          : ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(32),
+                topRight: Radius.circular(32),
+              ),
+              child: AnimatedList(
+                key: _listKey,
+                initialItemCount: model.messages.length,
+                reverse: true,
+                shrinkWrap: true,
+                padding: EdgeInsets.all(8.0),
+                itemBuilder: (context, index, animation) {
+                  MessageModel _message = model.messages[index];
+                  return MessageItem(
+                    message: _message,
+                    animation: animation,
+                    item: index,
+                    onTap: () {},
+                  );
+                },
+              ),
+            ),
     );
   }
 
@@ -89,9 +89,7 @@ class _DashboardViewState extends State<DashboardView>
           child: Row(children: [
             Expanded(
               child: TextField(
-                onChanged: (text) {
-                  model.addMsgToSink(text, false);
-                },
+                onChanged: (text) => model.addMsgToSink(text, false),
                 focusNode: _messageFocusNode,
                 controller: _messageController,
                 decoration: InputDecoration(

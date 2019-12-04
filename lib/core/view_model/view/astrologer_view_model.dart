@@ -13,6 +13,7 @@ class AstrologerViewModel extends BaseViewModel {
   fetchAstrologers() async {
     setBusy(true);
     await _homeService.fetchAstrologers();
+    print('astrologer fetched after');
     setBusy(false);
   }
 }

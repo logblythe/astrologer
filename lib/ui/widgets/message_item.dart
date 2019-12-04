@@ -1,4 +1,5 @@
 import 'package:astrologer/core/data_model/message_model.dart';
+import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -26,37 +27,22 @@ class MessageItem extends StatelessWidget {
     TextStyle textStyle = Theme.of(context).textTheme.display1;
     if (selected)
       textStyle = textStyle.copyWith(color: Colors.lightGreenAccent[400]);
-    return Padding(
-      padding: EdgeInsets.only(top: message.sent ? 0 : 32),
-      child: Stack(
-        overflow: Overflow.visible,
-        fit: StackFit.loose,
-        alignment: message.sent ? Alignment.centerRight : Alignment.centerLeft,
-        children: [
-          message.sent
-              ? SizedBox.shrink()
-              : Positioned(
-                  bottom: 60,
-                  child: CircleAvatar(
-                    child: Text('A'),
-                  ),
-                ),
-          Container(
-            margin: message.sent
-                ? EdgeInsets.only(left: 24)
-                : EdgeInsets.only(left: 24, right: 24),
-            child: Column(
-              children: <Widget>[
+    return Container(
+      margin:
+          message.sent ? EdgeInsets.only(left: 24) : EdgeInsets.only(right: 24),
+      child: Column(
+        children: <Widget>[
 //                _buildQuestionId(),
-                _buildMessageColumn(context),
-                _buildStatus()
-              ],
-              crossAxisAlignment: message.sent
-                  ? CrossAxisAlignment.end
-                  : CrossAxisAlignment.start,
-            ),
+          message.sent ? SizedBox.shrink() : CircleAvatar(child: Text('A')),
+          Padding(
+            padding: message.sent ? EdgeInsets.zero : EdgeInsets.only(left: 20),
+            child: _buildMessageColumn(context),
           ),
+          _buildStatus(),
+          UIHelper.verticalSpaceMedium,
         ],
+        crossAxisAlignment:
+            message.sent ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       ),
     );
   }
@@ -73,10 +59,17 @@ class MessageItem extends StatelessWidget {
           right: message.sent ? 0 : 24,
         ),
         decoration: BoxDecoration(
-          /* border: Border.all(
-                      color: message.sent
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey),*/
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              blurRadius: 20, // has the effect of softening the shadow
+              spreadRadius: 1, // has the effect of extending the shadow
+              offset: Offset(
+                10, // horizontal, move right 10
+                10, // vertical, move down 10
+              ),
+            )
+          ],
           color: message.sent ? Theme.of(context).primaryColor : Colors.grey,
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(message.sent ? 24 : 0),

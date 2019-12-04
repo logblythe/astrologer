@@ -1,5 +1,4 @@
 import 'package:astrologer/core/data_model/idea_model.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 final String whyCosmos =

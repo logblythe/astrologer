@@ -1,4 +1,5 @@
 import 'package:astrologer/core/constants/what_to_ask.dart';
+import 'package:astrologer/core/data_model/idea_model.dart';
 import 'package:astrologer/core/view_model/view/idea_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
@@ -99,6 +100,7 @@ class IdeasView extends StatelessWidget {
   }
 
   _showIdeasDialog(int index, BuildContext context, IdeaViewModel model) {
+    IdeaModel _idea = ideaModelList[index];
     showDialog(
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(
@@ -108,36 +110,33 @@ class IdeasView extends StatelessWidget {
           child: Column(
             children: <Widget>[
               Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.all(Radius.circular(8.0))),
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    'Select your query',
-                    textAlign: TextAlign.center,
-                    textScaleFactor: 1.2,
-                  )),
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.all(Radius.circular(8.0))),
+                padding: EdgeInsets.all(16),
+                child: Text(
+                  'Select your query',
+                  textAlign: TextAlign.center,
+                  textScaleFactor: 1.2,
+                ),
+              ),
               Expanded(
                 child: ListView.separated(
                     separatorBuilder: (context, index) => Divider(
-                          height: (index == 0 ||
-                                  index == ideaModelList[1].children.length - 1)
-                              ? 0
-                              : 1,
+                          height: (index == _idea.children.length - 1) ? 0 : 1,
                         ),
                     shrinkWrap: true,
-                    itemCount: ideaModelList[1].children.length,
+                    itemCount: _idea.children.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(ideaModelList[1].children[index]),
+                        title: Text(_idea.children[index]),
                         trailing: const Icon(
                           Icons.send,
                           color: Colors.blue,
                         ),
                         onTap: () {
-                          model.addMessageToSink(
-                              ideaModelList[1].children[index]);
+                          model.addMessageToSink(_idea.children[index]);
                           Navigator.pop(context);
                           onTap();
                         },

@@ -1,4 +1,3 @@
-
 import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
@@ -13,17 +12,17 @@ class UserService {
   final DbProvider _db;
   LoginResponse _loginResponse;
   UserModel _user;
-
   String fcmToken;
-  final FirebaseMessaging _fcm = FirebaseMessaging();
+  FirebaseMessaging _fcm;
 
   LoginResponse get loginResponse => _loginResponse;
-  UserModel get user => _user;
 
+  UserModel get user => _user;
 
   UserService({Api api, DbProvider dbProvider})
       : _api = api,
         _db = dbProvider {
+    _fcm = FirebaseMessaging();
     _getFcmToken();
   }
 

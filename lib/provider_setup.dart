@@ -3,6 +3,7 @@ import 'package:astrologer/core/service/db_provider.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/profile_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
+import 'package:astrologer/core/utils/local_notification_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:provider/provider.dart';
 
@@ -15,7 +16,8 @@ List<SingleChildCloneableWidget> providers = [
 List<SingleChildCloneableWidget> independentServices = [
   Provider.value(value: Api()),
   Provider.value(value: SharedPrefHelper()),
-  Provider.value(value: DbProvider())
+  Provider.value(value: DbProvider()),
+  Provider.value(value: LocalNotificationHelper()),
 ];
 
 List<SingleChildCloneableWidget> dependentServices = [

@@ -34,10 +34,9 @@ dependencies:
   path_provider:
   rxdart:
   firebase_core:
-  firebase_messaging:
+  firebase_messaging: 6.0.1
   flutter_local_notifications:
   flutter_inapp_purchase:
-  sticky_headers:
   expandable:
   random_color:
 

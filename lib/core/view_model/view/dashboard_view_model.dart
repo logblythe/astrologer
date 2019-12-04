@@ -17,6 +17,14 @@ class DashboardViewModel extends BaseViewModel {
   String _messageBox;
   bool _showSendBtn = false;
 
+  DashboardViewModel(
+      {@required HomeService homeService,
+      @required UserService userService,
+      @required SharedPrefHelper sharedPrefHelper})
+      : this._homeService = homeService,
+        this._userService = userService,
+        this._sharedPrefHelper = sharedPrefHelper;
+
   bool get showSendBtn => _showSendBtn;
 
   set showSendBtn(bool value) {
@@ -35,14 +43,6 @@ class DashboardViewModel extends BaseViewModel {
 
   List<MessageModel> get messages => _homeService.messages?.reversed?.toList();
 
-  DashboardViewModel(
-      {@required HomeService homeService,
-      @required UserService userService,
-      @required SharedPrefHelper sharedPrefHelper})
-      : this._homeService = homeService,
-        this._userService = userService,
-        this._sharedPrefHelper = sharedPrefHelper;
-
   init() async {
     setBusy(true);
     userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
@@ -52,6 +52,8 @@ class DashboardViewModel extends BaseViewModel {
     await _homeService.init(
         welcomeMessage: loginResponse?.welcomeMessage, userId: userId);
     setupListeners();
+    print('Messages are $messages ${messages.length}');
+    print('Messages are ${messages.length}');
     setBusy(false);
   }
 

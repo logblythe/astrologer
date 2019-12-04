@@ -1,4 +1,3 @@
-
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/profile_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';

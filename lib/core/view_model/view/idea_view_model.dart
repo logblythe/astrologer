@@ -1,4 +1,3 @@
-import 'package:astrologer/core/constants/what_to_ask.dart';
 import 'package:astrologer/core/data_model/idea_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
