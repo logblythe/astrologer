@@ -20,7 +20,7 @@ class IdeasView extends StatelessWidget {
       builder: (context, model, _) {
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).backgroundColor,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),

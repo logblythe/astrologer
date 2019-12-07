@@ -58,6 +58,7 @@ flutter:
     - assets/images/splash_image.jpg
     - assets/images/idea.gif
     - assets/images/crystal_ball.gif
+    - assets/images/settings.gif
     - assets/images/fortune_teller.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

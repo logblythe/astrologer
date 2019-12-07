@@ -1,15 +1,15 @@
+import 'package:rxdart/rxdart.dart';
 
-import 'dart:async';
+final theme = ThemeStream();
 
-class ThemeStream{
-  StreamController _controller=StreamController<bool>();
-  addValue(bool val){
-    _controller.sink.add(val);
-  }
-  Stream<bool> get getStream => _controller.stream;
+class ThemeStream {
+  BehaviorSubject _controller = BehaviorSubject<bool>();
 
-  dispose(){
-    _controller.close();
-  }
+  ValueObservable<bool> get themeStream => _controller.stream;
 
+  bool get getTheme => _controller.value;
+
+  changeValue(bool val) => _controller.sink.add(val);
+
+  dispose() => _controller.close();
 }

@@ -1,8 +1,8 @@
 import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
+import 'package:astrologer/core/service/settings_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
-import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
@@ -10,22 +10,24 @@ import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 class DashboardViewModel extends BaseViewModel {
   HomeService _homeService;
   UserService _userService;
-  SharedPrefHelper _sharedPrefHelper;
-  int userId;
+  SettingsService _settingsService;
+
   int _messageId;
   MessageModel _message;
   String _messageBox;
   bool _showSendBtn = false;
 
-  DashboardViewModel(
-      {@required HomeService homeService,
-      @required UserService userService,
-      @required SharedPrefHelper sharedPrefHelper})
-      : this._homeService = homeService,
+  DashboardViewModel({
+    @required HomeService homeService,
+    @required UserService userService,
+    @required SettingsService settingsService,
+  })  : this._homeService = homeService,
         this._userService = userService,
-        this._sharedPrefHelper = sharedPrefHelper;
+        this._settingsService = settingsService;
 
   bool get showSendBtn => _showSendBtn;
+
+  bool get darkModeEnabled => _settingsService.darkModeEnabled;
 
   set showSendBtn(bool value) {
     _showSendBtn = value;
@@ -45,15 +47,8 @@ class DashboardViewModel extends BaseViewModel {
 
   init() async {
     setBusy(true);
-    userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
-    if (loginResponse?.welcomeMessage != null) {
-      _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, 1);
-    }
-    await _homeService.init(
-        welcomeMessage: loginResponse?.welcomeMessage, userId: userId);
+    await _homeService.init(welcomeMessage: loginResponse?.welcomeMessage);
     setupListeners();
-    print('Messages are $messages ${messages.length}');
-    print('Messages are ${messages.length}');
     setBusy(false);
   }
 
@@ -77,7 +72,7 @@ class DashboardViewModel extends BaseViewModel {
   Future<void> addMessage(MessageModel message) async {
     setBusy(true);
     _homeService.addMsgToSink("", true);
-    _messageId = await _homeService.addMessage(message, userId);
+    _messageId = await _homeService.addMessage(message);
     setBusy(false);
   }
 
@@ -85,15 +80,7 @@ class DashboardViewModel extends BaseViewModel {
       {bool shouldCharge = true}) async {
     setBusy(true);
     _message = message;
-    int _freeCount =
-        await _sharedPrefHelper.getInteger(KEY_FREE_QUES_COUNT) ?? 0;
-    print('free count $_freeCount');
-    if (_freeCount > 0) {
-      await _homeService.askQuestion(_message, userId, true, shouldCharge);
-      _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, --_freeCount);
-    } else {
-      await _homeService.askQuestion(_message, userId, false, shouldCharge);
-    }
+    await _homeService.askQuestion(_message, shouldCharge);
     setBusy(false);
   }
 

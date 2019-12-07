@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
+import 'package:flutter/material.dart';
 
 class ProfileService {
   final DbProvider _db;
@@ -12,7 +13,7 @@ class ProfileService {
 
   UserModel get user => _user;
 
-  ProfileService({DbProvider db, Api api})
+  ProfileService({@required DbProvider db, @required Api api})
       : this._db = db,
         this._api = api;
 

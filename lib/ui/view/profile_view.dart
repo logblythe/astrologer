@@ -1,17 +1,14 @@
 import 'package:astrologer/core/view_model/view/profile_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
-import 'package:astrologer/ui/shared/theme_stream.dart';
 import 'package:astrologer/ui/widgets/circular_image.dart';
 import 'package:astrologer/ui/widgets/user_details.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ProfileView extends StatefulWidget {
-  final ThemeStream themeStream;
   final GlobalKey<UserDetailsState> userDetailsKey;
 
-  const ProfileView({Key key, this.themeStream, this.userDetailsKey})
-      : super(key: key);
+  const ProfileView({Key key, this.userDetailsKey}) : super(key: key);
 
   @override
   _ProfileViewState createState() => _ProfileViewState();

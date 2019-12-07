@@ -22,7 +22,10 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
   @override
   Widget build(BuildContext context) {
     return BaseWidget<LoginViewModel>(
-      model: LoginViewModel(userService: Provider.of(context)),
+      model: LoginViewModel(
+        userService: Provider.of(context),
+        homeService: Provider.of(context),
+      ),
       builder: (context, model, child) => Scaffold(
         body: Container(
           alignment: Alignment.center,
@@ -82,7 +85,9 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
             ),
             suffixIcon: IconButton(
               icon: Icon(Icons.remove_red_eye,
-                  color: model.obscureText ? Colors.grey : Colors.blueAccent),
+                  color: model.obscureText
+                      ? Colors.grey
+                      : Theme.of(context).accentColor),
               onPressed: () {
                 model.toggleObscureText();
               },

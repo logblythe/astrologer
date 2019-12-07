@@ -5,41 +5,56 @@ import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/cupertino.dart';
 
 class UserService {
   final Api _api;
   final DbProvider _db;
+  final SharedPrefHelper _sharedPrefHelper;
   LoginResponse _loginResponse;
   UserModel _user;
-  String fcmToken;
-  FirebaseMessaging _fcm;
+  String _fcmToken;
+  int _userId;
+
+  int get userId => _userId;
 
   LoginResponse get loginResponse => _loginResponse;
 
   UserModel get user => _user;
 
-  UserService({Api api, DbProvider dbProvider})
-      : _api = api,
-        _db = dbProvider {
-    _fcm = FirebaseMessaging();
+  UserService({
+    @required Api api,
+    @required DbProvider dbProvider,
+    @required SharedPrefHelper sharedPrefHelper,
+  })  : _api = api,
+        _db = dbProvider,
+        _sharedPrefHelper = sharedPrefHelper {
+    init();
+  }
+
+  init() async {
+    _userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
     _getFcmToken();
   }
 
-  void _getFcmToken() async {
-    fcmToken = await _fcm.getToken();
-    print('FCM TOKEN $fcmToken');
+  Future<String> _getFcmToken() async {
+    if (_fcmToken == null) {
+      _fcmToken = await FirebaseMessaging().getToken();
+    }
+    print('FCM TOKEN $_fcmToken');
+    return _fcmToken;
   }
 
   Future<LoginResponse> performLogin(String email, String password) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String fcmToken = await _getFcmToken();
     LoginResponse _loginResponse =
         await _api.performLogin(email, password, fcmToken);
     print('error is ${_loginResponse.error}');
     if (_loginResponse.error == null) {
       await _db.addUser(_loginResponse.user);
-      await sharedPreferences.setString(KEY_TOKEN, _loginResponse.token);
-      await sharedPreferences.setInt(KEY_USER_ID, _loginResponse.user.userId);
+      await _sharedPrefHelper.setString(KEY_TOKEN, _loginResponse.token);
+      await _sharedPrefHelper.setInt(KEY_USER_ID, _loginResponse.user.userId);
+      await _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, 1);
     }
     return _loginResponse;
   }

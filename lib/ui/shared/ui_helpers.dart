@@ -12,11 +12,28 @@ class UIHelper {
   static const double _HorizontalSpaceMedium = 20.0;
   static const double _HorizontalSpaceLarge = 60.0;
 
-  static const Widget verticalSpaceSmall = SizedBox(height: _VerticalSpaceSmall);
-  static const Widget verticalSpaceMedium = SizedBox(height: _VerticalSpaceMedium);
-  static const Widget verticalSpaceLarge = SizedBox(height: _VerticalSpaceLarge);
+  static const Widget verticalSpaceSmall =
+      SizedBox(height: _VerticalSpaceSmall);
+  static const Widget verticalSpaceMedium =
+      SizedBox(height: _VerticalSpaceMedium);
+  static const Widget verticalSpaceLarge =
+      SizedBox(height: _VerticalSpaceLarge);
 
-  static const Widget horizontalSpaceSmall = SizedBox(width: _HorizontalSpaceSmall);
-  static const Widget horizontalSpaceMedium = SizedBox(width: _HorizontalSpaceMedium);
-  static const Widget horizontalSpaceLarge = SizedBox(width: _HorizontalSpaceLarge);
+  static const Widget horizontalSpaceSmall =
+      SizedBox(width: _HorizontalSpaceSmall);
+  static const Widget horizontalSpaceMedium =
+      SizedBox(width: _HorizontalSpaceMedium);
+  static const Widget horizontalSpaceLarge =
+      SizedBox(width: _HorizontalSpaceLarge);
+
+  static ThemeData darkTheme = ThemeData(
+    primaryColor: Colors.black,
+    backgroundColor: Colors.grey[700],
+    brightness: Brightness.dark,
+  );
+  static ThemeData lightTheme = ThemeData(
+    primaryColor: Colors.blue,
+    backgroundColor: Colors.grey[200],
+    brightness: Brightness.light,
+  );
 }

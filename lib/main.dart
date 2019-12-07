@@ -1,6 +1,7 @@
 import 'package:astrologer/provider_setup.dart';
 import 'package:astrologer/router.dart';
 import 'package:astrologer/ui/shared/theme_stream.dart';
+import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:astrologer/ui/view/home_view.dart';
 import 'package:astrologer/ui/view/login_view.dart';
 import 'package:flutter/material.dart';
@@ -9,18 +10,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/utils/shared_pref_helper.dart';
 
 Future<void> main() async {
+//  debugPaintSizeEnabled=true;
   WidgetsFlutterBinding.ensureInitialized();
-  final ThemeStream theme = ThemeStream();
   final SharedPreferences sharedPref = await SharedPreferences.getInstance();
   final String token = sharedPref.getString(KEY_TOKEN);
-  runApp(MyApp(theme, token));
+  final bool darkModeEnabled = sharedPref.getBool(KEY_DARK_MODE_ENABLED);
+  runApp(MyApp(token, darkModeEnabled));
 }
 
 class MyApp extends StatefulWidget {
-  MyApp(this.theme, this.token);
+  MyApp(this.token, this.darkModeEnabled);
 
-  final ThemeStream theme;
   final String token;
+  final bool darkModeEnabled;
 
   @override
   _MyAppState createState() => _MyAppState();
@@ -30,24 +32,20 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<bool>(
-        stream: widget.theme.getStream,
-        initialData: false,
+        stream: theme.themeStream,
+        initialData: widget.darkModeEnabled,
         builder: (context, snapshot) {
           return MultiProvider(
             providers: providers,
             child: MaterialApp(
               title: 'Astrologer',
-              themeMode: snapshot.hasData && snapshot.data
-                  ? ThemeMode.dark
-                  : ThemeMode.light,
               theme: snapshot.hasData && snapshot.data
-                  ? ThemeData.dark()
-                  : ThemeData.light(),
+                  ? UIHelper.darkTheme
+                  : UIHelper.lightTheme,
               debugShowCheckedModeBanner: false,
               home: widget.token == null ? LoginView() : HomeView(),
 //              home: HomeView(),
-              onGenerateRoute: (settings) =>
-                  Router.generateRoute(settings, widget.theme),
+              onGenerateRoute: (settings) => Router.generateRoute(settings),
 //              initialRoute: RoutePaths.login, //commenting this cause it shows black screen initially
             ),
           );

@@ -6,17 +6,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class DashboardView extends StatefulWidget {
+  final GlobalKey<AnimatedListState> listKey;
+
+  const DashboardView({Key key, this.listKey}) : super(key: key);
+
   @override
   _DashboardViewState createState() => _DashboardViewState();
 }
 
 class _DashboardViewState extends State<DashboardView>
     with AutomaticKeepAliveClientMixin {
-  bool isShowSticker = false;
   TextEditingController _messageController;
   FocusNode _messageFocusNode;
   DashboardViewModel _dashboardViewModel;
-  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +33,15 @@ class _DashboardViewState extends State<DashboardView>
               TextSelection.collapsed(offset: _messageController.text.length);
         return GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
-          child: Container(
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 500),
             decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16))),
+              color: Theme.of(context).backgroundColor,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
             child: Column(
               children: <Widget>[
                 buildListMessage(model),
@@ -51,15 +56,17 @@ class _DashboardViewState extends State<DashboardView>
 
   Widget buildListMessage(DashboardViewModel model) {
     return Expanded(
-      child: model.busy
-          ? const Center(child: const CircularProgressIndicator())
+      child: model.messages.isEmpty
+          ? const Center(
+              child: Text('No messages'),
+            )
           : ClipRRect(
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(32),
                 topRight: Radius.circular(32),
               ),
               child: AnimatedList(
-                key: _listKey,
+                key: widget.listKey,
                 initialItemCount: model.messages.length,
                 reverse: true,
                 shrinkWrap: true,
@@ -67,6 +74,7 @@ class _DashboardViewState extends State<DashboardView>
                 itemBuilder: (context, index, animation) {
                   MessageModel _message = model.messages[index];
                   return MessageItem(
+                    darkMode: model.darkModeEnabled,
                     message: _message,
                     animation: animation,
                     item: index,
@@ -129,7 +137,9 @@ class _DashboardViewState extends State<DashboardView>
 
   void addMessage(DashboardViewModel model) async {
     var _message = MessageModel(message: _messageController.text, sent: true);
-    _listKey.currentState.insertItem(0, duration: Duration(milliseconds: 500));
+    final _listState = widget.listKey.currentState;
+    if (_listState != null)
+      _listState.insertItem(0, duration: Duration(milliseconds: 500));
     await model.addMessage(_message);
     await model.askQuestion(_message);
   }
@@ -140,7 +150,7 @@ class _DashboardViewState extends State<DashboardView>
     _dashboardViewModel = DashboardViewModel(
       homeService: Provider.of(context),
       userService: Provider.of(context),
-      sharedPrefHelper: Provider.of(context),
+      settingsService: Provider.of(context),
     );
     _messageFocusNode
       ..addListener(() {

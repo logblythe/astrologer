@@ -58,7 +58,7 @@ class ProfileDialog extends StatelessWidget {
             MaterialButton(
               padding: EdgeInsets.all(16),
               minWidth: MediaQuery.of(context).size.width / 1.4,
-              color: Colors.blue,
+              color: Theme.of(context).primaryColor,
               highlightColor: Colors.green,
               child: Text(
                 'OK',

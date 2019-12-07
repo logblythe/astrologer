@@ -1,9 +1,8 @@
 import 'package:astrologer/core/view_model/view/home_view_model.dart';
 import 'package:astrologer/ui/view/ideas_view.dart';
 import 'package:astrologer/ui/base_widget.dart';
-import 'package:astrologer/ui/shared/route_paths.dart';
-import 'package:astrologer/ui/shared/theme_stream.dart';
 import 'package:astrologer/ui/view/profile_view.dart';
+import 'package:astrologer/ui/view/settings_view.dart';
 import 'package:astrologer/ui/widgets/profile_dialog.dart';
 import 'package:astrologer/ui/widgets/user_details.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -15,11 +14,18 @@ import 'package:provider/provider.dart';
 import 'astrologers_view.dart';
 import 'dashboard_view.dart';
 
+final List<Map<String, dynamic>> _children = [
+  {
+    'title': 'Dashboard',
+    'action': Icons.person_pin,
+  },
+  {'title': 'Birth Profile'},
+  {'title': 'Astrologers'},
+  {'title': 'Ideas to ask'},
+  {'title': 'Settings'},
+];
+
 class HomeView extends StatefulWidget {
-  final ThemeStream themeStream;
-
-  const HomeView({Key key, this.themeStream}) : super(key: key);
-
   @override
   _HomeViewState createState() => _HomeViewState();
 }
@@ -27,18 +33,32 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   PageController _pageController;
   static GlobalKey<UserDetailsState> _formKey = GlobalKey();
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   final FirebaseMessaging _fcm = FirebaseMessaging();
   HomeViewModel _homeViewModel;
 
-  final List<Map<String, dynamic>> _children = [
-    {
-      'title': 'Dashboard',
-      'action': Icons.person_pin,
-    },
-    {'title': 'Birth Profile'},
-    {'title': 'Astrologers'},
-    {'title': 'Ideas to ask'},
-  ];
+  @override
+  Widget build(BuildContext context) {
+    return BaseWidget<HomeViewModel>(
+      model: _homeViewModel,
+      onModelReady: (_homeViewModel) async {
+        await _homeViewModel.getFreeQuesCount();
+        _homeViewModel.getLoggedInUser();
+        _homeViewModel.fetchQuestionPrice();
+      },
+      builder: (context, HomeViewModel model, _) => Scaffold(
+        backgroundColor: Theme.of(context).primaryColor,
+        drawer: _buildDrawer(model),
+        appBar: AppBar(
+          centerTitle: true,
+          elevation: 0,
+          title: Text(_children[model.index]['title']),
+          actions: <Widget>[_buildIconButton(model)],
+        ),
+        body: _buildWillPopScope(model),
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -54,42 +74,19 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  void _onNotificationReceived(Map<String, dynamic> message) async {
-    await _homeViewModel.onNotificationReceived(message);
-  }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _homeViewModel = HomeViewModel(
       userService: Provider.of(context),
       homeService: Provider.of(context),
-      sharedPrefHelper: Provider.of(context),
-      localNotificationHelper: Provider.of(context),
     );
     _initIAPs(_homeViewModel);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return BaseWidget<HomeViewModel>(
-      model: _homeViewModel,
-      onModelReady: (_homeViewModel) => _homeViewModel.getLoggedInUser(),
-      builder: (context, HomeViewModel model, _) =>
-          Scaffold(
-            backgroundColor: Theme
-                .of(context)
-                .primaryColor,
-            drawer: _buildDrawer(model),
-            appBar: AppBar(
-              centerTitle: true,
-              elevation: 0,
-              title: Text(_children[model.index]['title']),
-              actions: <Widget>[_buildIconButton(model)],
-            ),
-            body: _buildWillPopScope(model),
-          ),
-    );
+  void _onNotificationReceived(Map<String, dynamic> message) async {
+    _listKey.currentState.insertItem(0, duration: Duration(milliseconds: 500));
+    await _homeViewModel.onNotificationReceived(message);
   }
 
   IconButton _buildIconButton(HomeViewModel model) {
@@ -115,15 +112,31 @@ class _HomeViewState extends State<HomeView> {
 
   WillPopScope _buildWillPopScope(HomeViewModel model) {
     return WillPopScope(
-      onWillPop: () {
-        if (model.index != 0) {
-          _pageController.jumpTo(0);
-          return null;
-        } else {
-          return showDialog(
+      onWillPop: () => _onWillPop(model),
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+        child: PageView(
+          physics: NeverScrollableScrollPhysics(),
+          controller: _pageController,
+          children: _pageViewChildren(model),
+          scrollDirection: Axis.horizontal,
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _onWillPop(HomeViewModel model) {
+    if (model.index != 0) {
+      model.index = 0;
+      _pageController.jumpTo(0);
+      return null;
+    } else {
+      return showDialog(
             context: context,
-            builder: (context) =>
-            new AlertDialog(
+            builder: (context) => new AlertDialog(
               title: new Text('Are you sure?'),
               content: new Text('Do you want to exit an App'),
               actions: <Widget>[
@@ -141,120 +154,127 @@ class _HomeViewState extends State<HomeView> {
               ],
             ),
           ) ??
-              false;
-        }
-      },
-      child: ClipRRect(
-        borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16), topRight: Radius.circular(16)),
-        child: PageView(
-          physics: NeverScrollableScrollPhysics(),
-          controller: _pageController,
-          children: [
-            DashboardView(),
-            ProfileView(
-              userDetailsKey: _formKey,
-              themeStream: widget.themeStream,
-            ),
-            AstrologersView(),
-            IdeasView(onTap: () => _onDrawerTap(model, 0, shouldPop: false)),
-          ],
-          scrollDirection: Axis.horizontal,
-        ),
-      ),
-    );
+          false;
+    }
+  }
+
+  List<Widget> _pageViewChildren(HomeViewModel model) {
+    return [
+      DashboardView(listKey: _listKey),
+      ProfileView(userDetailsKey: _formKey),
+      AstrologersView(),
+      IdeasView(onTap: () => _onDrawerTap(model, 0, shouldPop: false)),
+      SettingsView(),
+    ];
   }
 
   Drawer _buildDrawer(HomeViewModel model) {
+    final freeCount = Provider.of<int>(context);
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          Container(height: 80, color: Theme
-              .of(context)
-              .primaryColor),
+          Container(height: 80, color: Theme.of(context).primaryColor),
           Container(
-            color: Theme
-                .of(context)
-                .primaryColor,
+            color: Theme.of(context).primaryColor,
             child: ListTile(
               title:
-              Text('Free questions', style: TextStyle(color: Colors.white)),
-              trailing: Text('0', style: TextStyle(color: Colors.white)),
+                  Text('Free questions', style: TextStyle(color: Colors.white)),
+              trailing: Text(freeCount?.toString(),
+                  style: TextStyle(color: Colors.white)),
             ),
           ),
           Container(
-              color: Colors.grey,
-              child: ListTile(
-                title: Text('Question price',
-                    style: TextStyle(color: Colors.white)),
-                trailing: Text('\$0.99', style: TextStyle(color: Colors.white)),
-              )),
+            padding: EdgeInsets.all(8),
+            color: Colors.grey,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('Question price',
+                      style: TextStyle(color: Colors.white)),
+                ),
+                model.discountInPercentage == null
+                    ? Container()
+                    : model.discountInPercentage.toInt() > 0
+                        ? RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              children: <TextSpan>[
+                                TextSpan(
+                                    text: '\$ ${model.priceAfterDiscount}\n',
+                                    style: TextStyle(height: 1.5)),
+                                TextSpan(
+                                  text: ' \$ ${model.questionPrice} ',
+                                  style: TextStyle(
+                                    decoration: TextDecoration.lineThrough,
+                                    height: 1.5,
+                                  ),
+                                ),
+                                TextSpan(
+                                    text:
+                                        '  (${model.discountInPercentage}% off)  ',
+                                    style: TextStyle(color: Colors.black45)),
+                              ],
+                            ),
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('\$ ${model.priceAfterDiscount}'),
+                          )
+              ],
+            ),
+          ),
           ListTile(
               title: Text('About Astrology',
-                  style: TextStyle(color: Theme
-                      .of(context)
-                      .disabledColor))),
+                  style: TextStyle(color: Theme.of(context).disabledColor))),
           ListTile(
             title: Text(
               'Dashboard',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .body2,
+              style: Theme.of(context).textTheme.body2,
             ),
-            leading: Icon(Icons.message),
+            leading: Icon(Icons.developer_board),
             onTap: () => _onDrawerTap(model, 0),
           ),
           ListTile(
             title: Text(
               'Astrologers',
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .body2,
+              style: Theme.of(context).textTheme.body2,
             ),
             leading: Icon(Icons.people),
             onTap: () => _onDrawerTap(model, 2),
           ),
           ListTile(
-            title:
-            Text('What to ask?', style: Theme
-                .of(context)
-                .textTheme
-                .body2),
-            leading: Icon(
-              Icons.check_circle,
-              color: Theme
-                  .of(context)
-                  .primaryColor,
+            title: Text(
+              'What to ask?',
+              style: Theme.of(context).textTheme.body2,
             ),
+            leading: Icon(Icons.help),
             onTap: () => _onDrawerTap(model, 3),
           ),
           ListTile(
-              title: Text('Help &, Settings',
-                  style: TextStyle(color: Theme
-                      .of(context)
-                      .disabledColor))),
+            title: Text(
+              'Help &, Settings',
+              style: TextStyle(color: Theme.of(context).disabledColor),
+            ),
+          ),
           ListTile(
-              title: Text('Customer support'), leading: Icon(Icons.people)),
-          ListTile(title: Text('How yodha works'), leading: Icon(Icons.people)),
-          ListTile(title: Text('Terms & privacy'), leading: Icon(Icons.people)),
+              title: Text('Customer support'),
+              leading: Icon(Icons.nature_people)),
           ListTile(
-            title: Text('Logout'),
-            leading: Icon(Icons.swap_horiz),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.popAndPushNamed(context, RoutePaths.login);
-            },
+              title: Text('How Cosmos works?'),
+              leading: Icon(Icons.business_center)),
+          ListTile(title: Text('Terms & privacy'), leading: Icon(Icons.lock)),
+          ListTile(
+            title: Text('Settings'),
+            leading: Icon(Icons.settings),
+            onTap: () => _onDrawerTap(model, 4),
           ),
           ListTile(
               title: Text(
-                  'Our mission is to make Vedic astrology accssible to all people to help them attain positive changes in their lives.',
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .body1)),
+                  'Our mission is to make Cosmic astrology accssible to all people to help them attain positive changes in their lives.',
+                  style: Theme.of(context).textTheme.body1)),
         ],
       ),
     );
@@ -268,35 +288,6 @@ class _HomeViewState extends State<HomeView> {
       Navigator.pop(context);
     }
   }
-
-/*Future onSelectNotification(String payload) async {
-    if (payload != null) {
-      debugPrint('notification payload: ' + payload);
-    }
-    debugPrint('notification selected');
-  }
-
-  Future onDidReceiveLocalNotification(
-      int id, String title, String body, String payload) async {
-    // display a dialog with the notification details, tap ok to go to another page
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => new CupertinoAlertDialog(
-        title: new Text(title),
-        content: new Text(body),
-        actions: [
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            child: new Text('Ok'),
-            onPressed: () async {
-              Navigator.of(context, rootNavigator: true).pop();
-              debugPrint('notification selected');
-            },
-          )
-        ],
-      ),
-    );
-}*/
 
   void _initIAPs(HomeViewModel model) async {
     print('Init iaps');

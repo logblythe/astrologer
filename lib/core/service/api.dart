@@ -138,4 +138,24 @@ class Api {
       return null;
     }
   }
+
+  Future<Map<String, dynamic>> fetchQuestionPrice() async {
+    try {
+      var token = await getToken;
+      print(token);
+      var response = await client.get(
+        fetchQuestionPriceUrl,
+        headers: {
+          "Content-Type": "application/json",
+          HttpHeaders.authorizationHeader: "Bearer $token"
+        },
+      );
+      print(
+          'response fetch question price ${response.statusCode} \n ${response.body}');
+      return jsonDecode(response.body);
+    } catch (e) {
+      print('the response exception $e}');
+      return null;
+    }
+  }
 }

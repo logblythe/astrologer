@@ -10,7 +10,8 @@ class MessageItem extends StatelessWidget {
       this.onTap,
       @required this.item,
       this.selected: false,
-      @required this.message})
+      @required this.message,
+      @required this.darkMode})
       : assert(animation != null),
         assert(item != null && item >= 0),
         assert(selected != null),
@@ -21,6 +22,7 @@ class MessageItem extends StatelessWidget {
   final int item;
   final bool selected;
   final MessageModel message;
+  final bool darkMode;
 
   @override
   Widget build(BuildContext context) {
@@ -59,23 +61,25 @@ class MessageItem extends StatelessWidget {
           right: message.sent ? 0 : 24,
         ),
         decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              blurRadius: 20, // has the effect of softening the shadow
-              spreadRadius: 1, // has the effect of extending the shadow
-              offset: Offset(
-                10, // horizontal, move right 10
-                10, // vertical, move down 10
-              ),
-            )
-          ],
+          boxShadow: darkMode
+              ? []
+              : [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    blurRadius: 20, // has the effect of softening the shadow
+                    spreadRadius: 1, // has the effect of extending the shadow
+                    offset: Offset(
+                      5, // horizontal, move right 10
+                      5, // vertical, move down 10
+                    ),
+                  )
+                ],
           color: message.sent ? Theme.of(context).primaryColor : Colors.grey,
           borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(message.sent ? 0 : 24),
               topLeft: Radius.circular(message.sent ? 24 : 0),
-              topRight: Radius.circular(message.sent ? 0 : 24),
               bottomLeft: Radius.circular(24),
-              bottomRight: Radius.circular(24)),
+              topRight: Radius.circular(24)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

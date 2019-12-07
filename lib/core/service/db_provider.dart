@@ -81,6 +81,12 @@ class DbProvider {
     await db.execute('PRAGMA foreign_keys = ON');
   }
 
+  Future deleteAllTables() async {
+    final db = await database;
+    db.delete('user');
+    db.delete('messages');
+  }
+
   Future<int> addUser(UserModel user) async {
     print('user details ${user.toMapForDb()}');
     final db = await database;

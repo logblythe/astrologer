@@ -4,6 +4,9 @@ import 'package:astrologer/core/data_model/idea_model.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
+import 'package:astrologer/core/utils/local_notification_helper.dart';
+import 'package:astrologer/core/utils/shared_pref_helper.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 import 'package:rxdart/rxdart.dart';
@@ -11,14 +14,18 @@ import 'package:rxdart/rxdart.dart';
 class HomeService {
   final DbProvider _dbProvider;
   final Api _api;
-  List<MessageModel> _messages;
+  final SharedPrefHelper _sharedPrefHelper;
+  final LocalNotificationHelper _localNotificationHelper;
+
+  List<MessageModel> _messageList = [];
   List<AstrologerModel> _astrologers;
-  int _id;
+  int _id, _userId, _freeCount;
   List<IAPItem> _iaps;
   FlutterInappPurchase _iap;
   List<IdeaModel> _ideas;
 
   PublishSubject<MessageAndUpdate> _newMessage = PublishSubject();
+  PublishSubject<int> _freeCountStream = PublishSubject();
 
   Stream<MessageAndUpdate> get nStream => _newMessage.stream;
 
@@ -28,18 +35,41 @@ class HomeService {
 
   get ideas => _ideas;
 
+  Stream<int> get freeCountStream => _freeCountStream.stream;
+
   set iaps(List<IAPItem> value) {
     _iaps = value;
   }
 
-  addMsgToSink(String message, update) =>
-      _newMessage.sink.add(MessageAndUpdate(message, update));
+  addMsgToSink(String message, update) {
+    _newMessage.sink.add(MessageAndUpdate(message, update));
+  }
 
-  HomeService({DbProvider db, Api api})
-      : _dbProvider = db,
-        _api = api;
+  addFreeCountToSink(int freeCount) {
+    _freeCountStream.sink.add(freeCount);
+  }
 
-  List<MessageModel> get messages => _messages;
+  HomeService({
+    @required DbProvider db,
+    @required Api api,
+    @required SharedPrefHelper sharedPrefHelper,
+    @required LocalNotificationHelper localNotificationHelper,
+  })  : _dbProvider = db,
+        _api = api,
+        _sharedPrefHelper = sharedPrefHelper,
+        _localNotificationHelper = localNotificationHelper {
+    {
+      _localNotificationHelper.onSelectionNotification = (payload) {
+        print('hello world');
+      };
+      _localNotificationHelper.onReceiveLocalNotification =
+          (id, title, body, payload) {
+        print("hello world 2");
+      };
+    }
+  }
+
+  List<MessageModel> get messages => _messageList;
 
   List<AstrologerModel> get astrologers => _astrologers;
 
@@ -50,34 +80,37 @@ class HomeService {
     }
   }
 
-  Future<void> init({String welcomeMessage, int userId}) async {
-    _messages = [];
+  Future<void> init({String welcomeMessage}) async {
     _iap = FlutterInappPurchase.instance;
+    _userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
     if (welcomeMessage != null) {
-      addMessage(MessageModel(message: welcomeMessage, sent: false), userId);
+      addMessage(MessageModel(message: welcomeMessage, sent: false));
     } else {
       List<MessageModel> messagesFromDb = await _dbProvider.getAllMessages();
       messagesFromDb.forEach((msg) =>
           print('message status ${msg.id} ${msg.status} ${msg.questionId}'));
-      _messages.addAll(messagesFromDb);
+      _messageList.addAll(messagesFromDb);
     }
   }
 
-  Future<int> addMessage(MessageModel message, int userId) async {
+  Future getFreeQuesCount() async =>
+      _freeCount = await _sharedPrefHelper.getInteger(KEY_FREE_QUES_COUNT) ?? 0;
+
+  Future<int> addMessage(MessageModel message) async {
     message.createdAt = DateTime.now().millisecondsSinceEpoch;
     _id = await _dbProvider.addMessage(message);
     message.id = _id;
-    _messages.add(message);
+    _messageList.add(message);
     return _id;
   }
 
-  Future<Null> askQuestion(
-      MessageModel message, int userId, bool isFree, bool shouldCharge) async {
+  Future<Null> askQuestion(MessageModel message, bool shouldCharge) async {
     //    int prevQuesId = await _db.getUnclearedQuestionId();
-    if (!isFree && shouldCharge) await _purchase();
-    print('After purchase');
+    print('free count $_freeCount');
+    /*if (_freeCount==0 && shouldCharge) await _purchase();
+    print('After purchase');*/
     Map<String, dynamic> messageResponse = await _api.askQuestion(
-      userId,
+      _userId,
       message.message,
 //      prevQuestionId: prevQuesId,
     );
@@ -87,6 +120,11 @@ class HomeService {
     } else {
       message.status = messageResponse['questionStatus'] ?? DELIVERED;
       message.questionId = messageResponse['engQuesId'];
+      if (_freeCount > 0) {
+        _freeCount = --_freeCount;
+        await _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, _freeCount);
+        addFreeCountToSink(_freeCount);
+      }
       print('message response updated');
     }
     await _dbProvider.updateMessage(message, _id);
@@ -94,9 +132,9 @@ class HomeService {
   }
 
   Future<void> updateQuestionStatusN(int questionId, String status) async {
-    for (int i = 0; i < _messages.length; i++) {
-      if (_messages[i].questionId == questionId) {
-        _messages[i].status = status;
+    for (int i = 0; i < _messageList.length; i++) {
+      if (_messageList[i].questionId == questionId) {
+        _messageList[i].status = status;
         await _dbProvider.updateQuestionStatus(questionId, status);
       }
     }
@@ -104,17 +142,19 @@ class HomeService {
 
   Future<void> updateQuestionStatusById(int id, String status) async {
     print('Status $status $id');
-    for (int i = 0; i < _messages.length; i++) {
-      print('at $i ${_messages[i].toMapForDb()}');
-      if (_messages[i].id == id) {
-        print('inside $i ${_messages[i].toMapForDb()}');
-        _messages[i].status = status;
+    for (int i = 0; i < _messageList.length; i++) {
+      print('at $i ${_messageList[i].toMapForDb()}');
+      if (_messageList[i].id == id) {
+        print('inside $i ${_messageList[i].toMapForDb()}');
+        _messageList[i].status = status;
         await _dbProvider.updateQuestionStatusById(id, status);
       }
     }
   }
 
-  void dispose() {}
+  void dispose() {
+    _messageList.clear();
+  }
 
   fetchAstrologers() async {
     if (_astrologers == null) _astrologers = await _api.fetchAstrologers();
@@ -134,6 +174,14 @@ class HomeService {
     }
     print('Purchase success ${_purchasedItem.productId}');
     return;
+  }
+
+  Future<Map<String, dynamic>> fetchQuestionPrice() async {
+    return await _api.fetchQuestionPrice();
+  }
+
+  showLocalNotification(String title, String body) async {
+    await _localNotificationHelper.showNotification(title: title, body: body);
   }
 }
 

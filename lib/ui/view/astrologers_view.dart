@@ -16,7 +16,7 @@ class AstrologersView extends StatelessWidget {
       builder: (context, model, child) {
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).backgroundColor,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
@@ -103,12 +103,12 @@ class AstrologersView extends StatelessWidget {
                 child: Column(
                   children: <Widget>[
                     Container(
+                      color: Theme.of(context).disabledColor,
                       width: double.infinity,
                       padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(color: Colors.grey[200]),
                       child: Text(
                         'Our Astrologers',
-                        style: Theme.of(context).textTheme.caption,
+                        style: Theme.of(context).textTheme.subhead,
                       ),
                     ),
                     ListView.separated(
