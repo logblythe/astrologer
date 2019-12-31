@@ -25,7 +25,6 @@ class LoginViewModel extends BaseViewModel {
     if (loginResponse.error != null) {
       setError(loginResponse.error);
     } else {
-      _homeService.addFreeCountToSink(1);
       setBusy(false);
     }
     return loginResponse;

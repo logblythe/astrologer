@@ -1,6 +1,7 @@
 //const String baseUrl = "https://online-astro.azurewebsites.net/api";
 const String baseUrl = "https://cosmos-api.azurewebsites.net/api";
 //const String baseUrl = "http://10.6.1.47:8082/api";
+//const String baseUrl = "http://127.0.0.1:8082/api";
 //const String baseUrl = "http://192.168.138.1:8080/api";
 
 const String login = "$baseUrl/user/login";

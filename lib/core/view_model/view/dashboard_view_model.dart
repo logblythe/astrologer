@@ -16,6 +16,7 @@ class DashboardViewModel extends BaseViewModel {
   MessageModel _message;
   String _messageBox;
   bool _showSendBtn = false;
+  bool _fetchingList = false;
 
   DashboardViewModel({
     @required HomeService homeService,
@@ -24,6 +25,8 @@ class DashboardViewModel extends BaseViewModel {
   })  : this._homeService = homeService,
         this._userService = userService,
         this._settingsService = settingsService;
+
+  bool get fetchingList => _fetchingList;
 
   bool get showSendBtn => _showSendBtn;
 
@@ -47,8 +50,10 @@ class DashboardViewModel extends BaseViewModel {
 
   init() async {
     setBusy(true);
+    _fetchingList = true;
     await _homeService.init(welcomeMessage: loginResponse?.welcomeMessage);
     setupListeners();
+    _fetchingList = false;
     setBusy(false);
   }
 

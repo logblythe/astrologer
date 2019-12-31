@@ -17,7 +17,8 @@ class HomeService {
   final SharedPrefHelper _sharedPrefHelper;
   final LocalNotificationHelper _localNotificationHelper;
 
-  List<MessageModel> _messageList = [];
+  List<MessageModel> _messageList;
+
   List<AstrologerModel> _astrologers;
   int _id, _userId, _freeCount;
   List<IAPItem> _iaps;
@@ -81,6 +82,7 @@ class HomeService {
   }
 
   Future<void> init({String welcomeMessage}) async {
+    _messageList = [];
     _iap = FlutterInappPurchase.instance;
     _userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
     if (welcomeMessage != null) {
@@ -93,8 +95,10 @@ class HomeService {
     }
   }
 
-  Future getFreeQuesCount() async =>
-      _freeCount = await _sharedPrefHelper.getInteger(KEY_FREE_QUES_COUNT) ?? 0;
+  Future getFreeQuesCount() async {
+    _freeCount = await _sharedPrefHelper.getInteger(KEY_FREE_QUES_COUNT) ?? 0;
+    addFreeCountToSink(_freeCount);
+  }
 
   Future<int> addMessage(MessageModel message) async {
     message.createdAt = DateTime.now().millisecondsSinceEpoch;

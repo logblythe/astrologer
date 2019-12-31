@@ -56,33 +56,33 @@ class _DashboardViewState extends State<DashboardView>
 
   Widget buildListMessage(DashboardViewModel model) {
     return Expanded(
-      child: model.messages.isEmpty
-          ? const Center(
-              child: Text('No messages'),
-            )
-          : ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(32),
-                topRight: Radius.circular(32),
-              ),
-              child: AnimatedList(
-                key: widget.listKey,
-                initialItemCount: model.messages.length,
-                reverse: true,
-                shrinkWrap: true,
-                padding: EdgeInsets.all(8.0),
-                itemBuilder: (context, index, animation) {
-                  MessageModel _message = model.messages[index];
-                  return MessageItem(
-                    darkMode: model.darkModeEnabled,
-                    message: _message,
-                    animation: animation,
-                    item: index,
-                    onTap: () {},
-                  );
-                },
-              ),
-            ),
+      child: model.fetchingList
+          ? const Center(child: CircularProgressIndicator())
+          : model.messages.isEmpty
+              ? const Center(child: Text('No messages'))
+              : ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  ),
+                  child: AnimatedList(
+                    key: widget.listKey,
+                    initialItemCount: model.messages.length,
+                    reverse: true,
+                    shrinkWrap: true,
+                    padding: EdgeInsets.all(8.0),
+                    itemBuilder: (context, index, animation) {
+                      MessageModel _message = model.messages[index];
+                      return MessageItem(
+                        darkMode: model.darkModeEnabled,
+                        message: _message,
+                        animation: animation,
+                        item: index,
+                        onTap: () {},
+                      );
+                    },
+                  ),
+                ),
     );
   }
 

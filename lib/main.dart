@@ -1,3 +1,4 @@
+import 'package:astrologer/core/service/navigation_service.dart';
 import 'package:astrologer/provider_setup.dart';
 import 'package:astrologer/router.dart';
 import 'package:astrologer/ui/shared/theme_stream.dart';
@@ -46,6 +47,7 @@ class _MyAppState extends State<MyApp> {
               home: widget.token == null ? LoginView() : HomeView(),
 //              home: HomeView(),
               onGenerateRoute: (settings) => Router.generateRoute(settings),
+//              navigatorKey: navigatorKey,
 //              initialRoute: RoutePaths.login, //commenting this cause it shows black screen initially
             ),
           );
