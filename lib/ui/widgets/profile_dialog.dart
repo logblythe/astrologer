@@ -15,6 +15,7 @@ class ProfileDialog extends StatelessWidget {
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             UIHelper.verticalSpaceSmall,
             Align(
@@ -36,8 +37,9 @@ class ProfileDialog extends StatelessWidget {
             ),
             UIHelper.verticalSpaceMedium,
             Text(
-              'Sikshya Maharjan',
-              style: Theme.of(context).textTheme.headline,
+              userModel.firstName,
+              style:
+                  Theme.of(context).textTheme.headline.copyWith(fontSize: 20),
             ),
             UIHelper.verticalSpaceMedium,
             Divider(),
@@ -76,12 +78,14 @@ class ProfileDialog extends StatelessWidget {
   Widget _buildProfileItem(BuildContext context,
       {String title, String subtitle, IconData iconData}) {
     return Padding(
-      padding: const EdgeInsets.only(top: 16.0, bottom: 16),
+      padding: const EdgeInsets.only(top: 8.0, bottom: 16),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
             title,
             style: TextStyle(
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
                 color: Theme.of(context).disabledColor),
           ),
@@ -97,8 +101,7 @@ class ProfileDialog extends StatelessWidget {
               Text(
                 subtitle,
                 style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
             ],

@@ -33,24 +33,25 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<bool>(
-        stream: theme.themeStream,
-        initialData: widget.darkModeEnabled,
-        builder: (context, snapshot) {
-          return MultiProvider(
-            providers: providers,
-            child: MaterialApp(
-              title: 'Astrologer',
-              theme: snapshot.hasData && snapshot.data
-                  ? UIHelper.darkTheme
-                  : UIHelper.lightTheme,
-              debugShowCheckedModeBanner: false,
-              home: widget.token == null ? LoginView() : HomeView(),
+      stream: theme.themeStream,
+      initialData: widget.darkModeEnabled,
+      builder: (context, snapshot) {
+        return MultiProvider(
+          providers: providers,
+          child: MaterialApp(
+            title: 'Astrologer',
+            theme: snapshot.hasData && snapshot.data
+                ? UIHelper.darkTheme
+                : UIHelper.lightTheme,
+            debugShowCheckedModeBanner: false,
+            home: widget.token == null ? LoginView() : HomeView(),
 //              home: HomeView(),
-              onGenerateRoute: (settings) => Router.generateRoute(settings),
+            onGenerateRoute: (settings) => Router.generateRoute(settings),
 //              navigatorKey: navigatorKey,
 //              initialRoute: RoutePaths.login, //commenting this cause it shows black screen initially
-            ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }
