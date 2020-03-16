@@ -1,6 +1,9 @@
+import 'package:astrologer/connectivity_mixin.dart';
+import 'package:astrologer/core/data_model/notification_model.dart';
 import 'package:astrologer/core/view_model/view/home_view_model.dart';
-import 'package:astrologer/ui/view/ideas_view.dart';
 import 'package:astrologer/ui/base_widget.dart';
+import 'package:astrologer/ui/shared/route_paths.dart';
+import 'package:astrologer/ui/view/ideas_view.dart';
 import 'package:astrologer/ui/view/profile_view.dart';
 import 'package:astrologer/ui/view/settings_view.dart';
 import 'package:astrologer/ui/widgets/profile_dialog.dart';
@@ -16,7 +19,7 @@ import 'dashboard_view.dart';
 
 final List<Map<String, dynamic>> _children = [
   {
-    'title': 'Dashboard',
+    'title': '  ',
     'action': Icons.person_pin,
   },
   {'title': 'Birth Profile'},
@@ -30,7 +33,7 @@ class HomeView extends StatefulWidget {
   _HomeViewState createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends State<HomeView> with ConnectivityMixin {
   PageController _pageController;
   static GlobalKey<UserDetailsState> _formKey = GlobalKey();
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
@@ -43,11 +46,11 @@ class _HomeViewState extends State<HomeView> {
       model: _homeViewModel,
       onModelReady: (_homeViewModel) async {
         await _homeViewModel.getFreeQuesCount();
-        _homeViewModel.getLoggedInUser();
-        _homeViewModel.fetchQuestionPrice();
+//        _homeViewModel.getLoggedInUser();
+//        _homeViewModel.fetchQuestionPrice();
+        initConnectivity(_homeViewModel);
       },
       builder: (context, HomeViewModel model, _) => Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
         drawer: _buildDrawer(model),
         appBar: AppBar(
           centerTitle: true,
@@ -81,12 +84,13 @@ class _HomeViewState extends State<HomeView> {
       userService: Provider.of(context),
       homeService: Provider.of(context),
     );
-    _initIAPs(_homeViewModel);
+//    _initIAPs(_homeViewModel);
   }
 
   void _onNotificationReceived(Map<String, dynamic> message) async {
+    NotificationModel notification = NotificationModel.fromJson(message);
+    await _homeViewModel.onNotificationReceived(notification);
     _listKey.currentState.insertItem(0, duration: Duration(milliseconds: 500));
-    await _homeViewModel.onNotificationReceived(message);
   }
 
   IconButton _buildIconButton(HomeViewModel model) {
@@ -95,10 +99,11 @@ class _HomeViewState extends State<HomeView> {
       onPressed: () async {
         switch (model.index) {
           case 0:
-            showDialog(
-              context: context,
-              builder: (context) => ProfileDialog(userModel: model.userModel),
-            );
+            if (model.userModel != null)
+              Navigator.pushNamed(context, RoutePaths.profile);
+            else
+              showDialog(
+                  context: context, builder: (context) => NoUserDialog());
             break;
           case 1:
             if (await _formKey.currentState.updateUser()) {
@@ -113,17 +118,36 @@ class _HomeViewState extends State<HomeView> {
   WillPopScope _buildWillPopScope(HomeViewModel model) {
     return WillPopScope(
       onWillPop: () => _onWillPop(model),
-      child: ClipRRect(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
-        ),
-        child: PageView(
-          physics: NeverScrollableScrollPhysics(),
-          controller: _pageController,
-          children: _pageViewChildren(model),
-          scrollDirection: Axis.horizontal,
-        ),
+      child: Stack(
+        children: <Widget>[
+          PageView(
+            physics: NeverScrollableScrollPhysics(),
+            controller: _pageController,
+            children: _pageViewChildren(model),
+            scrollDirection: Axis.horizontal,
+          ),
+          model.internetConnection
+              ? Container()
+              : AnimatedContainer(
+                  duration: Duration(milliseconds: 2000),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Material(
+                    borderRadius: BorderRadius.circular(16),
+                    type: MaterialType.card,
+                    animationDuration: Duration(milliseconds: 500),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 12),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text('NO INTERNET CONNECTION'),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+        ],
       ),
     );
   }
@@ -143,7 +167,7 @@ class _HomeViewState extends State<HomeView> {
                 new FlatButton(
                   onPressed: () async {
                     Navigator.of(context).pop(false);
-                    model.showLocalNotification("title", "body");
+//                    model.showLocalNotification("title", "body");
                   },
                   child: new Text('No'),
                 ),
@@ -180,7 +204,7 @@ class _HomeViewState extends State<HomeView> {
             child: ListTile(
               title:
                   Text('Free questions', style: TextStyle(color: Colors.white)),
-              trailing: Text(freeCount?.toString(),
+              trailing: Text(freeCount != null ? freeCount?.toString() : "-",
                   style: TextStyle(color: Colors.white)),
             ),
           ),
@@ -305,5 +329,19 @@ class _HomeViewState extends State<HomeView> {
     } catch (e) {
       print('we have error');
     }
+  }
+
+  void initConnectivity(HomeViewModel model) {
+    initializeConnectivity(onConnected: () {
+      model.internetConnection = true;
+    }, onDisconnected: () {
+      model.internetConnection = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    subscription.cancel();
   }
 }

@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 
 const String ID = "id";
 const String USER_ID = "userId";
@@ -64,7 +64,7 @@ class DbProvider {
          $QUESTION_ID integer,
          $CREATED_AT integer,
          $UPDATED_AT integer,
-         $ASTROLOGER_ID integer
+         $ASTROLOGER text
         )""");
       await batch.commit();
     }, onUpgrade: (database, int oldVersion, int newVersion) async {
@@ -106,7 +106,8 @@ class DbProvider {
   Future<UserModel> getLoggedInUser() async {
     final db = await database;
     List<Map<String, dynamic>> users = await db.query('user', columns: ['*']);
-    return UserModel.fromDb(users.first);
+    if (users.length > 0) return UserModel.fromDb(users.first);
+    return null;
   }
 
   Future<int> updateUser(UserModel user) async {
@@ -120,7 +121,6 @@ class DbProvider {
 
   Future<int> addMessage(MessageModel message) async {
     final db = await database;
-    print('new message is ${message.toString()}');
     return db.insert(
       'messages',
       message.toMapForDb(),
@@ -164,7 +164,7 @@ class DbProvider {
   Future<int> updateQuestionStatus(int questionId, String statusV) async {
     final db = await database;
     int _id = await db.rawUpdate(
-        "UPDATE messages SET status = ? WHERE questionId = ?",
+        "UPDATE messages SET status = ? WHERE engQuestionId = ?",
         [statusV, questionId]);
     return _id;
   }

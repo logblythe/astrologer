@@ -10,7 +10,7 @@
 
     <application
         android:name=".Application"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/launcher_icon"
         android:label="astrologer">
         <activity
             android:name="com.sikshya.astrologer.MainActivity"

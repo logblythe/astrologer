@@ -49,12 +49,13 @@ class UserService {
     String fcmToken = await _getFcmToken();
     LoginResponse _loginResponse =
         await _api.performLogin(email, password, fcmToken);
-    print('error is ${_loginResponse.error}');
     if (_loginResponse.error == null) {
       await _db.addUser(_loginResponse.user);
       await _sharedPrefHelper.setString(KEY_TOKEN, _loginResponse.token);
       await _sharedPrefHelper.setInt(KEY_USER_ID, _loginResponse.user.userId);
-      await _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, 1);
+      if (_loginResponse.welcomeMessage != null) {
+        await _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, 1);
+      }
     }
     return _loginResponse;
   }

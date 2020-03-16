@@ -1,11 +1,15 @@
 import 'dart:async';
 
 import 'package:connectivity/connectivity.dart';
+import 'package:flutter/cupertino.dart';
 
 mixin ConnectivityMixin {
   StreamSubscription<ConnectivityResult> subscription;
 
-  initializeConnectivity({Function onConnected, Function onDisconnected}) {
+  initializeConnectivity({
+    @required Function onConnected,
+    @required Function onDisconnected,
+  }) {
     subscription = Connectivity()
         .onConnectivityChanged
         .listen((ConnectivityResult result) {

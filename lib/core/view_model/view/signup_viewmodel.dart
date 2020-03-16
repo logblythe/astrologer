@@ -1,7 +1,9 @@
-import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
+import 'package:astrologer/core/enum/gender.dart';
+import 'package:astrologer/core/service/navigation_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
+import 'package:astrologer/ui/shared/route_paths.dart';
 import 'package:flutter/material.dart';
 
 class SignUpViewModel extends BaseViewModel {
@@ -19,19 +21,16 @@ class SignUpViewModel extends BaseViewModel {
   }
 
   Future<UserModel> register(
-      Gender gender,
-      String name,
-      String lname,
+      String name, String lname, String email, String password,
+      {Gender gender,
       String dob,
       String time,
       bool timeAccurate,
       String country,
       String location,
-      String email,
-      String password,
       String phone,
       String state,
-      String fcmToken) async {
+      String fcmToken}) async {
     setBusy(true);
     var userModel = await _userService.register(
         gender,
@@ -47,10 +46,17 @@ class SignUpViewModel extends BaseViewModel {
         phone,
         state,
         fcmToken);
-    setBusy(false);
     if (userModel.errorMessage != null) {
       setError(userModel.errorMessage);
+    } else {
+      var loginResponse = await _userService.performLogin(email, password);
+      if (loginResponse.error != null) {
+        setError(loginResponse.error);
+      } else {
+        navigatorKey.currentState.pushReplacementNamed(RoutePaths.home);
+      }
     }
+    setBusy(false);
     return userModel;
   }
 }

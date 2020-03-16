@@ -1,11 +1,11 @@
 import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
+import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/settings_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 
 class DashboardViewModel extends BaseViewModel {
   HomeService _homeService;
@@ -48,10 +48,13 @@ class DashboardViewModel extends BaseViewModel {
 
   List<MessageModel> get messages => _homeService.messages?.reversed?.toList();
 
+  UserModel get user => _userService.user;
+
   init() async {
     setBusy(true);
     _fetchingList = true;
     await _homeService.init(welcomeMessage: loginResponse?.welcomeMessage);
+    await _userService.getLoggedInUser();
     setupListeners();
     _fetchingList = false;
     setBusy(false);
@@ -62,7 +65,7 @@ class DashboardViewModel extends BaseViewModel {
       _messageBox = data.message;
       if (data.update) notifyListeners();
     });
-    FlutterInappPurchase.purchaseError.listen((PurchaseResult event) async {
+    /*   FlutterInappPurchase.purchaseError.listen((PurchaseResult event) async {
       print("purchase error ${event.message}");
       await updateQuestionStatusById(NOT_DELIVERED);
     });
@@ -71,7 +74,7 @@ class DashboardViewModel extends BaseViewModel {
           await _homeService.iap.consumePurchaseAndroid(item.purchaseToken);
       print('purchase listener $result');
       await askQuestion(_message, shouldCharge: false);
-    });
+    });*/
   }
 
   Future<void> addMessage(MessageModel message) async {
@@ -85,7 +88,9 @@ class DashboardViewModel extends BaseViewModel {
       {bool shouldCharge = true}) async {
     setBusy(true);
     _message = message;
-    await _homeService.askQuestion(_message, shouldCharge);
+    var price = _homeService.priceAfterDiscount;
+    await _homeService.askQuestion(
+        _message, shouldCharge, _homeService.priceAfterDiscount);
     setBusy(false);
   }
 

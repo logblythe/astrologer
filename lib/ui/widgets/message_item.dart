@@ -35,7 +35,11 @@ class MessageItem extends StatelessWidget {
       child: Column(
         children: <Widget>[
 //                _buildQuestionId(),
-          message.sent ? SizedBox.shrink() : CircleAvatar(child: Text('A')),
+          message.sent
+              ? SizedBox.shrink()
+              : CircleAvatar(
+                  child:
+                      Text(message?.astrologer?.substring(0, 1)?.toUpperCase() ?? "*")),
           Padding(
             padding: message.sent ? EdgeInsets.zero : EdgeInsets.only(left: 20),
             child: _buildMessageColumn(context),
@@ -61,35 +65,27 @@ class MessageItem extends StatelessWidget {
           right: message.sent ? 0 : 24,
         ),
         decoration: BoxDecoration(
-          boxShadow: darkMode
-              ? []
-              : [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    blurRadius: 20, // has the effect of softening the shadow
-                    spreadRadius: 1, // has the effect of extending the shadow
-                    offset: Offset(
-                      5, // horizontal, move right 10
-                      5, // vertical, move down 10
-                    ),
-                  )
-                ],
-          color: message.sent ? Theme.of(context).primaryColor : Colors.grey,
-          borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(message.sent ? 0 : 24),
-              topLeft: Radius.circular(message.sent ? 24 : 0),
-              bottomLeft: Radius.circular(24),
-              topRight: Radius.circular(24)),
-        ),
+            color: message.sent
+                ? Theme.of(context).primaryColor.withOpacity(.2)
+                : Colors.grey.withOpacity(.2),
+            borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(message.sent ? 0 : 12),
+                topLeft: Radius.circular(message.sent ? 12 : 0),
+                bottomLeft: Radius.circular(12),
+                topRight: Radius.circular(12)),
+            border: Border.all(
+                color: message.sent
+                    ? Theme.of(context).primaryColor.withOpacity(.5)
+                    : Colors.grey)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
                 DateFormat("MMM d, yyyy hh:mm a").format(
                     DateTime.fromMillisecondsSinceEpoch(message.createdAt)),
-                style: TextStyle(color: Colors.white, fontSize: 10)),
+                style: TextStyle(color: Colors.grey, fontSize: 10)),
             SizedBox(height: 8),
-            Text(message.message, style: TextStyle(color: Colors.white))
+            Text(message.message ?? 'no message')
           ],
         ),
       ),

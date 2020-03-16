@@ -19,8 +19,8 @@ class _ProfileViewState extends State<ProfileView> {
   Widget build(BuildContext context) {
     return BaseWidget(
       model: ProfileViewModel(profileService: Provider.of(context)),
-      onModelReady: (ProfileViewModel model) async {
-        await model.getLoggedInUser();
+      onModelReady: (ProfileViewModel model) {
+        model.getLoggedInUser();
       },
       builder: (context, ProfileViewModel model, child) {
         return Container(

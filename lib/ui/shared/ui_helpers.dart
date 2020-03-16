@@ -32,7 +32,8 @@ class UIHelper {
     brightness: Brightness.dark,
   );
   static ThemeData lightTheme = ThemeData(
-    primaryColor: Colors.blue,
+    primaryColor: Colors.red,
+    accentColor: Colors.red[400],
     backgroundColor: Colors.grey[200],
     brightness: Brightness.light,
   );

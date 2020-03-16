@@ -15,8 +15,6 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final _usernameNode = FocusNode();
-  final _passwordNode = FocusNode();
   final _buttonNode = FocusNode();
 
   @override
@@ -25,112 +23,104 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
       model: LoginViewModel(
         userService: Provider.of(context),
         homeService: Provider.of(context),
+        navigationService: Provider.of(context),
       ),
       builder: (context, model, child) => Scaffold(
-        body: Container(
-          alignment: Alignment.center,
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _buildTitleText(context),
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            _buildUsername(context),
-                            UIHelper.verticalSpaceSmall,
-                            _buildPassword(model, context)
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Image.asset(
+                  "assets/images/ic_sign_up.png",
+                  height: 80,
+                  width: 80,
                 ),
-                _buildErrorText(model),
-                _buildAnimatedLoginButton(model, context),
-                _buildAnimatedSwitcher(model, context)
-              ],
-            ),
+              ),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      padding:
+                          const EdgeInsets.only(left: 32.0, right: 32, top: 64),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            "Login",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 32.0,
+                            ),
+                          ),
+                          Text(
+                            "Please sign in to continue",
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                          UIHelper.verticalSpaceLarge,
+                          _listTile("EMAIL", Icon(Icons.mail_outline),
+                              controller: _usernameController,
+                              validator: validateEmail),
+                          UIHelper.verticalSpaceMedium,
+                          _listTile("PASSWORD", Icon(Icons.lock_outline),
+                              suffixIcon: GestureDetector(
+                                child: Icon(
+                                  Icons.remove_red_eye,
+                                  color: model.obscureText
+                                      ? Theme.of(context).primaryColor
+                                      : Theme.of(context).disabledColor,
+                                ),
+                                onTap: model.toggleObscureText,
+                              ),
+                              obscureText: model.obscureText,
+                              controller: _passwordController,
+                              validator: validatePassword),
+                          SizedBox(height: 32),
+                          Align(
+                              alignment: Alignment.bottomRight,
+                              child: _buildAnimatedLoginButton(model, context)),
+                          UIHelper.verticalSpaceMedium,
+                          Align(
+                              alignment: Alignment.center,
+                              child: _buildErrorText(model)),
+                          _buildAnimatedSwitcher(model, context)
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildPassword(LoginViewModel model, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: TextFormField(
-          focusNode: _passwordNode,
-          controller: _passwordController,
-          obscureText: model.obscureText,
-          validator: validatePassword,
-          textInputAction: TextInputAction.done,
-          onFieldSubmitted: (value) {
-            _passwordNode.unfocus();
-            FocusScope.of(context).requestFocus(_buttonNode);
-          },
-          decoration: InputDecoration(
-            labelText: 'Password',
-            hintText: 'Password',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(Icons.remove_red_eye,
-                  color: model.obscureText
-                      ? Colors.grey
-                      : Theme.of(context).accentColor),
-              onPressed: () {
-                model.toggleObscureText();
-              },
-            ),
-          ),
-          keyboardType: TextInputType.emailAddress),
-    );
-  }
-
-  Widget _buildUsername(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: TextFormField(
-          focusNode: _usernameNode,
-          controller: _usernameController,
-          textInputAction: TextInputAction.next,
-          validator: validateEmail,
-          onFieldSubmitted: (value) {
-            _usernameNode.unfocus();
-            FocusScope.of(context).requestFocus(_passwordNode);
-          },
-          decoration: InputDecoration(
-            labelText: 'Email',
-            hintText: 'example@example.com',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-          keyboardType: TextInputType.emailAddress),
-    );
-  }
-
-  Widget _buildTitleText(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Text(
-        "Ahem Brahmasmi",
-        style: TextStyle(
-          color: Theme.of(context).primaryColor,
-          fontWeight: FontWeight.bold,
-          fontSize: 32.0,
-        ),
-      ),
+  Widget _listTile(String title, Icon prefixIcon,
+      {bool obscureText: false,
+      Widget suffixIcon,
+      TextEditingController controller,
+      FormFieldValidator validator,
+      TextInputType keyboardType}) {
+    return TextFormField(
+      validator: validator,
+      decoration: InputDecoration(
+          isDense: true,
+          labelText: title,
+          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          prefixIcon: prefixIcon,
+          suffix: suffixIcon),
+      obscureText: obscureText,
+      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+      controller: controller,
+      keyboardType: keyboardType,
     );
   }
 
@@ -147,37 +137,45 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
           ScaleTransition(child: child, scale: animation),
       duration: Duration(milliseconds: 250),
       child: model.busy
-          ? CircularProgressIndicator()
-          : Container(
-              margin: EdgeInsets.all(16.0),
-              width: MediaQuery.of(context).size.width,
-              child: RaisedButton(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(32)),
-                focusNode: _buttonNode,
-                padding: EdgeInsets.all(22.0),
-                child: Text(
-                  'Login',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.0,
+          ? Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CircularProgressIndicator(),
+            )
+          : RaisedButton(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32)),
+              focusNode: _buttonNode,
+              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    'LOGIN',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.0,
+                    ),
                   ),
-                ),
-                onPressed: () async {
-                  if (_formKey.currentState.validate()) {
-                    _formKey.currentState.save();
-                    var loginResponse = await model.login(
-                        _usernameController.text, _passwordController.text);
-                    if (loginResponse.error == null) {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        RoutePaths.home,
-                      );
-                    }
-                  }
-                },
-                color: Theme.of(context).primaryColor,
+                  Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                  ),
+                ],
               ),
+              onPressed: () async {
+                if (_formKey.currentState.validate()) {
+                  _formKey.currentState.save();
+                  var loginResponse = await model.login(
+                      _usernameController.text, _passwordController.text);
+                  if (loginResponse.error == null) {
+                    Navigator.pushReplacementNamed(
+                      context,
+                      RoutePaths.home,
+                    );
+                  }
+                }
+              },
+              color: Theme.of(context).primaryColor,
             ),
     );
   }
@@ -190,15 +188,28 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
       duration: Duration(milliseconds: 250),
       child: model.busy
           ? Container()
-          : InkWell(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Create an account',
-                  style: Theme.of(context).textTheme.subhead,
+          : Container(
+              margin: EdgeInsets.only(top: 120),
+              alignment: Alignment.center,
+              child: InkWell(
+                child: RichText(
+                  text: TextSpan(
+                    text: "Don\'t have an account? ",
+                    style: Theme.of(context)
+                        .textTheme
+                        .body2
+                        .copyWith(color: Theme.of(context).disabledColor),
+                    children: <TextSpan>[
+                      TextSpan(
+                          text: 'Sign up',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor)),
+                    ],
+                  ),
                 ),
+                onTap: model.navigateToSignUp,
               ),
-              onTap: () => Navigator.pushNamed(context, RoutePaths.signup),
             ),
     );
   }

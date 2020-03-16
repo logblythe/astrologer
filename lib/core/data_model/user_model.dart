@@ -87,6 +87,4 @@ class UserModel {
   String toString() {
     return toMapForDb().toString();
   }
-
-
 }

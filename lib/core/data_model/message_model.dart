@@ -5,14 +5,14 @@ const String NOT_DELIVERED = "Not delivered";
 const String DELIVERED = "Delivered";
 
 const String ID = "id";
-const String MESSAGE = "message";
+const String MESSAGE = "answer";
 const String STATUS = "status";
 const String SENT = "sent";
-const String QUESTION_ID = "questionId";
+const String QUESTION_ID = "engQuestionId";
 const String CREATED_AT = "createdAt";
 const String DELETED_AT = "deletedAt";
 const String UPDATED_AT = "updatedAt";
-const String ASTROLOGER_ID = "astrologerId";
+const String ASTROLOGER = "astrologer";
 
 class MessageModel {
   int id;
@@ -23,7 +23,7 @@ class MessageModel {
   String error;
   int createdAt;
   int updatedAt;
-  int astrologerId;
+  String astrologer;
 
   MessageModel(
       {this.id,
@@ -34,7 +34,7 @@ class MessageModel {
       this.error,
       this.createdAt,
       this.updatedAt,
-      this.astrologerId});
+      this.astrologer});
 
   MessageModel.fromJson(Map<String, dynamic> json)
       : message = json[MESSAGE],
@@ -42,14 +42,14 @@ class MessageModel {
         status = json[STATUS] ?? "",
         questionId = json[QUESTION_ID],
         error = json["error"],
-        astrologerId = json[ASTROLOGER_ID];
+        astrologer = json[ASTROLOGER];
 
   MessageModel.fromNotification(Map<String, dynamic> json)
       : message = json[MESSAGE],
         sent = false,
         status = json[STATUS] ?? "",
         questionId = json[QUESTION_ID],
-        astrologerId = json[ASTROLOGER_ID];
+        astrologer = json[ASTROLOGER];
 
   Map<String, dynamic> toMapForDb() => {
         MESSAGE: message,
@@ -57,7 +57,7 @@ class MessageModel {
         STATUS: status,
         QUESTION_ID: questionId,
         CREATED_AT: createdAt,
-        ASTROLOGER_ID: astrologerId,
+        ASTROLOGER: astrologer,
         ID: id,
       };
 
@@ -67,7 +67,7 @@ class MessageModel {
         status = json[STATUS],
         sent = json[SENT] == 1,
         questionId = json[QUESTION_ID],
-        astrologerId = json[ASTROLOGER_ID],
+        astrologer = json[ASTROLOGER],
         createdAt = json[CREATED_AT];
 
   @override

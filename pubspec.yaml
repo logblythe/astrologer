@@ -44,6 +44,13 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.7.3"
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo.png"
+
 
 
 # For information on the generic Dart part of this file, see the
@@ -55,11 +62,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/splash_image.jpg
-    - assets/images/idea.gif
-    - assets/images/crystal_ball.gif
-    - assets/images/settings.gif
-    - assets/images/fortune_teller.png
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

@@ -1,5 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
+import 'package:astrologer/core/data_model/image_model.dart';
+import 'package:path/path.dart';
+import 'package:async/async.dart';
 
 import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
@@ -32,7 +37,6 @@ class Api {
       String dob,
       String time,
       bool timeAccurate) async {
-    print(register);
     try {
       var response = await client.post(
         register,
@@ -88,14 +92,11 @@ class Api {
     }
   }
 
-  Future<Map<String, dynamic>> askQuestion(int userId, String question,
+  Future<Map<String, dynamic>> askQuestion(
+      int userId, String question, double questionPrice,
       {int prevQuestionId}) async {
-    print(askQuestionUrl);
-    print(userId);
-    print(question);
     try {
       var token = await getToken;
-      print(token);
       var response = await client.post(
         askQuestionUrl,
         headers: {
@@ -106,7 +107,8 @@ class Api {
           {
             'engQuestion': question,
             'userId': userId,
-            'prevQuestionId': prevQuestionId
+            'prevQuestionId': prevQuestionId,
+            'questionPrice': questionPrice,
           },
         ),
       );
@@ -121,7 +123,6 @@ class Api {
   fetchAstrologers() async {
     try {
       var token = await getToken;
-      print(token);
       var response = await client.get(
         fetchAstrologersUrl,
         headers: {
@@ -142,7 +143,6 @@ class Api {
   Future<Map<String, dynamic>> fetchQuestionPrice() async {
     try {
       var token = await getToken;
-      print(token);
       var response = await client.get(
         fetchQuestionPriceUrl,
         headers: {
@@ -157,5 +157,50 @@ class Api {
       print('the response exception $e}');
       return null;
     }
+  }
+
+  Future<ImageModel> upload(File imageFile) async {
+    var token = await getToken;
+    Map<String, String> headers = {
+      HttpHeaders.authorizationHeader: "Bearer $token"
+    };
+
+    // open a bytestream
+    var stream =
+        new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    // get file length
+    var length = await imageFile.length();
+
+    // string to uri
+    var uri = Uri.parse(uploadProfile);
+
+    // multipart that takes file
+    var multipartFile = new http.MultipartFile('image', stream, length,
+        filename: basename(imageFile.path));
+
+    // create multipart request
+    var request = new http.MultipartRequest("POST", uri);
+    request.headers.addAll(headers);
+
+    // add file to multipart
+    request.files.add(multipartFile);
+
+    // send
+    var response = await request.send();
+    print(response.statusCode);
+
+    var contents = new StringBuffer();
+    var completer = new Completer<ImageModel>();
+    // listen for response
+    response.stream.transform(utf8.decoder).listen(
+      (value) {
+        contents.write(value);
+      },
+      onDone: () {
+        var jsonData = json.decode(contents.toString());
+        completer.complete(ImageModel.fromJson(jsonData));
+      },
+    );
+    return completer.future;
   }
 }

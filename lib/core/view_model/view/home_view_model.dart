@@ -1,4 +1,5 @@
 import 'package:astrologer/core/data_model/message_model.dart';
+import 'package:astrologer/core/data_model/notification_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
@@ -10,9 +11,20 @@ class HomeViewModel extends BaseViewModel {
   final HomeService _homeService;
   final UserService _userService;
   int _index = 0;
-  double priceAfterDiscount;
-  double questionPrice;
-  double discountInPercentage;
+  bool _internetConnection = true;
+
+  bool get internetConnection => _internetConnection;
+
+  set internetConnection(bool value) {
+    _internetConnection = value;
+    notifyListeners();
+  }
+
+  double get priceAfterDiscount => _homeService.priceAfterDiscount;
+
+  double get questionPrice => _homeService.questionPrice;
+
+  double get discountInPercentage => _homeService.discountInPercentage;
 
   HomeViewModel(
       {@required HomeService homeService, @required UserService userService})
@@ -36,43 +48,36 @@ class HomeViewModel extends BaseViewModel {
 
   getLoggedInUser() => _userService.getLoggedInUser();
 
-  Future<void> onNotificationReceived(Map<String, dynamic> message) async {
-    updateQuestionStatusN(message);
-    if (message['data']['message'] != null) {
-      await addMessage(message);
+  Future<void> onNotificationReceived(NotificationModel answer) async {
+    await updateQuestionStatusN(answer);
+    if (answer.data.message != null) {
+      await addMessage(answer);
     }
   }
 
   Future getFreeQuesCount() async => await _homeService.getFreeQuesCount();
 
-  Future<void> updateQuestionStatusN(Map<String, dynamic> message) async {
+  Future<void> updateQuestionStatusN(NotificationModel message) async {
     setBusy(true);
     await _homeService.updateQuestionStatusN(
-        int.parse(message['data']['questionId']), message['data']['status']);
+        int.parse(message.data.engQuestionId), message.data.status);
     setBusy(false);
   }
 
-  Future<void> addMessage(Map<String, dynamic> message) async {
-    print('add message homeviewmodel');
+  Future<void> addMessage(NotificationModel message) async {
     setBusy(true);
-    var id = await _homeService.addMessage(MessageModel(
-      sent: false,
-      status: message['data']['status'],
-      message: message['data']['message'],
-      questionId: int.parse(message['data']['questionId']),
-    ));
-    print('newly added id is $id');
+    await _homeService.addMessage(MessageModel(
+        sent: false,
+        status: message.data.status,
+        message: message.data.message,
+        questionId: int.parse(message.data.engQuestionId),
+        astrologer: message.data.repliedBy));
     setBusy(false);
   }
 
   fetchQuestionPrice() async {
     setBusy(true);
-    var result = await _homeService.fetchQuestionPrice();
-    if (result != null) {
-      questionPrice = result['questionPrice'] ?? 0;
-      discountInPercentage = result['discountInPercentage'] ?? 0;
-      priceAfterDiscount = (100 - discountInPercentage) / 100 * questionPrice;
-    }
+    await _homeService.fetchQuestionPrice();
     setBusy(false);
   }
 

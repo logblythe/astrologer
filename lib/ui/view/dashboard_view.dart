@@ -1,7 +1,10 @@
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/view_model/view/dashboard_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
+import 'package:astrologer/ui/shared/route_paths.dart';
+import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:astrologer/ui/widgets/message_item.dart';
+import 'package:astrologer/ui/widgets/profile_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -32,22 +35,24 @@ class _DashboardViewState extends State<DashboardView>
           ..selection =
               TextSelection.collapsed(offset: _messageController.text.length);
         return GestureDetector(
-          onTap: () => FocusScope.of(context).unfocus(),
-          child: AnimatedContainer(
-            duration: Duration(milliseconds: 500),
-            decoration: BoxDecoration(
-              color: Theme.of(context).backgroundColor,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
+          onTap: () => _messageFocusNode.unfocus(),
+          child: Stack(
+            children: <Widget>[
+              Image.asset(
+                "assets/images/background.png",
+                fit: BoxFit.fill,
+                width: MediaQuery.of(context).size.width,
               ),
-            ),
-            child: Column(
-              children: <Widget>[
-                buildListMessage(model),
-                buildInput(model),
-              ],
-            ),
+              AnimatedContainer(
+                duration: Duration(milliseconds: 500),
+                child: Column(
+                  children: <Widget>[
+                    buildListMessage(model),
+                    buildInput(model),
+                  ],
+                ),
+              ),
+            ],
           ),
         );
       },
@@ -59,29 +64,41 @@ class _DashboardViewState extends State<DashboardView>
       child: model.fetchingList
           ? const Center(child: CircularProgressIndicator())
           : model.messages.isEmpty
-              ? const Center(child: Text('No messages'))
-              : ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32),
-                  ),
-                  child: AnimatedList(
-                    key: widget.listKey,
-                    initialItemCount: model.messages.length,
-                    reverse: true,
-                    shrinkWrap: true,
-                    padding: EdgeInsets.all(8.0),
-                    itemBuilder: (context, index, animation) {
-                      MessageModel _message = model.messages[index];
-                      return MessageItem(
-                        darkMode: model.darkModeEnabled,
-                        message: _message,
-                        animation: animation,
-                        item: index,
-                        onTap: () {},
-                      );
-                    },
-                  ),
+              ? Center(
+                  child: model.user == null
+                      ? NoMessageWidget(
+                          buttonTitle: "Ok! Let me login",
+                          buttonTap: () {
+                            Navigator.pushNamedAndRemoveUntil(
+                                context,
+                                RoutePaths.login,
+                                ModalRoute.withName(RoutePaths.home));
+                          },
+                        )
+                      : NoMessageWidget(
+                          buttonTitle: "OK! Lets chat",
+                          buttonTap: () {
+                            FocusScope.of(context)
+                                .requestFocus(_messageFocusNode);
+                          },
+                        ),
+                )
+              : AnimatedList(
+                  key: widget.listKey,
+                  initialItemCount: model.messages.length,
+                  reverse: true,
+                  shrinkWrap: true,
+                  padding: EdgeInsets.all(8.0),
+                  itemBuilder: (context, index, animation) {
+                    MessageModel _message = model.messages[index];
+                    return MessageItem(
+                      darkMode: model.darkModeEnabled,
+                      message: _message,
+                      animation: animation,
+                      item: index,
+                      onTap: () {},
+                    );
+                  },
                 ),
     );
   }
@@ -89,59 +106,64 @@ class _DashboardViewState extends State<DashboardView>
   buildInput(DashboardViewModel model) {
     return Align(
       alignment: Alignment.bottomCenter,
-      child: Material(
-        type: MaterialType.card,
-        elevation: 16,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(children: [
-            Expanded(
-              child: TextField(
-                onChanged: (text) => model.addMsgToSink(text, false),
-                focusNode: _messageFocusNode,
-                controller: _messageController,
-                decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(12),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(25.0)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Theme.of(context).primaryColor),
-                        borderRadius: BorderRadius.circular(25.0)),
-                    border: InputBorder.none,
-                    hintText: 'Type message...'),
-              ),
+      child: Container(
+        color: Colors.white.withOpacity(.6),
+        padding: const EdgeInsets.all(8.0),
+        child: Row(children: [
+          Expanded(
+            child: TextField(
+              onChanged: (text) => model.addMsgToSink(text, false),
+              focusNode: _messageFocusNode,
+              controller: _messageController,
+              decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(12),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(25.0)),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Theme.of(context).primaryColor),
+                      borderRadius: BorderRadius.circular(25.0)),
+                  border: InputBorder.none,
+                  hintText: 'Type message...'),
             ),
-            AnimatedCrossFade(
-              firstChild: IconButton(
-                  icon: Icon(
-                    Icons.send,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  onPressed: () => addMessage(model)),
-              secondChild: Container(),
-              duration: Duration(milliseconds: 500),
-              crossFadeState: _dashboardViewModel.showSendBtn
-                  ? CrossFadeState.showFirst
-                  : CrossFadeState.showSecond,
-              sizeCurve: Curves.easeOutSine,
-              firstCurve: Curves.easeOutSine,
-              secondCurve: Curves.easeOutSine,
-            ),
-          ]),
-        ),
+          ),
+          AnimatedCrossFade(
+            firstChild: IconButton(
+                icon: Icon(
+                  Icons.send,
+                  color: Theme.of(context).primaryColor,
+                ),
+                onPressed: () => addMessage(model)),
+            secondChild: Container(),
+            duration: Duration(milliseconds: 500),
+            crossFadeState: _dashboardViewModel.showSendBtn
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            sizeCurve: Curves.easeOutSine,
+            firstCurve: Curves.easeOutSine,
+            secondCurve: Curves.easeOutSine,
+          ),
+        ]),
       ),
     );
   }
 
   void addMessage(DashboardViewModel model) async {
-    var _message = MessageModel(message: _messageController.text, sent: true);
-    final _listState = widget.listKey.currentState;
-    if (_listState != null)
-      _listState.insertItem(0, duration: Duration(milliseconds: 500));
-    await model.addMessage(_message);
-    await model.askQuestion(_message);
+    if (model.user == null) {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return NoUserDialog();
+          });
+    } else {
+      var _message = MessageModel(message: _messageController.text, sent: true);
+      final _listState = widget.listKey.currentState;
+      if (_listState != null)
+        _listState.insertItem(0, duration: Duration(milliseconds: 500));
+      await model.addMessage(_message);
+      await model.askQuestion(_message);
+    }
   }
 
   @override
@@ -152,7 +174,13 @@ class _DashboardViewState extends State<DashboardView>
       userService: Provider.of(context),
       settingsService: Provider.of(context),
     );
-    _messageFocusNode
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _messageController = TextEditingController();
+    _messageFocusNode = FocusNode()
       ..addListener(() {
         if (_messageFocusNode.hasFocus) {
           _dashboardViewModel.showSendBtn = true;
@@ -163,13 +191,62 @@ class _DashboardViewState extends State<DashboardView>
   }
 
   @override
-  void initState() {
-    super.initState();
-    _messageController = TextEditingController();
-    _messageFocusNode = FocusNode();
-  }
+  bool get wantKeepAlive => true;
+}
+
+class NoMessageWidget extends StatelessWidget {
+  final String buttonTitle;
+  final Function buttonTap;
+
+  const NoMessageWidget({Key key, this.buttonTitle, this.buttonTap})
+      : super(key: key);
 
   @override
-// TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Container(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 40.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              UIHelper.verticalSpaceMedium,
+              Image.asset('assets/images/ic_we.png', height: 160),
+              Text("Welcome to COSMOS!",
+                  style: Theme.of(context).textTheme.body2),
+              SizedBox(height: 4),
+              Text(
+                "With cosmos, you can put your queries related to astrology and get clear instructions from our astrologers.",
+                style: Theme.of(context).textTheme.body2.copyWith(
+                    color: Theme.of(context).disabledColor,
+                    fontWeight: FontWeight.w400),
+              ),
+              Text(
+                "You can start right away by starting the converstion, after entering your credentials into our system",
+                style: Theme.of(context).textTheme.body2.copyWith(
+                    color: Theme.of(context).disabledColor,
+                    fontWeight: FontWeight.w400),
+              ),
+              UIHelper.verticalSpaceSmall,
+              Align(
+                alignment: Alignment.bottomRight,
+                child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32)),
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+                    color: Theme.of(context).primaryColor,
+                    child: Text(
+                      buttonTitle,
+                      style: TextStyle(color: Colors.white),
+                      textAlign: TextAlign.left,
+                    ),
+                    onPressed: buttonTap),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

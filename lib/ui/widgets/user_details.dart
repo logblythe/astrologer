@@ -1,17 +1,15 @@
 import 'package:astrologer/core/constants/end_points.dart';
-import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
+import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/validator_mixin.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:astrologer/core/view_model/view/profile_view_model.dart';
 import 'package:astrologer/core/view_model/view/signup_viewmodel.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
-import 'package:astrologer/ui/widgets/circular_image.dart';
 import 'package:astrologer/ui/widgets/gender_selection.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:astrologer/ui/shared/route_paths.dart';
 
 class UserDetails<T extends BaseViewModel> extends StatefulWidget {
   final T model;
@@ -31,7 +29,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
     with ValidationMixing {
   final FirebaseMessaging _fcm = FirebaseMessaging();
 
-  T model;
+  SignUpViewModel model;
   GlobalKey<FormState> formKey = GlobalKey();
   UserModel user;
   String fcmToken;
@@ -45,6 +43,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
       _dateController,
       _timeController,
       _emailController,
+      _conPasswordController,
       _passwordController,
       _stateController,
       _phoneController;
@@ -61,51 +60,60 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(32),
-            topRight: Radius.circular(32),
-          )),
-      child: SingleChildScrollView(
-        padding: EdgeInsets.all(8.0),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              model is SignUpViewModel
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text(
-                        "Ahem Brahmasmi",
-                        style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 32.0,
-                        ),
-                      ),
-                    )
-                  : Center(
-                      child: CircularImage(),
-                    ),
-              _nameRow(),
-              model is SignUpViewModel ? _phoneTextField() : SizedBox.shrink(),
-              model is SignUpViewModel ? _emailTextField() : SizedBox.shrink(),
-              model is SignUpViewModel
-                  ? _passwordTextField(model as SignUpViewModel)
-                  : Container(),
-              _dateTimeRow(),
-              _accurateTimeSwitch(),
-              _countryDropdown(),
-              _locationTextField(),
-              model is SignUpViewModel
-                  ? _registerButton(model as SignUpViewModel, context)
-                  : Container(),
-            ],
+    return Form(
+      key: formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.max,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            "Create Account",
+            style: TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.bold,
+              fontSize: 32.0,
+            ),
           ),
-        ),
+          UIHelper.verticalSpaceMedium,
+          _listTile("FULL NAME", Icon(Icons.person),
+              controller: _nameController, validator: isEmptyValidation),
+          UIHelper.verticalSpaceMedium,
+          _listTile("EMAIL", Icon(Icons.email),
+              controller: _emailController, validator: validateEmail),
+          UIHelper.verticalSpaceMedium,
+          _listTile("PASSWORD", Icon(Icons.lock),
+              suffixIcon: Icon(Icons.remove_red_eye),
+              controller: _passwordController,
+              validator: isEmptyValidation),
+          UIHelper.verticalSpaceMedium,
+          _listTile("CONFIRM PASSWORD", Icon(Icons.lock),
+              controller: _conPasswordController, validator: isEmptyValidation),
+          Container(
+            margin: EdgeInsets.only(top: 32),
+            alignment: Alignment.bottomRight,
+            child: _registerButton(model, context),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 120),
+            alignment: Alignment.center,
+            child: RichText(
+              text: TextSpan(
+                text: 'Already have a account?',
+                style: Theme.of(context)
+                    .textTheme
+                    .body2
+                    .copyWith(color: Theme.of(context).disabledColor),
+                children: <TextSpan>[
+                  TextSpan(
+                      text: 'Sign in',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor)),
+                ],
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -124,6 +132,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             selectedGender: selectedGender,
           ),
         ),
+        _listTile("FULL NAME", Icon(Icons.person)),
         ListTile(
           leading: Icon(Icons.perm_identity),
           title: Container(
@@ -145,52 +154,28 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             ),
           ),
         ),
-        /*  ListTile(
-          leading: Icon(Icons.perm_identity),
-          title: Row(children: [
-            Expanded(
-              child: Container(
-                margin: EdgeInsets.all(2),
-                child: TextFormField(
-                  validator: isEmptyValidation,
-                  onFieldSubmitted: (_) =>
-                      FocusScope.of(context).requestFocus(_lnameFocusNode),
-                  focusNode: _nameFocusNode,
-                  decoration: InputDecoration(
-                    labelText: 'First Name',
-                    hintText: 'Joy',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                  ),
-                  maxLines: 1,
-                  controller: _nameController,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                margin: EdgeInsets.all(2),
-                child: TextFormField(
-                  validator: isEmptyValidation,
-                  onFieldSubmitted: (_) =>
-                      FocusScope.of(context).requestFocus(_phoneFocusNode),
-                  focusNode: _lnameFocusNode,
-                  decoration: InputDecoration(
-                    labelText: 'Last Name',
-                    hintText: 'Honey',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                  ),
-                  maxLines: 1,
-                  controller: _lnameController,
-                ),
-              ),
-            ),
-          ]),
-        ),*/
       ],
+    );
+  }
+
+  Widget _listTile(String title, Icon prefixIcon,
+      {bool obscureText: false,
+      Widget suffixIcon,
+      TextEditingController controller,
+      FormFieldValidator validator,
+      TextInputType keyboardType}) {
+    return TextFormField(
+      validator: validator,
+      decoration: InputDecoration(
+          isDense: true,
+          labelText: title,
+          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          prefixIcon: prefixIcon,
+          suffix: suffixIcon),
+      obscureText: obscureText,
+      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+      controller: controller,
+      keyboardType: keyboardType,
     );
   }
 
@@ -292,6 +277,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             child: Container(
               margin: EdgeInsets.all(2),
               child: TextFormField(
+                readOnly: true,
                 validator: isEmptyValidation,
                 onFieldSubmitted: (_) =>
                     FocusScope.of(context).requestFocus(_timeFocusNode),
@@ -324,6 +310,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             child: Container(
               margin: EdgeInsets.all(2),
               child: TextFormField(
+                readOnly: true,
                 validator: isEmptyValidation,
                 focusNode: _timeFocusNode,
                 onTap: () async {
@@ -465,60 +452,60 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
       transitionBuilder: (Widget child, Animation<double> animation) =>
           ScaleTransition(child: child, scale: animation),
       duration: Duration(milliseconds: 250),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: model.busy
-            ? CircularProgressIndicator()
-            : Container(
-                width: MediaQuery.of(context).size.width / 1.5,
-                margin: EdgeInsets.all(16.0),
-                child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32)),
-                  padding: EdgeInsets.all(22.0),
-                  child: Text(
-                    'Register',
+      child: model.busy
+          ? CircularProgressIndicator()
+          : RaisedButton(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32)),
+              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    'SIGN UP',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16.0,
                     ),
                   ),
-                  onPressed: () async {
-                    if (validateForm()) {
-                      formKey.currentState.save();
-                      var response = await model.register(
-                          selectedGender,
-                          _nameController.text.split(" ")[0],
-                          _nameController.text.split(" ").length > 1
-                              ? _nameController.text.split(" ")[1]
-                              : '',
-                          DateFormat("yyyy-MM-d").format(
-                              DateFormat('MMM d, yyyy')
-                                  .parse(_dateController.text)),
-                          DateFormat("HH:mm").format(DateFormat("hh:mm a")
-                              .parse(_timeController.text)),
-                          _timeAccurate,
-                          _country,
-                          _locationController.text,
-                          _emailController.text,
-                          _passwordController.text,
-                          _phoneController.text,
-                          _stateController.text,
-                          fcmToken);
-                      if (response.errorMessage == null) {
-                        Navigator.pushReplacementNamed(
-                            context, RoutePaths.home);
-                      } else {
-                        Scaffold.of(context).showSnackBar(SnackBar(
-                          content: Text(response.errorMessage),
-                        ));
-                      }
-                    }
-                  },
-                  color: Theme.of(context).primaryColor,
-                ),
+                  Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                  )
+                ],
               ),
-      ),
+              onPressed: () async {
+                if (formKey.currentState.validate()) {
+                  formKey.currentState.save();
+                  var response = await model.register(
+                    _nameController.text.split(" ")[0],
+                    _nameController.text.split(" ").length > 1
+                        ? _nameController.text.split(" ")[1]
+                        : '',
+                    _emailController.text,
+                    _passwordController.text,
+                    /* selectedGender,
+                      DateFormat("yyyy-MM-d").format(DateFormat('MMM d, yyyy')
+                          .parse(_dateController.text)),
+                      DateFormat("HH:mm").format(
+                          DateFormat("hh:mm a").parse(_timeController.text)),
+                      _timeAccurate,
+                      _country,
+                      _locationController.text,
+
+                      _phoneController.text,
+                      _stateController.text,
+                      fcmToken*/
+                  );
+                  if (response.errorMessage != null) {
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text(response.errorMessage),
+                    ));
+                  }
+                }
+              },
+              color: Theme.of(context).primaryColor,
+            ),
     );
   }
 
@@ -581,6 +568,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
     _dateController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+    _conPasswordController = TextEditingController();
     _phoneController = TextEditingController();
     _stateController = TextEditingController();
     _nameFocusNode = FocusNode();
@@ -616,6 +604,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
     _timeController.dispose();
     _dateController.dispose();
     _emailController.dispose();
+    _conPasswordController.dispose();
     _passwordController.dispose();
     _phoneController.dispose();
     _nameFocusNode.dispose();

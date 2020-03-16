@@ -18,12 +18,15 @@ class HomeService {
   final LocalNotificationHelper _localNotificationHelper;
 
   List<MessageModel> _messageList;
-
   List<AstrologerModel> _astrologers;
   int _id, _userId, _freeCount;
   List<IAPItem> _iaps;
   FlutterInappPurchase _iap;
   List<IdeaModel> _ideas;
+
+  double _priceAfterDiscount;
+  double _questionPrice;
+  double _discountInPercentage;
 
   PublishSubject<MessageAndUpdate> _newMessage = PublishSubject();
   PublishSubject<int> _freeCountStream = PublishSubject();
@@ -37,6 +40,12 @@ class HomeService {
   get ideas => _ideas;
 
   Stream<int> get freeCountStream => _freeCountStream.stream;
+
+  double get priceAfterDiscount => _priceAfterDiscount;
+
+  double get questionPrice => _questionPrice;
+
+  double get discountInPercentage => _discountInPercentage;
 
   set iaps(List<IAPItem> value) {
     _iaps = value;
@@ -71,6 +80,7 @@ class HomeService {
   }
 
   List<MessageModel> get messages => _messageList;
+//  List<MessageModel> get messages => [MessageModel(sent: false,message: "This is the received message",createdAt: DateTime.now().millisecondsSinceEpoch),MessageModel(sent: true,message: "this is the sent message",createdAt: DateTime.now().millisecondsSinceEpoch)];
 
   List<AstrologerModel> get astrologers => _astrologers;
 
@@ -108,7 +118,8 @@ class HomeService {
     return _id;
   }
 
-  Future<Null> askQuestion(MessageModel message, bool shouldCharge) async {
+  Future askQuestion(
+      MessageModel message, bool shouldCharge, double questionPrice) async {
     //    int prevQuesId = await _db.getUnclearedQuestionId();
     print('free count $_freeCount');
     /*if (_freeCount==0 && shouldCharge) await _purchase();
@@ -116,6 +127,7 @@ class HomeService {
     Map<String, dynamic> messageResponse = await _api.askQuestion(
       _userId,
       message.message,
+      questionPrice,
 //      prevQuestionId: prevQuesId,
     );
     if (messageResponse == null) {
@@ -158,6 +170,8 @@ class HomeService {
 
   void dispose() {
     _messageList.clear();
+    _newMessage.close();
+    _freeCountStream.close();
   }
 
   fetchAstrologers() async {
@@ -180,8 +194,14 @@ class HomeService {
     return;
   }
 
-  Future<Map<String, dynamic>> fetchQuestionPrice() async {
-    return await _api.fetchQuestionPrice();
+  fetchQuestionPrice() async {
+    var result = await _api.fetchQuestionPrice();
+    if (result != null) {
+      _questionPrice = result['questionPrice'] ?? 0;
+      _discountInPercentage = result['discountInPercentage'] ?? 0;
+      _priceAfterDiscount =
+          (100 - _discountInPercentage) / 100 * _questionPrice;
+    }
   }
 
   showLocalNotification(String title, String body) async {
