@@ -64,7 +64,8 @@ class HomeService {
     @required Api api,
     @required SharedPrefHelper sharedPrefHelper,
     @required LocalNotificationHelper localNotificationHelper,
-  })  : _dbProvider = db,
+  })
+      : _dbProvider = db,
         _api = api,
         _sharedPrefHelper = sharedPrefHelper,
         _localNotificationHelper = localNotificationHelper {
@@ -80,6 +81,7 @@ class HomeService {
   }
 
   List<MessageModel> get messages => _messageList;
+
 //  List<MessageModel> get messages => [MessageModel(sent: false,message: "This is the received message",createdAt: DateTime.now().millisecondsSinceEpoch),MessageModel(sent: true,message: "this is the sent message",createdAt: DateTime.now().millisecondsSinceEpoch)];
 
   List<AstrologerModel> get astrologers => _astrologers;
@@ -91,12 +93,19 @@ class HomeService {
     }
   }
 
-  Future<void> init({String welcomeMessage}) async {
+  Future getFreeQuesCount() async {
+    _freeCount = await _sharedPrefHelper.getInteger(KEY_FREE_QUES_COUNT) ?? 0;
+    addFreeCountToSink(_freeCount);
+  }
+
+  Future<void> init({List<String> welcomeMessage}) async {
     _messageList = [];
     _iap = FlutterInappPurchase.instance;
     _userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
     if (welcomeMessage != null) {
-      addMessage(MessageModel(message: welcomeMessage, sent: false));
+      welcomeMessage.forEach((element) {
+        addMessage(MessageModel(message: element, sent: false));
+      });
     } else {
       List<MessageModel> messagesFromDb = await _dbProvider.getAllMessages();
       messagesFromDb.forEach((msg) =>
@@ -105,21 +114,18 @@ class HomeService {
     }
   }
 
-  Future getFreeQuesCount() async {
-    _freeCount = await _sharedPrefHelper.getInteger(KEY_FREE_QUES_COUNT) ?? 0;
-    addFreeCountToSink(_freeCount);
-  }
-
   Future<int> addMessage(MessageModel message) async {
-    message.createdAt = DateTime.now().millisecondsSinceEpoch;
+    message.createdAt = DateTime
+        .now()
+        .millisecondsSinceEpoch;
     _id = await _dbProvider.addMessage(message);
     message.id = _id;
     _messageList.add(message);
     return _id;
   }
 
-  Future askQuestion(
-      MessageModel message, bool shouldCharge, double questionPrice) async {
+  Future askQuestion(MessageModel message, bool shouldCharge,
+      double questionPrice) async {
     //    int prevQuesId = await _db.getUnclearedQuestionId();
     print('free count $_freeCount');
     /*if (_freeCount==0 && shouldCharge) await _purchase();

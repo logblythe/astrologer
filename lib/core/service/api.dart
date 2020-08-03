@@ -46,16 +46,17 @@ class Api {
           "lastName": lname,
           "email": email,
           "password": password,
-          "phoneNumber": phone,
-          "gender": (gender == Gender.male) ? MALE : FEMALE,
-          "city": location,
-          "state": state,
-          "country": country,
-          "dateOfBirth": dob,
-          "birthTime": time,
-          "accurateTime": timeAccurate,
+          "phoneNumber": 9843663988,
+          "gender": MALE,
+          "city": "kathmandu",
+          "state": "Bagmati",
+          "country": "Nepal",
+          "dateOfBirth": "2000-10-12",
+          "birthTime": "12:00",
+          "accurateTime": true,
         }),
       );
+      print('Registration response $response');
       print('Registration response ${jsonDecode(response.body)}');
       switch (response.statusCode) {
         case 200:
@@ -86,7 +87,7 @@ class Api {
         ),
       );
       print('LOGIN RESPONSE ${response.statusCode}${response.body}');
-      return LoginResponse().fromJson(jsonDecode(response.body));
+      return LoginResponse.fromJsonMap(jsonDecode(response.body));
     } on SocketException catch (e) {
       return LoginResponse.withError(e.message);
     }

@@ -180,12 +180,12 @@ class NoUserDialog extends StatelessWidget {
           UIHelper.verticalSpaceMedium,
           Text(
             'LOG IN & CONTINUE ?',
-            style: Theme.of(context).textTheme.body2,
+            style: Theme.of(context).textTheme.bodyText1,
           ),
           UIHelper.verticalSpaceSmall,
           Text(
             "Looks like you haven\'t logged into our system. Would you like to log in and continue",
-            style: Theme.of(context).textTheme.body2.copyWith(
+            style: Theme.of(context).textTheme.bodyText1.copyWith(
                 color: Theme.of(context).disabledColor,
                 fontWeight: FontWeight.w400),
           ),

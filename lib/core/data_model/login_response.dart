@@ -1,53 +1,30 @@
 import 'package:astrologer/core/data_model/user_model.dart';
 
-const String UN_PROCESSABLE_ENTITY = "UNPROCESSABLE_ENTITY";
-const String UN_AUTHORIZED = "UNAUTHORIZED";
-
 class LoginResponse {
-  String status;
-  String error; // unused or not found in server response
-  String message;
+String error;
   String type;
   String token;
   bool firstLogin;
-  String welcomeMessage;
-  UserModel user;
+  List<String> welcomeMessageList;
+  UserModel userDetails;
 
-  LoginResponse.fromJson(Map<String, dynamic> json)
-      : status = json['status'],
-        error = json['error'],
-        type = json['type'],
-        token = json['token'],
-        firstLogin = json['firstLogin'],
-        welcomeMessage = json['welcomeMessage'],
-        user = UserModel.fromJson(json['userDetails']);
+	LoginResponse.fromJsonMap(Map<String, dynamic> map):
+		type = map["type"],
+		token = map["token"],
+		firstLogin = map["firstLogin"],
+		welcomeMessageList = List<String>.from(map["welcomeMessageList"]),
+		userDetails = UserModel.fromJson(map["userDetails"]);
 
-  LoginResponse(
-      {this.status,
-      this.error,
-      this.type,
-      this.token,
-      this.firstLogin,
-      this.welcomeMessage,
-      this.user});
+	Map<String, dynamic> toJson() {
+		final Map<String, dynamic> data = new Map<String, dynamic>();
+		data['type'] = type;
+		data['token'] = token;
+		data['firstLogin'] = firstLogin;
+		data['welcomeMessageList'] = welcomeMessageList;
+		data['userDetails'] = userDetails == null ? null : userDetails.toMapForDb();
+		return data;
+	}
 
-  LoginResponse fromJson(Map<String, dynamic> json) {
-    if (json['status'] == UN_PROCESSABLE_ENTITY ||
-        json['status'] == UN_AUTHORIZED) {
-      print('inside if');
-      return LoginResponse.withError(json['message']);
-    }
-    print('outside if');
-    return LoginResponse(
-      status: json['status'],
-      error: json['error'],
-      type: json['type'],
-      token: json['token'],
-      firstLogin: json['firstLogin'],
-      welcomeMessage: json['welcomeMessage'],
-      user: UserModel.fromJson(json['userDetails']),
-    );
-  }
+LoginResponse.withError(String error) : error = error;
 
-  LoginResponse.withError(String error) : error = error;
 }

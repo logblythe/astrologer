@@ -1,6 +1,5 @@
 import 'package:astrologer/ui/view/home_view.dart';
 import 'package:astrologer/ui/view/login_view.dart';
-import 'package:astrologer/ui/view/profile_view.dart';
 import 'package:astrologer/ui/shared/route_paths.dart';
 import 'package:astrologer/ui/view/sign_up_view.dart';
 import 'package:astrologer/ui/widgets/profile_dialog.dart';

@@ -197,7 +197,7 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
                     text: "Don\'t have an account? ",
                     style: Theme.of(context)
                         .textTheme
-                        .body2
+                        .bodyText1
                         .copyWith(color: Theme.of(context).disabledColor),
                     children: <TextSpan>[
                       TextSpan(

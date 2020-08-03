@@ -23,7 +23,7 @@ class IdeaItem extends StatelessWidget {
             child: Text(
               entry.title,
               textScaleFactor: 1,
-              style: Theme.of(context).textTheme.subhead,
+              style: Theme.of(context).textTheme.subtitle1,
             )),
         expanded: Column(
           children: entry.children

@@ -50,10 +50,10 @@ class UserService {
     LoginResponse _loginResponse =
         await _api.performLogin(email, password, fcmToken);
     if (_loginResponse.error == null) {
-      await _db.addUser(_loginResponse.user);
+      await _db.addUser(_loginResponse.userDetails);
       await _sharedPrefHelper.setString(KEY_TOKEN, _loginResponse.token);
-      await _sharedPrefHelper.setInt(KEY_USER_ID, _loginResponse.user.userId);
-      if (_loginResponse.welcomeMessage != null) {
+      await _sharedPrefHelper.setInt(KEY_USER_ID, _loginResponse.userDetails.userId);
+      if (_loginResponse.firstLogin) {
         await _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, 1);
       }
     }

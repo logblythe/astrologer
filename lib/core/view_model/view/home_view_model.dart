@@ -55,7 +55,7 @@ class HomeViewModel extends BaseViewModel {
     }
   }
 
-  Future getFreeQuesCount() async => await _homeService.getFreeQuesCount();
+  getFreeQuesCount() => _homeService.getFreeQuesCount();
 
   Future<void> updateQuestionStatusN(NotificationModel message) async {
     setBusy(true);

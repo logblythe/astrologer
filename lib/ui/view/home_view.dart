@@ -45,9 +45,9 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
     return BaseWidget<HomeViewModel>(
       model: _homeViewModel,
       onModelReady: (_homeViewModel) async {
-        await _homeViewModel.getFreeQuesCount();
-//        _homeViewModel.getLoggedInUser();
-//        _homeViewModel.fetchQuestionPrice();
+        _homeViewModel.getFreeQuesCount();
+        _homeViewModel.getLoggedInUser();
+        _homeViewModel.fetchQuestionPrice();
         initConnectivity(_homeViewModel);
       },
       builder: (context, HomeViewModel model, _) => Scaffold(
@@ -256,7 +256,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
           ListTile(
             title: Text(
               'Dashboard',
-              style: Theme.of(context).textTheme.body2,
+              style: Theme.of(context).textTheme.bodyText1,
             ),
             leading: Icon(Icons.developer_board),
             onTap: () => _onDrawerTap(model, 0),
@@ -264,7 +264,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
           ListTile(
             title: Text(
               'Astrologers',
-              style: Theme.of(context).textTheme.body2,
+              style: Theme.of(context).textTheme.bodyText1,
             ),
             leading: Icon(Icons.people),
             onTap: () => _onDrawerTap(model, 2),
@@ -272,7 +272,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
           ListTile(
             title: Text(
               'What to ask?',
-              style: Theme.of(context).textTheme.body2,
+              style: Theme.of(context).textTheme.bodyText1,
             ),
             leading: Icon(Icons.help),
             onTap: () => _onDrawerTap(model, 3),
@@ -297,8 +297,8 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
           ),
           ListTile(
               title: Text(
-                  'Our mission is to make Cosmic astrology accssible to all people to help them attain positive changes in their lives.',
-                  style: Theme.of(context).textTheme.body1)),
+                  'Our mission is to make Cosmic astrology accessible to all people to help them attain positive changes in their lives.',
+                  style: Theme.of(context).textTheme.bodyText1)),
         ],
       ),
     );

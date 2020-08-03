@@ -63,7 +63,7 @@ class _DashboardViewState extends State<DashboardView>
     return Expanded(
       child: model.fetchingList
           ? const Center(child: CircularProgressIndicator())
-          : model.messages.isEmpty
+          : model.messages==null|| model.messages.length == 0
               ? Center(
                   child: model.user == null
                       ? NoMessageWidget(
@@ -76,7 +76,7 @@ class _DashboardViewState extends State<DashboardView>
                           },
                         )
                       : NoMessageWidget(
-                          buttonTitle: "OK! Lets chat",
+                          buttonTitle: "Ok! Lets chat",
                           buttonTap: () {
                             FocusScope.of(context)
                                 .requestFocus(_messageFocusNode);
@@ -85,7 +85,7 @@ class _DashboardViewState extends State<DashboardView>
                 )
               : AnimatedList(
                   key: widget.listKey,
-                  initialItemCount: model.messages.length,
+                  initialItemCount: model.messages?.length,
                   reverse: true,
                   shrinkWrap: true,
                   padding: EdgeInsets.all(8.0),
@@ -214,17 +214,17 @@ class NoMessageWidget extends StatelessWidget {
               UIHelper.verticalSpaceMedium,
               Image.asset('assets/images/ic_we.png', height: 160),
               Text("Welcome to COSMOS!",
-                  style: Theme.of(context).textTheme.body2),
+                  style: Theme.of(context).textTheme.bodyText1),
               SizedBox(height: 4),
               Text(
                 "With cosmos, you can put your queries related to astrology and get clear instructions from our astrologers.",
-                style: Theme.of(context).textTheme.body2.copyWith(
+                style: Theme.of(context).textTheme.bodyText1.copyWith(
                     color: Theme.of(context).disabledColor,
                     fontWeight: FontWeight.w400),
               ),
               Text(
                 "You can start right away by starting the converstion, after entering your credentials into our system",
-                style: Theme.of(context).textTheme.body2.copyWith(
+                style: Theme.of(context).textTheme.bodyText1.copyWith(
                     color: Theme.of(context).disabledColor,
                     fontWeight: FontWeight.w400),
               ),

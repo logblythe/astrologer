@@ -54,7 +54,7 @@ class AstrologersView extends StatelessWidget {
             UIHelper.verticalSpaceMedium,
             Text(
               'Our astrologers are genuine professionals trained to treat astrology like a sacred science. In their own lives in Nepal, they are known to combine simple, honest living with high thinking',
-              style: Theme.of(context).textTheme.subhead,
+              style: Theme.of(context).textTheme.subtitle1,
               softWrap: true,
             ),
           ],
@@ -77,7 +77,7 @@ class AstrologersView extends StatelessWidget {
                 padding: const EdgeInsets.all(32.0),
                 child: Text(
                   'Why COSMOS?',
-                  style: Theme.of(context).textTheme.headline,
+                  style: Theme.of(context).textTheme.headline5,
                 ),
               ),
             ],
@@ -108,7 +108,7 @@ class AstrologersView extends StatelessWidget {
                       padding: EdgeInsets.all(16),
                       child: Text(
                         'Our Astrologers',
-                        style: Theme.of(context).textTheme.subhead,
+                        style: Theme.of(context).textTheme.subtitle1,
                       ),
                     ),
                     ListView.separated(

@@ -57,7 +57,7 @@ class IdeasView extends StatelessWidget {
             UIHelper.verticalSpaceMedium,
             Text(
               'There are some question samples to inspire you with ideas what type and kind of questions you may ask. Of course, there are imaginary questions, our customer data is strictly confidential.',
-              style: Theme.of(context).textTheme.subhead,
+              style: Theme.of(context).textTheme.subtitle1,
               softWrap: true,
             ),
           ],

@@ -101,7 +101,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
                 text: 'Already have a account?',
                 style: Theme.of(context)
                     .textTheme
-                    .body2
+                    .bodyText1
                     .copyWith(color: Theme.of(context).disabledColor),
                 children: <TextSpan>[
                   TextSpan(

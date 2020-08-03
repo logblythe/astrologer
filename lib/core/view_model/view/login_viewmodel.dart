@@ -31,6 +31,8 @@ class LoginViewModel extends BaseViewModel {
       setError(loginResponse.error);
     } else {
       setBusy(false);
+      if (loginResponse.firstLogin)
+        _homeService.init(welcomeMessage: loginResponse.welcomeMessageList);
     }
     return loginResponse;
   }
