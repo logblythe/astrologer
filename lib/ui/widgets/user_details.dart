@@ -46,7 +46,9 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
       _conPasswordController,
       _passwordController,
       _stateController,
+      _countryController,
       _phoneController;
+
   FocusNode _nameFocusNode,
       _locationFocusNode,
       _dateFocusNode,
@@ -54,6 +56,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
       _emailFocusNode,
       _passwordFocusNode,
       _stateFocusNode,
+      _countryFocusNode,
       _phoneFocusNode;
 
   bool _countryDropDownValid = true;
@@ -75,19 +78,54 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             ),
           ),
           UIHelper.verticalSpaceMedium,
-          _listTile("FULL NAME", Icon(Icons.person),
-              controller: _nameController, validator: isEmptyValidation),
+          _listTile(
+            "FULL NAME",
+            Icon(Icons.person),
+            controller: _nameController,
+            validator: isEmptyValidation,
+          ),
           UIHelper.verticalSpaceMedium,
-          _listTile("EMAIL", Icon(Icons.email),
-              controller: _emailController, validator: validateEmail),
+          _listTile(
+            "EMAIL",
+            Icon(Icons.email),
+            controller: _emailController,
+            validator: validateEmail,
+            keyboardType: TextInputType.emailAddress,
+          ),
           UIHelper.verticalSpaceMedium,
-          _listTile("PASSWORD", Icon(Icons.lock),
-              suffixIcon: Icon(Icons.remove_red_eye),
-              controller: _passwordController,
-              validator: isEmptyValidation),
+          _listTile(
+            "PASSWORD",
+            Icon(Icons.lock),
+            suffixIcon: Icon(Icons.remove_red_eye),
+            controller: _passwordController,
+            validator: isEmptyValidation,
+          ),
           UIHelper.verticalSpaceMedium,
-          _listTile("CONFIRM PASSWORD", Icon(Icons.lock),
-              controller: _conPasswordController, validator: isEmptyValidation),
+          _listTile(
+            "CONFIRM PASSWORD",
+            Icon(Icons.lock),
+            controller: _conPasswordController,
+            validator: isEmptyValidation,
+          ),
+          UIHelper.verticalSpaceMedium,
+          _listTile(
+            "PHONE",
+            Icon(Icons.phone_android),
+            controller: _phoneController,
+            validator: isEmptyValidation,
+            keyboardType: TextInputType.number,
+          ),
+          UIHelper.verticalSpaceMedium,
+          _dateTimeRow(),
+          UIHelper.verticalSpaceMedium,
+          _listTile(
+            "Country",
+            Icon(Icons.local_airport),
+            controller: _countryController,
+            validator: isEmptyValidation,
+          ),
+          UIHelper.verticalSpaceMedium,
+          _locationTextField(),
           Container(
             margin: EdgeInsets.only(top: 32),
             alignment: Alignment.bottomRight,
@@ -122,42 +160,6 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
     selectedGender = gender;
   }
 
-  Widget _nameRow() {
-    return Column(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: GenderSelection(
-            updateGender: updateGender,
-            selectedGender: selectedGender,
-          ),
-        ),
-        _listTile("FULL NAME", Icon(Icons.person)),
-        ListTile(
-          leading: Icon(Icons.perm_identity),
-          title: Container(
-            margin: EdgeInsets.all(2),
-            child: TextFormField(
-              validator: isEmptyValidation,
-              onFieldSubmitted: (_) =>
-                  FocusScope.of(context).requestFocus(_phoneFocusNode),
-              focusNode: _nameFocusNode,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                hintText: 'Joy Honey',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-              ),
-              maxLines: 1,
-              controller: _nameController,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _listTile(String title, Icon prefixIcon,
       {bool obscureText: false,
       Widget suffixIcon,
@@ -179,164 +181,77 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
     );
   }
 
-  Widget _phoneTextField() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ListTile(
-        leading: Icon(Icons.smartphone),
-        title: TextFormField(
-          maxLength: 10,
-          validator: isEmptyValidation,
-          onFieldSubmitted: (_) =>
-              FocusScope.of(context).requestFocus(_emailFocusNode),
-          focusNode: _phoneFocusNode,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            labelText: 'Phone',
-            hintText: 'Phone',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-          ),
-          maxLines: 1,
-          controller: _phoneController,
-        ),
-      ),
-    );
-  }
-
-  Widget _emailTextField() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ListTile(
-        leading: Icon(Icons.mail_outline),
-        title: TextFormField(
-          validator: validateEmail,
-          onFieldSubmitted: (_) =>
-              FocusScope.of(context).requestFocus(_passwordFocusNode),
-          focusNode: _emailFocusNode,
-          keyboardType: TextInputType.emailAddress,
-          decoration: InputDecoration(
-            labelText: 'Email',
-            hintText: 'example@example.com',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-          ),
-          maxLines: 1,
-          controller: _emailController,
-        ),
-      ),
-    );
-  }
-
-  Widget _passwordTextField(SignUpViewModel model) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ListTile(
-        leading: Icon(Icons.lock_outline),
-        title: TextFormField(
-          validator: isEmptyValidation,
-          onFieldSubmitted: (_) =>
-              FocusScope.of(context).requestFocus(_dateFocusNode),
-          focusNode: _passwordFocusNode,
-          obscureText: model.obscureText,
-          keyboardType: TextInputType.visiblePassword,
-          decoration: InputDecoration(
-            labelText: 'Password',
-            hintText: 'Password',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-            suffixIcon: IconButton(
-              icon: Icon(
-                Icons.remove_red_eye,
-                color: !model.obscureText
-                    ? Theme.of(context).primaryColor
-                    : Theme.of(context).disabledColor,
-              ),
-              onPressed: () => model.toggleObscureText(),
-            ),
-          ),
-          maxLines: 1,
-          controller: _passwordController,
-        ),
-      ),
-    );
-  }
-
   Widget _dateTimeRow() {
     DateTime currentDate = DateTime.now();
-    return ListTile(
-      leading: Icon(Icons.calendar_today),
-      title: Row(
-        children: <Widget>[
-          Flexible(
-            fit: FlexFit.loose,
-            flex: 2,
-            child: Container(
-              margin: EdgeInsets.all(2),
-              child: TextFormField(
-                readOnly: true,
-                validator: isEmptyValidation,
-                onFieldSubmitted: (_) =>
-                    FocusScope.of(context).requestFocus(_timeFocusNode),
-                focusNode: _dateFocusNode,
-                onTap: () async {
-                  DateTime selectedDate = await showDatePicker(
-                      context: context,
-                      initialDate: currentDate,
-                      firstDate: DateTime(1980),
-                      lastDate: currentDate);
-                  setState(() {
-                    if (selectedDate != null) date = selectedDate;
-                    _dateController.text = DateFormat.yMMMd().format(date);
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Date of birth',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                ),
-                maxLines: 1,
-                controller: _dateController,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: <Widget>[
+        Flexible(
+          fit: FlexFit.loose,
+          flex: 2,
+          child: Container(
+            margin: EdgeInsets.all(2),
+            child: TextFormField(
+              readOnly: true,
+              validator: isEmptyValidation,
+              onFieldSubmitted: (_) =>
+                  FocusScope.of(context).requestFocus(_timeFocusNode),
+              focusNode: _dateFocusNode,
+              onTap: () async {
+                DateTime selectedDate = await showDatePicker(
+                    context: context,
+                    initialDate: currentDate,
+                    firstDate: DateTime(1980),
+                    lastDate: currentDate);
+                setState(() {
+                  if (selectedDate != null) date = selectedDate;
+                  _dateController.text = DateFormat.yMMMd().format(date);
+                });
+              },
+              decoration: InputDecoration(
+                prefixIcon: Icon(Icons.calendar_today),
+                isDense: true,
+                labelStyle:
+                    TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                labelText: 'Date of birth',
               ),
+              maxLines: 1,
+              controller: _dateController,
             ),
           ),
-          Flexible(
-            fit: FlexFit.loose,
-            flex: 1,
-            child: Container(
-              margin: EdgeInsets.all(2),
-              child: TextFormField(
-                readOnly: true,
-                validator: isEmptyValidation,
-                focusNode: _timeFocusNode,
-                onTap: () async {
-                  TimeOfDay selectedTime = await showTimePicker(
-                      context: context, initialTime: TimeOfDay.now());
-                  setState(() {
-                    if (selectedTime != null) {
-                      time = selectedTime;
-                      _timeController.text = DateFormat("hh:mm a").format(
-                          DateFormat("HH:mm").parse(time.format(context)));
-                    }
-                  });
-                },
-                decoration: InputDecoration(
-                  labelText: 'Time',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                ),
-                maxLines: 1,
-                controller: _timeController,
+        ),
+        Flexible(
+          fit: FlexFit.loose,
+          flex: 1,
+          child: Container(
+            margin: EdgeInsets.all(2),
+            child: TextFormField(
+              readOnly: true,
+              validator: isEmptyValidation,
+              focusNode: _timeFocusNode,
+              onTap: () async {
+                TimeOfDay selectedTime = await showTimePicker(
+                    context: context, initialTime: TimeOfDay.now());
+                setState(() {
+                  if (selectedTime != null) {
+                    time = selectedTime;
+                    _timeController.text = DateFormat("hh:mm a").format(
+                        DateFormat("HH:mm").parse(time.format(context)));
+                  }
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Time',
+                isDense: true,
+                labelStyle:
+                    TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
+              maxLines: 1,
+              controller: _timeController,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -396,54 +311,45 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
   }
 
   Widget _locationTextField() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ListTile(
-        leading: Icon(Icons.my_location),
-        title: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Flexible(
-              flex: 1,
-              child: TextFormField(
-                onFieldSubmitted: (_) {
-                  FocusScope.of(context).requestFocus(_locationFocusNode);
-                },
-                keyboardType: TextInputType.number,
-                maxLength: 1,
-                validator: isEmptyValidation,
-                focusNode: _stateFocusNode,
-                decoration: InputDecoration(
-                  labelText: 'State',
-                  hintText: '0',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                ),
-                maxLines: 1,
-                controller: _stateController,
-              ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Flexible(
+          flex: 1,
+          child: TextFormField(
+            onFieldSubmitted: (_) {
+              FocusScope.of(context).requestFocus(_locationFocusNode);
+            },
+            keyboardType: TextInputType.number,
+            validator: isEmptyValidation,
+            focusNode: _stateFocusNode,
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.location_on),
+              labelText: 'State',
+              isDense: true,
+              labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
-            UIHelper.horizontalSpaceSmall,
-            Flexible(
-              flex: 2,
-              child: TextFormField(
-                validator: isEmptyValidation,
-                focusNode: _locationFocusNode,
-                decoration: InputDecoration(
-                  labelText: 'Location',
-                  hintText: 'Kathmandu',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16.0),
-                  ),
-                ),
-                maxLines: 1,
-                controller: _locationController,
-              ),
-            ),
-          ],
+            maxLines: 1,
+            controller: _stateController,
+          ),
         ),
-      ),
+        UIHelper.horizontalSpaceSmall,
+        Flexible(
+          flex: 2,
+          child: TextFormField(
+            validator: isEmptyValidation,
+            focusNode: _locationFocusNode,
+            decoration: InputDecoration(
+              labelText: 'Location',
+              isDense: true,
+              labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            ),
+            maxLines: 1,
+            controller: _locationController,
+          ),
+        ),
+      ],
     );
   }
 
@@ -474,39 +380,36 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
                   )
                 ],
               ),
-              onPressed: () async {
-                if (formKey.currentState.validate()) {
-                  formKey.currentState.save();
-                  var response = await model.register(
-                    _nameController.text.split(" ")[0],
-                    _nameController.text.split(" ").length > 1
-                        ? _nameController.text.split(" ")[1]
-                        : '',
-                    _emailController.text,
-                    _passwordController.text,
-                    /* selectedGender,
-                      DateFormat("yyyy-MM-d").format(DateFormat('MMM d, yyyy')
-                          .parse(_dateController.text)),
-                      DateFormat("HH:mm").format(
-                          DateFormat("hh:mm a").parse(_timeController.text)),
-                      _timeAccurate,
-                      _country,
-                      _locationController.text,
-
-                      _phoneController.text,
-                      _stateController.text,
-                      fcmToken*/
-                  );
-                  if (response.errorMessage != null) {
-                    Scaffold.of(context).showSnackBar(SnackBar(
-                      content: Text(response.errorMessage),
-                    ));
-                  }
-                }
-              },
+              onPressed: _handleButtonPress,
               color: Theme.of(context).primaryColor,
             ),
     );
+  }
+
+  void _handleButtonPress() async {
+    if (formKey.currentState.validate()) {
+      formKey.currentState.save();
+      var dob = DateFormat("yyyy-MM-d")
+          .format(DateFormat('MMM d, yyyy').parse(_dateController.text));
+      user = UserModel();
+      user.firstName = _nameController.text.split(" ").elementAt(0);
+      user.lastName = _nameController.text.split(" ").elementAt(1) ?? "";
+      user.email = _emailController.text;
+      user.password = _passwordController.text;
+      user.phoneNumber = _phoneController.text;
+      user.city = _locationController.text;
+      user.state = _stateController.text;
+      user.country = _countryController.text;
+      user.dateOfBirth = dob;
+      user.birthTime = _timeController.text;
+      user.accurateTime = true;
+      var response = await model.register(user: user);
+      if (response.errorMessage != null) {
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text(response.errorMessage),
+        ));
+      }
+    }
   }
 
   Future<bool> updateUser() async {
@@ -521,9 +424,8 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             city: _locationController.text,
             state: _stateController.text,
             country: _country,
-            /*dateOfBirth: DateFormat("yyyy-MM-d")
-                .format(DateFormat('MMM d, yyyy').parse(_dateController.text)),*/
-            dateOfBirth: _dateController.text,
+            dateOfBirth: DateFormat("yyyy-MM-d")
+                .format(DateFormat('MMM d, yyyy').parse(_dateController.text)),
             birthTime: DateFormat("HH:mm")
                 .format(DateFormat("hh:mm a").parse(_timeController.text)),
             accurateTime: _timeAccurate),
@@ -571,6 +473,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
     _conPasswordController = TextEditingController();
     _phoneController = TextEditingController();
     _stateController = TextEditingController();
+    _countryController = TextEditingController();
     _nameFocusNode = FocusNode();
     _locationFocusNode = FocusNode();
     _dateFocusNode = FocusNode();

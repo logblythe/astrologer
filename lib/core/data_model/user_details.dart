@@ -1,6 +1,5 @@
 
 class UserDetails {
-
   int userId;
   String firstName;
   String lastName;

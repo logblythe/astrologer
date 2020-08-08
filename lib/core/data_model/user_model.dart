@@ -2,6 +2,7 @@ class UserModel {
   int userId;
   String firstName;
   String lastName;
+  String password;
   String email;
   String phoneNumber;
   String gender;
@@ -18,6 +19,7 @@ class UserModel {
     this.userId,
     this.firstName,
     this.lastName,
+    this.password,
     this.email,
     this.phoneNumber,
     this.gender,
@@ -41,6 +43,7 @@ class UserModel {
       : userId = json['userId'],
         firstName = json['firstName'],
         lastName = json['lastName'],
+        password = json['password'],
         email = json['email'],
         phoneNumber = json['phoneNumber'],
         gender = json['gender'],
@@ -57,6 +60,7 @@ class UserModel {
         firstName = json['firstName'],
         lastName = json['lastName'],
         email = json['email'],
+        password = json['password'],
         phoneNumber = json['phoneNumber'],
         gender = json['gender'],
         city = json['city'],
@@ -73,6 +77,7 @@ class UserModel {
         "lastName": lastName,
         "email": email,
         "phoneNumber": phoneNumber,
+        "password": password,
         "gender": gender,
         "city": city,
         "state": state,
@@ -80,7 +85,7 @@ class UserModel {
         "role": role,
         "dateOfBirth": dateOfBirth,
         "birthTime": birthTime,
-        "accurateTime": accurateTime ? 1 : 0,
+        "accurateTime": accurateTime,
       };
 
   @override

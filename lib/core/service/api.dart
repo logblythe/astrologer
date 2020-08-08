@@ -24,38 +24,12 @@ class Api {
     return sharedPref.getString(KEY_TOKEN);
   }
 
-  Future<UserModel> registerUser(
-      Gender gender,
-      String name,
-      String lname,
-      String email,
-      String password,
-      String phone,
-      String location,
-      String state,
-      String country,
-      String dob,
-      String time,
-      bool timeAccurate) async {
+  Future<UserModel> registerUser(UserModel user) async {
     try {
-      var response = await client.post(
-        register,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "firstName": name,
-          "lastName": lname,
-          "email": email,
-          "password": password,
-          "phoneNumber": 9843663988,
-          "gender": MALE,
-          "city": "kathmandu",
-          "state": "Bagmati",
-          "country": "Nepal",
-          "dateOfBirth": "2000-10-12",
-          "birthTime": "12:00",
-          "accurateTime": true,
-        }),
-      );
+      print('Registration response ${jsonEncode(user.toMapForDb())}');
+      var response = await client.post(register,
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(user.toMapForDb()));
       print('Registration response $response');
       print('Registration response ${jsonDecode(response.body)}');
       switch (response.statusCode) {

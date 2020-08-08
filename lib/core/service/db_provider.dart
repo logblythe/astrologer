@@ -11,6 +11,7 @@ const String USER_ID = "userId";
 const String FIRST_NAME = "firstName";
 const String LAST_NAME = "lastName";
 const String EMAIL = "email";
+const String PASSWORD = "password";
 const String PHONE = "phoneNumber";
 const String GENDER = "gender";
 const String CITY = "city";
@@ -45,6 +46,7 @@ class DbProvider {
          $FIRST_NAME text,
          $LAST_NAME text,
          $EMAIL text,
+         $PASSWORD text,
          $PHONE text,
          $GENDER text,
          $CITY text,

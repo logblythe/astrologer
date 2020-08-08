@@ -20,36 +20,16 @@ class SignUpViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  Future<UserModel> register(
-      String name, String lname, String email, String password,
-      {Gender gender,
-      String dob,
-      String time,
-      bool timeAccurate,
-      String country,
-      String location,
-      String phone,
-      String state,
-      String fcmToken}) async {
+  Future<UserModel> register({UserModel user, String fcmToken}) async {
     setBusy(true);
     var userModel = await _userService.register(
-        gender,
-        name,
-        lname,
-        dob,
-        time,
-        timeAccurate,
-        country,
-        location,
-        email,
-        password,
-        phone,
-        state,
-        fcmToken);
+      user: user,
+      fcmToken: fcmToken,
+    );
     if (userModel.errorMessage != null) {
       setError(userModel.errorMessage);
     } else {
-      var loginResponse = await _userService.performLogin(email, password);
+      var loginResponse = await _userService.performLogin(user.email, user.password);
       if (loginResponse.error != null) {
         setError(loginResponse.error);
       } else {

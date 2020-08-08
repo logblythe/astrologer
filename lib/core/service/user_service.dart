@@ -52,7 +52,8 @@ class UserService {
     if (_loginResponse.error == null) {
       await _db.addUser(_loginResponse.userDetails);
       await _sharedPrefHelper.setString(KEY_TOKEN, _loginResponse.token);
-      await _sharedPrefHelper.setInt(KEY_USER_ID, _loginResponse.userDetails.userId);
+      await _sharedPrefHelper.setInt(
+          KEY_USER_ID, _loginResponse.userDetails.userId);
       if (_loginResponse.firstLogin) {
         await _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, 1);
       }
@@ -67,37 +68,10 @@ class UserService {
     return _user;
   }
 
-  Future<UserModel> register(
-      Gender gender,
-      String name,
-      String lname,
-      String dob,
-      String time,
-      bool timeAccurate,
-      String country,
-      String location,
-      String email,
-      String password,
-      String phone,
-      String state,
-      String fcmToken) async {
-    print('time and date $time $dob');
-    UserModel userModel = await _api.registerUser(
-      gender,
-      name,
-      lname,
-      email,
-      password,
-      phone,
-      location,
-      state,
-      country,
-      dob,
-      time,
-      timeAccurate,
-    );
+  Future<UserModel> register({UserModel user, String fcmToken}) async {
+    UserModel userModel = await _api.registerUser(user);
     if (userModel.errorMessage == null) {
-      await performLogin(email, password);
+      await performLogin(user.email, user.password);
     }
     return userModel;
   }
