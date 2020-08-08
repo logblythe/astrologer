@@ -116,7 +116,7 @@ class Api {
       print('the ask question response ${response.statusCode}${response.body}');
       return jsonDecode(response.body);
     } catch (e) {
-      print('the response exception $e}');
+      print('ASK QUESTION the response exception $e}');
       return null;
     }
   }
@@ -135,7 +135,7 @@ class Api {
       List<dynamic> astrologers = jsonDecode(response.body);
       return astrologers.map((json) => AstrologerModel.fromJson(json)).toList();
     } catch (e) {
-      print('the response exception $e}');
+      print('FETCH ASTROLOGER the response exception $e}');
 //      return AstrologerModel.withError(e.toString());
       return null;
     }
@@ -155,7 +155,7 @@ class Api {
           'response fetch question price ${response.statusCode} \n ${response.body}');
       return jsonDecode(response.body);
     } catch (e) {
-      print('the response exception $e}');
+      print('FETCHQUESTION PRICE the response exception $e}');
       return null;
     }
   }

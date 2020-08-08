@@ -1,4 +1,4 @@
-package com.sikshya.astrologer;
+package com.cosmosNepal.cosmos;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

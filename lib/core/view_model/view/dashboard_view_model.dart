@@ -6,17 +6,12 @@ import 'package:astrologer/core/service/settings_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 
 class DashboardViewModel extends BaseViewModel {
   HomeService _homeService;
   UserService _userService;
   SettingsService _settingsService;
-
-  int _messageId;
-  MessageModel _message;
-  String _messageBox;
-  bool _showSendBtn = false;
-  bool _fetchingList = false;
 
   DashboardViewModel({
     @required HomeService homeService,
@@ -26,10 +21,12 @@ class DashboardViewModel extends BaseViewModel {
         this._userService = userService,
         this._settingsService = settingsService;
 
+  int _messageId;
+  String _messageBox;
+  bool _showSendBtn = false;
+  bool _fetchingList = false;
   bool get fetchingList => _fetchingList;
-
   bool get showSendBtn => _showSendBtn;
-
   bool get darkModeEnabled => _settingsService.darkModeEnabled;
 
   set showSendBtn(bool value) {
@@ -53,6 +50,7 @@ class DashboardViewModel extends BaseViewModel {
   init() async {
     setBusy(true);
     _fetchingList = true;
+    _homeService.init();
     await _userService.getLoggedInUser();
     setupListeners();
     _fetchingList = false;
@@ -64,16 +62,16 @@ class DashboardViewModel extends BaseViewModel {
       _messageBox = data.message;
       if (data.update) notifyListeners();
     });
-    /*   FlutterInappPurchase.purchaseError.listen((PurchaseResult event) async {
-      print("purchase error ${event.message}");
-      await updateQuestionStatusById(NOT_DELIVERED);
-    });
-    FlutterInappPurchase.purchaseUpdated.listen((PurchasedItem item) async {
-      var result =
-          await _homeService.iap.consumePurchaseAndroid(item.purchaseToken);
-      print('purchase listener $result');
-      await askQuestion(_message, shouldCharge: false);
-    });*/
+//    FlutterInappPurchase.purchaseError.listen((PurchaseResult event) async {
+//      print("purchase error ${event.message}");
+//      await updateQuestionStatusById(NOT_DELIVERED);
+//    });
+//    FlutterInappPurchase.purchaseUpdated.listen((PurchasedItem item) async {
+//      var result =
+//          await _homeService.iap.consumePurchaseAndroid(item.purchaseToken);
+//      print('purchase listener $result');
+//      await askQuestion(_message, shouldCharge: false);
+//    });
   }
 
   Future<void> addMessage(MessageModel message) async {
@@ -86,10 +84,8 @@ class DashboardViewModel extends BaseViewModel {
   Future<void> askQuestion(MessageModel message,
       {bool shouldCharge = true}) async {
     setBusy(true);
-    _message = message;
-    var price = _homeService.priceAfterDiscount;
     await _homeService.askQuestion(
-        _message, shouldCharge, _homeService.priceAfterDiscount);
+        message, shouldCharge, _homeService.priceAfterDiscount);
     setBusy(false);
   }
 

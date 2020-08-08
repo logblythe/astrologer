@@ -17,10 +17,10 @@ class HomeService {
   final SharedPrefHelper _sharedPrefHelper;
   final LocalNotificationHelper _localNotificationHelper;
 
-  List<MessageModel> _messageList;
+  List<MessageModel> _messageList =[];
   List<AstrologerModel> _astrologers;
   int _id, _userId, _freeCount;
-  List<IAPItem> _iaps;
+  List<IAPItem> _iapList;
   FlutterInappPurchase _iap;
   List<IdeaModel> _ideas;
 
@@ -35,7 +35,8 @@ class HomeService {
 
   FlutterInappPurchase get iap => _iap;
 
-  List<IAPItem> get iaps => _iaps;
+  // ignore: unnecessary_getters_setters
+  List<IAPItem> get iaps => _iapList;
 
   get ideas => _ideas;
 
@@ -48,7 +49,7 @@ class HomeService {
   double get discountInPercentage => _discountInPercentage;
 
   set iaps(List<IAPItem> value) {
-    _iaps = value;
+    _iapList = value;
   }
 
   addMsgToSink(String message, update) {
@@ -99,8 +100,7 @@ class HomeService {
   }
 
   Future<void> init({List<String> welcomeMessage}) async {
-    _messageList = [];
-    _iap = FlutterInappPurchase.instance;
+//    _iap = FlutterInappPurchase.instance;
     _userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
     if (welcomeMessage != null) {
       welcomeMessage.forEach((element) {
@@ -128,8 +128,8 @@ class HomeService {
       double questionPrice) async {
     //    int prevQuesId = await _db.getUnclearedQuestionId();
     print('free count $_freeCount');
-    /*if (_freeCount==0 && shouldCharge) await _purchase();
-    print('After purchase');*/
+    if (_freeCount==0 && shouldCharge) await _purchase();
+    print('After purchase');
     Map<String, dynamic> messageResponse = await _api.askQuestion(
       _userId,
       message.message,
@@ -185,18 +185,18 @@ class HomeService {
   }
 
   Future<Null> _purchase() async {
-    PurchasedItem _purchasedItem;
-    print('the product id is ${_iaps[0].productId}');
-    try {
-      _purchasedItem = await _iap.requestPurchase(_iaps[0].productId);
-      _iap.consumePurchaseAndroid(_purchasedItem.purchaseToken);
-    } catch (e) {
-      PlatformException p = e as PlatformException;
-      print("exception ${p.code}");
-      print("exception ${p.message}");
-      print("exception ${p.details}");
-    }
-    print('Purchase success ${_purchasedItem.productId}');
+//    PurchasedItem _purchasedItem;
+//    print('the product id is ${_iapList[0].productId}');
+//    try {
+//      _purchasedItem = await _iap.requestPurchase(_iapList[0].productId);
+//      _iap.consumePurchaseAndroid(_purchasedItem.purchaseToken);
+//    } catch (e) {
+//      PlatformException p = e as PlatformException;
+//      print("exception ${p.code}");
+//      print("exception ${p.message}");
+//      print("exception ${p.details}");
+//    }
+//    print('Purchase success ${_purchasedItem.productId}');
     return;
   }
 

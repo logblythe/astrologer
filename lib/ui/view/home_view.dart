@@ -49,6 +49,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
         _homeViewModel.getLoggedInUser();
         _homeViewModel.fetchQuestionPrice();
         initConnectivity(_homeViewModel);
+        _initIAPs(_homeViewModel);
       },
       builder: (context, HomeViewModel model, _) => Scaffold(
         drawer: _buildDrawer(model),
@@ -84,7 +85,6 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
       userService: Provider.of(context),
       homeService: Provider.of(context),
     );
-//    _initIAPs(_homeViewModel);
   }
 
   void _onNotificationReceived(Map<String, dynamic> message) async {
