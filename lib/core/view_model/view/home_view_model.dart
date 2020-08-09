@@ -49,31 +49,20 @@ class HomeViewModel extends BaseViewModel {
   getLoggedInUser() => _userService.getLoggedInUser();
 
   Future<void> onNotificationReceived(NotificationModel answer) async {
-    await updateQuestionStatusN(answer);
+    var data = answer.data;
+    _homeService.updateQuestionStatusN(
+        int.parse(data.engQuestionId), data.status);
     if (answer.data.message != null) {
-      await addMessage(answer);
+      await _homeService.addMessage(MessageModel(
+          sent: false,
+          status: data.status,
+          message: data.message,
+          questionId: 0,
+          astrologer: data.repliedBy));
     }
   }
 
   getFreeQuesCount() => _homeService.getFreeQuesCount();
-
-  Future<void> updateQuestionStatusN(NotificationModel message) async {
-    setBusy(true);
-    await _homeService.updateQuestionStatusN(
-        int.parse(message.data.engQuestionId), message.data.status);
-    setBusy(false);
-  }
-
-  Future<void> addMessage(NotificationModel message) async {
-    setBusy(true);
-    await _homeService.addMessage(MessageModel(
-        sent: false,
-        status: message.data.status,
-        message: message.data.message,
-        questionId: int.parse(message.data.engQuestionId),
-        astrologer: message.data.repliedBy));
-    setBusy(false);
-  }
 
   fetchQuestionPrice() async {
     setBusy(true);

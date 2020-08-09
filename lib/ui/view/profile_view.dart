@@ -96,7 +96,7 @@ class _ProfileViewState extends State<ProfileView> {
                   elevation: 4,
                   child: Padding(
                     padding: const EdgeInsets.all(4.0),
-                    child: CircularImage(),
+                    child: CircularImage(busy: model.uploadingImage),
                   ),
                 ),
                 left: MediaQuery.of(context).size.width / 3,

@@ -1,3 +1,4 @@
+import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/constants/what_to_ask.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/data_model/idea_model.dart';
@@ -7,7 +8,6 @@ import 'package:astrologer/core/service/db_provider.dart';
 import 'package:astrologer/core/utils/local_notification_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -17,7 +17,7 @@ class HomeService {
   final SharedPrefHelper _sharedPrefHelper;
   final LocalNotificationHelper _localNotificationHelper;
 
-  List<MessageModel> _messageList =[];
+  List<MessageModel> _messageList = [];
   List<AstrologerModel> _astrologers;
   int _id, _userId, _freeCount;
   List<IAPItem> _iapList;
@@ -65,8 +65,7 @@ class HomeService {
     @required Api api,
     @required SharedPrefHelper sharedPrefHelper,
     @required LocalNotificationHelper localNotificationHelper,
-  })
-      : _dbProvider = db,
+  })  : _dbProvider = db,
         _api = api,
         _sharedPrefHelper = sharedPrefHelper,
         _localNotificationHelper = localNotificationHelper {
@@ -115,20 +114,18 @@ class HomeService {
   }
 
   Future<int> addMessage(MessageModel message) async {
-    message.createdAt = DateTime
-        .now()
-        .millisecondsSinceEpoch;
+    message.createdAt = DateTime.now().millisecondsSinceEpoch;
     _id = await _dbProvider.addMessage(message);
     message.id = _id;
     _messageList.add(message);
     return _id;
   }
 
-  Future askQuestion(MessageModel message, bool shouldCharge,
-      double questionPrice) async {
+  Future askQuestion(
+      MessageModel message, bool shouldCharge, double questionPrice) async {
     //    int prevQuesId = await _db.getUnclearedQuestionId();
     print('free count $_freeCount');
-    if (_freeCount==0 && shouldCharge) await _purchase();
+    if (_freeCount == 0 && shouldCharge) await _purchase();
     print('After purchase');
     Map<String, dynamic> messageResponse = await _api.askQuestion(
       _userId,
@@ -143,9 +140,9 @@ class HomeService {
       message.status = messageResponse['questionStatus'] ?? DELIVERED;
       message.questionId = messageResponse['engQuesId'];
       if (_freeCount > 0) {
-        _freeCount = --_freeCount;
-        await _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, _freeCount);
-        addFreeCountToSink(_freeCount);
+        int freeCount = _freeCount - 1;
+        await _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, freeCount);
+        addFreeCountToSink(freeCount);
       }
       print('message response updated');
     }
@@ -158,6 +155,12 @@ class HomeService {
       if (_messageList[i].questionId == questionId) {
         _messageList[i].status = status;
         await _dbProvider.updateQuestionStatus(questionId, status);
+        if (status == QuestionStatus.UNCLEAR) {
+          int freeCount =
+              await _sharedPrefHelper.getInteger(KEY_FREE_QUES_COUNT) + 1;
+          _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, freeCount);
+          addFreeCountToSink(freeCount);
+        }
       }
     }
   }

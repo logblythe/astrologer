@@ -1,4 +1,3 @@
-
 const String baseUrl = "http://144.91.121.115:8080/api";
 const String login = "$baseUrl/user/login";
 const String register = "$baseUrl/user/register";
@@ -15,3 +14,9 @@ const List<String> country = [
   "China",
   "Australia"
 ];
+
+class QuestionStatus {
+  static const DELIVERED = "DELIVERED";
+  static const UNCLEAR = "UNCLEAR";
+  static const CLEAR = "CLEAR";
+}

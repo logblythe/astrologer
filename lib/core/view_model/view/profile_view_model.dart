@@ -26,7 +26,7 @@ class ProfileViewModel extends BaseViewModel {
     setBusy(true);
     UserModel user = await _profileService.getLoggedInUser();
     accurateTime = user.accurateTime;
-    selectedGender=user.gender == "M" ? Gender.male : Gender.female;
+    selectedGender = user.gender == "M" ? Gender.male : Gender.female;
     setBusy(false);
   }
 
@@ -37,10 +37,10 @@ class ProfileViewModel extends BaseViewModel {
     return userModel;
   }
 
-  Future<ImageModel> upload(imageFile) async {
-    setBusy(true);
+  upload(imageFile) async {
+    setUploadingImage(true);
     await _profileService.upload(imageFile);
-    setBusy(false);
+    setUploadingImage(false);
   }
 
 /*getImageUrl() async {

@@ -13,12 +13,7 @@ import 'package:astrologer/ui/widgets/text_input.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ProfileDialog extends StatefulWidget {
-  @override
-  _ProfileDialogState createState() => _ProfileDialogState();
-}
-
-class _ProfileDialogState extends State<ProfileDialog> with ValidationMixing {
+class ProfileDialog extends StatelessWidget with ValidationMixing {
   final formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
@@ -64,9 +59,8 @@ class _ProfileDialogState extends State<ProfileDialog> with ValidationMixing {
                       Center(
                         child: CircularImage(
                           imageUrl: Provider.of<String>(context),
-                          onImageCaptured: (imageFile) {
-                            model.upload(imageFile);
-                          },
+                          onImageCaptured: model.upload,
+                          busy: model.uploadingImage,
                         ),
                       ),
                       UIHelper.verticalSpaceMedium,
@@ -126,7 +120,11 @@ class _ProfileDialogState extends State<ProfileDialog> with ValidationMixing {
                       UIHelper.verticalSpaceMedium,
                       Align(
                         alignment: Alignment.bottomRight,
-                        child: _registerButton(model, ctx, handleUpdateClick),
+                        child: _registerButton(
+                          model,
+                          ctx,
+                          handleUpdateClick,
+                        ),
                       ),
                       UIHelper.verticalSpaceMedium,
                     ],

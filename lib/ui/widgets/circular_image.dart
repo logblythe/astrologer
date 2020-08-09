@@ -6,8 +6,9 @@ import 'package:image_picker/image_picker.dart';
 class CircularImage extends StatefulWidget {
   final Function(File image) onImageCaptured;
   final String imageUrl;
+  final bool busy;
 
-  const CircularImage({Key key, this.onImageCaptured, this.imageUrl})
+  const CircularImage({Key key, this.onImageCaptured, this.imageUrl, this.busy})
       : super(key: key);
 
   @override
@@ -16,7 +17,7 @@ class CircularImage extends StatefulWidget {
 
 class _CircularImageState extends State<CircularImage> {
   File _image;
-  String imageUrl;
+  String _imageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,7 @@ class _CircularImageState extends State<CircularImage> {
           child: CircleAvatar(
             backgroundColor: Colors.red,
             radius: 56,
-            child: imageUrl != null
+            child: _imageUrl != null
                 ? Container(
                     width: 190.0,
                     height: 190.0,
@@ -36,11 +37,10 @@ class _CircularImageState extends State<CircularImage> {
                             fit: BoxFit.fill,
                             image: NetworkImage(widget.imageUrl))))
                 : _image == null
-                    ? Icon(Icons.person_outline,)
+                    ? Icon(Icons.person_outline)
                     : Container(
                         decoration: BoxDecoration(
-                          border:
-                              Border.all(color: Colors.red),
+                          border: Border.all(color: Colors.red),
                           shape: BoxShape.circle,
                           image: DecorationImage(
                               fit: BoxFit.fill, image: FileImage(_image)),
@@ -65,6 +65,13 @@ class _CircularImageState extends State<CircularImage> {
               onTap: () => getImage(ImageSource.gallery),
             ),
           ),
+        ),
+        Positioned(
+          top: 38,
+          left: 38,
+          child: widget.busy
+              ? CircularProgressIndicator(strokeWidth: 4,backgroundColor: Colors.white54,)
+              : Container(),
         )
       ],
     );
@@ -73,7 +80,7 @@ class _CircularImageState extends State<CircularImage> {
   @override
   void initState() {
     super.initState();
-    imageUrl = widget.imageUrl;
+    _imageUrl = widget.imageUrl;
   }
 
   @override
@@ -81,7 +88,7 @@ class _CircularImageState extends State<CircularImage> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.imageUrl != widget.imageUrl) {
       setState(() {
-        imageUrl = widget.imageUrl;
+        _imageUrl = widget.imageUrl;
       });
     }
   }
@@ -96,7 +103,7 @@ class _CircularImageState extends State<CircularImage> {
     if (image != null) {
       setState(() {
         _image = image;
-        imageUrl = null;
+        _imageUrl = null;
       });
       widget.onImageCaptured(image);
     }
