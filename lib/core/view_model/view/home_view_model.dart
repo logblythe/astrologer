@@ -48,7 +48,11 @@ class HomeViewModel extends BaseViewModel {
 
   getLoggedInUser() => _userService.getLoggedInUser();
 
-  Future<void> onNotificationReceived(NotificationModel answer) async {
+  addMessageSink(String message) {
+    _homeService.addMsgToSink(message, true);
+  }
+
+  onNotificationReceived(NotificationModel answer) async {
     var data = answer.data;
     _homeService.updateQuestionStatusN(
         int.parse(data.engQuestionId), data.status);

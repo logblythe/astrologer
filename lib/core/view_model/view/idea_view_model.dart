@@ -12,15 +12,13 @@ class IdeaViewModel extends BaseViewModel {
   List<IdeaModel> get ideas => _homeService.ideas;
 
   addMessageToSink(String message) {
-    _homeService.addMsgToSink(message, true);
+//    _homeService.addMsgToSink(message, true);
   }
 
   fetchIdeas() async {
     setBusy(true);
     _homeService.fetchIdeas();
-    Future.delayed(Duration(seconds: 1)).then((_) {
-      setBusy(false);
-    });
+    setBusy(true);
   }
 
   @override

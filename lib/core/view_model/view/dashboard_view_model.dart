@@ -60,7 +60,7 @@ class DashboardViewModel extends BaseViewModel {
   void setupListeners() {
     nMsgStream.listen((MessageAndUpdate data) {
       _messageBox = data.message;
-      if (data.update) notifyListeners();
+//      if (data.update) notifyListeners();
     });
 //    FlutterInappPurchase.purchaseError.listen((PurchaseResult event) async {
 //      print("purchase error ${event.message}");

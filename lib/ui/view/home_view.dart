@@ -4,13 +4,9 @@ import 'package:astrologer/core/view_model/view/home_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/route_paths.dart';
 import 'package:astrologer/ui/view/ideas_view.dart';
-import 'package:astrologer/ui/view/profile_view.dart';
 import 'package:astrologer/ui/view/settings_view.dart';
 import 'package:astrologer/ui/widgets/no_user_dialog.dart';
-import 'package:astrologer/ui/widgets/profile_dialog.dart';
-import 'package:astrologer/ui/widgets/user_details.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +19,6 @@ final List<Map<String, dynamic>> _children = [
     'title': '  ',
     'action': Icons.person_pin,
   },
-  {'title': 'Birth Profile'},
   {'title': 'Astrologers'},
   {'title': 'Ideas to ask'},
   {'title': 'Settings'},
@@ -36,7 +31,6 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> with ConnectivityMixin {
   PageController _pageController;
-  static GlobalKey<UserDetailsState> _formKey = GlobalKey();
   final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   final FirebaseMessaging _fcm = FirebaseMessaging();
   HomeViewModel _homeViewModel;
@@ -156,20 +150,20 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
     } else {
       return showDialog(
             context: context,
-            builder: (context) => new AlertDialog(
-              title: new Text('Are you sure?'),
-              content: new Text('Do you want to exit an App'),
+            builder: (context) => AlertDialog(
+              title: Text('Are you sure?'),
+              content: Text('Do you want to exit an App'),
               actions: <Widget>[
-                new FlatButton(
+                FlatButton(
                   onPressed: () async {
                     Navigator.of(context).pop(false);
 //                    model.showLocalNotification("title", "body");
                   },
-                  child: new Text('No'),
+                  child: Text('No'),
                 ),
-                new FlatButton(
+                FlatButton(
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: new Text('Yes'),
+                  child: Text('Yes'),
                 ),
               ],
             ),
@@ -181,9 +175,10 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
   List<Widget> _pageViewChildren(HomeViewModel model) {
     return [
       DashboardView(listKey: _listKey),
-      ProfileView(userDetailsKey: _formKey),
       AstrologersView(),
-      IdeasView(onTap: () => _onDrawerTap(model, 0, shouldPop: false)),
+      IdeasView(
+        onTap: (idea) => _handleIdeaSelection(model, idea),
+      ),
       SettingsView(),
     ];
   }
@@ -263,7 +258,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
               style: Theme.of(context).textTheme.bodyText1,
             ),
             leading: Icon(Icons.people),
-            onTap: () => _onDrawerTap(model, 2),
+            onTap: () => _onDrawerTap(model, 1),
           ),
           ListTile(
             title: Text(
@@ -271,7 +266,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
               style: Theme.of(context).textTheme.bodyText1,
             ),
             leading: Icon(Icons.help),
-            onTap: () => _onDrawerTap(model, 3),
+            onTap: () => _onDrawerTap(model, 2),
           ),
           ListTile(
             title: Text(
@@ -289,7 +284,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
           ListTile(
             title: Text('Settings'),
             leading: Icon(Icons.settings),
-            onTap: () => _onDrawerTap(model, 4),
+            onTap: () => _onDrawerTap(model, 3),
           ),
           ListTile(
               title: Text(
@@ -298,15 +293,6 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
         ],
       ),
     );
-  }
-
-  void _onDrawerTap(HomeViewModel model, int index, {bool shouldPop = true}) {
-    FocusScope.of(context).unfocus();
-    model.index = index;
-    _pageController.jumpToPage(model.index);
-    if (shouldPop) {
-      Navigator.pop(context);
-    }
   }
 
   void _initIAPs(HomeViewModel model) async {
@@ -339,5 +325,19 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
   void dispose() {
     super.dispose();
     subscription.cancel();
+  }
+
+  void _onDrawerTap(HomeViewModel model, int index, {bool shouldPop = true}) {
+    FocusScope.of(context).unfocus();
+    model.index = index;
+    _pageController.jumpToPage(model.index);
+    if (shouldPop) {
+      Navigator.pop(context);
+    }
+  }
+
+  _handleIdeaSelection(HomeViewModel model, String message) {
+    model.addMessageSink(message);
+    _pageController.jumpToPage(0);
   }
 }

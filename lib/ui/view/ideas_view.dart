@@ -1,10 +1,8 @@
 import 'package:astrologer/core/constants/what_to_ask.dart';
 import 'package:astrologer/core/data_model/idea_model.dart';
 import 'package:astrologer/core/view_model/view/idea_view_model.dart';
-import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:random_color/random_color.dart';
 
 class IdeasView extends StatelessWidget {
@@ -14,26 +12,20 @@ class IdeasView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BaseWidget<IdeaViewModel>(
-      model: IdeaViewModel(homeService: Provider.of(context)),
-      onModelReady: (model) => model.fetchIdeas(),
-      builder: (context, model, _) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).backgroundColor,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(16),
-              topRight: Radius.circular(16),
-            ),
-          ),
-          child: ListView(
-            children: <Widget>[
-              _buildHeader(context),
-              _buildIdeas(context, model),
-            ],
-          ),
-        );
-      },
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).backgroundColor,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+      ),
+      child: ListView(
+        children: <Widget>[
+          _buildHeader(context),
+          _buildIdeas(context),
+        ],
+      ),
     );
   }
 
@@ -66,12 +58,12 @@ class IdeasView extends StatelessWidget {
     );
   }
 
-  Widget _buildIdeas(BuildContext context, IdeaViewModel model) {
+  Widget _buildIdeas(BuildContext context) {
     return GridView.builder(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         padding: EdgeInsets.all(8),
-        itemCount: model.ideas.length,
+        itemCount: ideaModelList.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             childAspectRatio: 1.5,
             crossAxisCount: 2,
@@ -80,18 +72,18 @@ class IdeasView extends StatelessWidget {
         itemBuilder: (context, index) {
           return Card(
             child: InkWell(
-              onTap: () => _showIdeasDialog(index, context, model),
+              onTap: () => _showIdeasDialog(index, context),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 mainAxisSize: MainAxisSize.max,
                 children: <Widget>[
                   Icon(
-                    model.ideas[index].iconData,
+                    ideaModelList[index].iconData,
                     size: 60,
                     color: RandomColor()
                         .randomColor(colorBrightness: ColorBrightness.dark),
                   ),
-                  Text(model.ideas[index].title),
+                  Text(ideaModelList[index].title),
                 ],
               ),
             ),
@@ -99,7 +91,7 @@ class IdeasView extends StatelessWidget {
         });
   }
 
-  _showIdeasDialog(int index, BuildContext context, IdeaViewModel model) {
+  _showIdeasDialog(int index, BuildContext context) {
     IdeaModel _idea = ideaModelList[index];
     showDialog(
       builder: (context) => Dialog(
@@ -136,9 +128,8 @@ class IdeasView extends StatelessWidget {
                           color: Colors.blue,
                         ),
                         onTap: () {
-                          model.addMessageToSink(_idea.children[index]);
                           Navigator.pop(context);
-                          onTap();
+                          onTap(_idea.children[index]);
                         },
                       );
                     }),

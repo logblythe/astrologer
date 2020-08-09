@@ -32,10 +32,13 @@ class _DashboardViewState extends State<DashboardView>
       model: _dashboardViewModel,
       onModelReady: (DashboardViewModel model) => model.init(),
       builder: (context, DashboardViewModel model, child) {
+        if(model.messageBox!=null){
+          FocusScope.of(context).requestFocus(_messageFocusNode);
+        }
         _messageController
           ..text = model.messageBox
           ..selection =
-              TextSelection.collapsed(offset: _messageController.text.length);
+          TextSelection.collapsed(offset: _messageController.text.length);
         return GestureDetector(
           onTap: () => _messageFocusNode.unfocus(),
           child: Stack(
@@ -43,7 +46,10 @@ class _DashboardViewState extends State<DashboardView>
               Image.asset(
                 "assets/images/background.png",
                 fit: BoxFit.fill,
-                width: MediaQuery.of(context).size.width,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
               ),
               AnimatedContainer(
                 duration: Duration(milliseconds: 500),
@@ -66,42 +72,42 @@ class _DashboardViewState extends State<DashboardView>
       child: model.fetchingList
           ? const Center(child: CircularProgressIndicator())
           : model.messages == null || model.messages.length == 0
-              ? Center(
-                  child: model.user == null
-                      ? NoMessageWidget(
-                          buttonTitle: "Ok! Let me login",
-                          buttonTap: () {
-                            Navigator.pushNamedAndRemoveUntil(
-                                context,
-                                RoutePaths.login,
-                                ModalRoute.withName(RoutePaths.home));
-                          },
-                        )
-                      : NoMessageWidget(
-                          buttonTitle: "Ok! Lets chat",
-                          buttonTap: () {
-                            FocusScope.of(context)
-                                .requestFocus(_messageFocusNode);
-                          },
-                        ),
-                )
-              : AnimatedList(
-                  key: widget.listKey,
-                  initialItemCount: model.messages?.length,
-                  reverse: true,
-                  shrinkWrap: true,
-                  padding: EdgeInsets.all(8.0),
-                  itemBuilder: (context, index, animation) {
-                    MessageModel _message = model.messages[index];
-                    return MessageItem(
-                      darkMode: model.darkModeEnabled,
-                      message: _message,
-                      animation: animation,
-                      item: index,
-                      onTap: () {},
-                    );
-                  },
-                ),
+          ? Center(
+        child: model.user == null
+            ? NoMessageWidget(
+          buttonTitle: "Ok! Let me login",
+          buttonTap: () {
+            Navigator.pushNamedAndRemoveUntil(
+                context,
+                RoutePaths.login,
+                ModalRoute.withName(RoutePaths.home));
+          },
+        )
+            : NoMessageWidget(
+          buttonTitle: "Ok! Lets chat",
+          buttonTap: () {
+            FocusScope.of(context)
+                .requestFocus(_messageFocusNode);
+          },
+        ),
+      )
+          : AnimatedList(
+        key: widget.listKey,
+        initialItemCount: model.messages?.length,
+        reverse: true,
+        shrinkWrap: true,
+        padding: EdgeInsets.all(8.0),
+        itemBuilder: (context, index, animation) {
+          MessageModel _message = model.messages[index];
+          return MessageItem(
+            darkMode: model.darkModeEnabled,
+            message: _message,
+            animation: animation,
+            item: index,
+            onTap: () {},
+          );
+        },
+      ),
     );
   }
 
@@ -124,7 +130,9 @@ class _DashboardViewState extends State<DashboardView>
                       borderRadius: BorderRadius.circular(25.0)),
                   focusedBorder: OutlineInputBorder(
                       borderSide:
-                          BorderSide(color: Theme.of(context).primaryColor),
+                      BorderSide(color: Theme
+                          .of(context)
+                          .primaryColor),
                       borderRadius: BorderRadius.circular(25.0)),
                   border: InputBorder.none,
                   hintText: 'Type message...'),
@@ -134,7 +142,9 @@ class _DashboardViewState extends State<DashboardView>
             firstChild: IconButton(
                 icon: Icon(
                   Icons.send,
-                  color: Theme.of(context).primaryColor,
+                  color: Theme
+                      .of(context)
+                      .primaryColor,
                 ),
                 onPressed: () => addMessage(model)),
             secondChild: Container(),
