@@ -7,6 +7,7 @@ import 'package:astrologer/core/view_model/view/profile_view_model.dart';
 import 'package:astrologer/core/view_model/view/signup_viewmodel.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:astrologer/ui/widgets/gender_selection.dart';
+import 'package:astrologer/ui/widgets/text_input.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -78,39 +79,39 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             ),
           ),
           UIHelper.verticalSpaceMedium,
-          _listTile(
-            "FULL NAME",
-            Icon(Icons.person),
+          TextInput(
+            title: "FULL NAME",
+            prefixIcon: Icon(Icons.person),
             controller: _nameController,
             validator: isEmptyValidation,
           ),
           UIHelper.verticalSpaceMedium,
-          _listTile(
-            "EMAIL",
-            Icon(Icons.email),
+          TextInput(
+            title: "EMAIL",
+            prefixIcon: Icon(Icons.email),
             controller: _emailController,
             validator: validateEmail,
             keyboardType: TextInputType.emailAddress,
           ),
           UIHelper.verticalSpaceMedium,
-          _listTile(
-            "PASSWORD",
-            Icon(Icons.lock),
+          TextInput(
+            title: "PASSWORD",
+            prefixIcon: Icon(Icons.lock),
             suffixIcon: Icon(Icons.remove_red_eye),
             controller: _passwordController,
             validator: isEmptyValidation,
           ),
           UIHelper.verticalSpaceMedium,
-          _listTile(
-            "CONFIRM PASSWORD",
-            Icon(Icons.lock),
+          TextInput(
+            title: "CONFIRM PASSWORD",
+            prefixIcon: Icon(Icons.lock),
             controller: _conPasswordController,
             validator: isEmptyValidation,
           ),
           UIHelper.verticalSpaceMedium,
-          _listTile(
-            "PHONE",
-            Icon(Icons.phone_android),
+          TextInput(
+            title: "PHONE",
+            prefixIcon: Icon(Icons.phone_android),
             controller: _phoneController,
             validator: isEmptyValidation,
             keyboardType: TextInputType.number,
@@ -118,9 +119,9 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
           UIHelper.verticalSpaceMedium,
           _dateTimeRow(),
           UIHelper.verticalSpaceMedium,
-          _listTile(
-            "Country",
-            Icon(Icons.local_airport),
+          TextInput(
+            title: "Country",
+            prefixIcon: Icon(Icons.local_airport),
             controller: _countryController,
             validator: isEmptyValidation,
           ),
@@ -158,27 +159,6 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
 
   void updateGender(Gender gender) {
     selectedGender = gender;
-  }
-
-  Widget _listTile(String title, Icon prefixIcon,
-      {bool obscureText: false,
-      Widget suffixIcon,
-      TextEditingController controller,
-      FormFieldValidator validator,
-      TextInputType keyboardType}) {
-    return TextFormField(
-      validator: validator,
-      decoration: InputDecoration(
-          isDense: true,
-          labelText: title,
-          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          prefixIcon: prefixIcon,
-          suffix: suffixIcon),
-      obscureText: obscureText,
-      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-      controller: controller,
-      keyboardType: keyboardType,
-    );
   }
 
   Widget _dateTimeRow() {

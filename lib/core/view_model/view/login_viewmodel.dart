@@ -27,12 +27,12 @@ class LoginViewModel extends BaseViewModel {
   Future<LoginResponse> login(String email, String password) async {
     setBusy(true);
     var loginResponse = await _userService.performLogin(email, password);
-    if (loginResponse.error != null) {
-      setError(loginResponse.error);
-    } else {
+    if (loginResponse.token != null) {
       setBusy(false);
       if (loginResponse.firstLogin)
         _homeService.init(welcomeMessage: loginResponse.welcomeMessageList);
+    } else {
+      setError(loginResponse.error);
     }
     return loginResponse;
   }

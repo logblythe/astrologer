@@ -3,6 +3,7 @@ import 'package:astrologer/core/view_model/view/login_viewmodel.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/route_paths.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
+import 'package:astrologer/ui/widgets/text_input.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -64,23 +65,30 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
                             ),
                           ),
                           UIHelper.verticalSpaceLarge,
-                          _listTile("EMAIL", Icon(Icons.mail_outline),
-                              controller: _usernameController,
-                              validator: validateEmail),
+                          TextInput(
+                            title: "EMAIL",
+                            prefixIcon: Icon(Icons.mail_outline),
+                            controller: _usernameController,
+                            validator: validateEmail,
+                            keyboardType: TextInputType.emailAddress,
+                          ),
                           UIHelper.verticalSpaceMedium,
-                          _listTile("PASSWORD", Icon(Icons.lock_outline),
-                              suffixIcon: GestureDetector(
-                                child: Icon(
-                                  Icons.remove_red_eye,
-                                  color: model.obscureText
-                                      ? Theme.of(context).primaryColor
-                                      : Theme.of(context).disabledColor,
-                                ),
-                                onTap: model.toggleObscureText,
+                          TextInput(
+                            title: "PASSWORD",
+                            prefixIcon: Icon(Icons.lock_outline),
+                            suffixIcon: GestureDetector(
+                              child: Icon(
+                                Icons.remove_red_eye,
+                                color: model.obscureText
+                                    ? Theme.of(context).primaryColor
+                                    : Theme.of(context).disabledColor,
                               ),
-                              obscureText: model.obscureText,
-                              controller: _passwordController,
-                              validator: validatePassword),
+                              onTap: model.toggleObscureText,
+                            ),
+                            obscureText: model.obscureText,
+                            controller: _passwordController,
+                            validator: validatePassword,
+                          ),
                           SizedBox(height: 32),
                           Align(
                               alignment: Alignment.bottomRight,
@@ -100,27 +108,6 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _listTile(String title, Icon prefixIcon,
-      {bool obscureText: false,
-      Widget suffixIcon,
-      TextEditingController controller,
-      FormFieldValidator validator,
-      TextInputType keyboardType}) {
-    return TextFormField(
-      validator: validator,
-      decoration: InputDecoration(
-          isDense: true,
-          labelText: title,
-          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          prefixIcon: prefixIcon,
-          suffix: suffixIcon),
-      obscureText: obscureText,
-      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-      controller: controller,
-      keyboardType: keyboardType,
     );
   }
 
@@ -162,19 +149,7 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
                   ),
                 ],
               ),
-              onPressed: () async {
-                if (_formKey.currentState.validate()) {
-                  _formKey.currentState.save();
-                  var loginResponse = await model.login(
-                      _usernameController.text, _passwordController.text);
-                  if (loginResponse.error == null) {
-                    Navigator.pushReplacementNamed(
-                      context,
-                      RoutePaths.home,
-                    );
-                  }
-                }
-              },
+              onPressed: () => _handleLoginPress(context, model),
               color: Theme.of(context).primaryColor,
             ),
     );
@@ -212,5 +187,19 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
               ),
             ),
     );
+  }
+
+  _handleLoginPress(BuildContext context, LoginViewModel model) async {
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      var loginResponse =
+          await model.login(_usernameController.text, _passwordController.text);
+      if (loginResponse.token != null) {
+        Navigator.pushReplacementNamed(
+          context,
+          RoutePaths.home,
+        );
+      }
+    }
   }
 }

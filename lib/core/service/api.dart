@@ -57,7 +57,11 @@ class Api {
         login,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(
-          {'email': email, 'password': password, 'deviceToken': fcmToken},
+          {
+            'email': email,
+            'password': password,
+            'deviceToken': fcmToken,
+          },
         ),
       );
       print('LOGIN RESPONSE ${response.statusCode}${response.body}');

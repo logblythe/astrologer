@@ -45,22 +45,6 @@ class UserService {
     return _fcmToken;
   }
 
-  Future<LoginResponse> performLogin(String email, String password) async {
-    String fcmToken = await _getFcmToken();
-    LoginResponse _loginResponse =
-        await _api.performLogin(email, password, fcmToken);
-    if (_loginResponse.error == null) {
-      await _db.addUser(_loginResponse.userDetails);
-      await _sharedPrefHelper.setString(KEY_TOKEN, _loginResponse.token);
-      await _sharedPrefHelper.setInt(
-          KEY_USER_ID, _loginResponse.userDetails.userId);
-      if (_loginResponse.firstLogin) {
-        await _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, 1);
-      }
-    }
-    return _loginResponse;
-  }
-
   Future<bool> userExists() => _db.userExists();
 
   Future<UserModel> getLoggedInUser() async {
@@ -70,9 +54,23 @@ class UserService {
 
   Future<UserModel> register({UserModel user, String fcmToken}) async {
     UserModel userModel = await _api.registerUser(user);
-    if (userModel.errorMessage == null) {
-      await performLogin(user.email, user.password);
-    }
     return userModel;
+  }
+
+  Future<LoginResponse> performLogin(String email, String password) async {
+    String fcmToken = await _getFcmToken();
+    LoginResponse _loginResponse =
+        await _api.performLogin(email, password, fcmToken);
+    if (_loginResponse.token != null) {
+      await _db.addUser(_loginResponse.userDetails);
+      await _sharedPrefHelper.setString(KEY_TOKEN, _loginResponse.token);
+      await _sharedPrefHelper.setInt(
+          KEY_USER_ID, _loginResponse.userDetails.userId);
+      //todo no free question at first
+//      if (_loginResponse.firstLogin) {
+//        await _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, 1);
+//      }
+    }
+    return _loginResponse;
   }
 }

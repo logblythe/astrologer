@@ -29,11 +29,12 @@ class SignUpViewModel extends BaseViewModel {
     if (userModel.errorMessage != null) {
       setError(userModel.errorMessage);
     } else {
-      var loginResponse = await _userService.performLogin(user.email, user.password);
-      if (loginResponse.error != null) {
-        setError(loginResponse.error);
-      } else {
+      var loginResponse =
+          await _userService.performLogin(user.email, user.password);
+      if (loginResponse.token != null) {
         navigatorKey.currentState.pushReplacementNamed(RoutePaths.home);
+      } else {
+        setError(loginResponse.error);
       }
     }
     setBusy(false);
