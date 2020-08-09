@@ -53,7 +53,8 @@ class UserModel {
         role = json['role'],
         dateOfBirth = json['dateOfBirth'],
         birthTime = json['birthTime'],
-        accurateTime = json['accurateTime'] ?? 0;
+        accurateTime = json['accurateTime'] ?? false,
+        errorMessage = json['message'];
 
   UserModel.fromDb(Map<String, dynamic> json)
       : userId = json['userId'] as int,

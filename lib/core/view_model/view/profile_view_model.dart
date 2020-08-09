@@ -1,10 +1,17 @@
 import 'package:astrologer/core/data_model/image_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
+import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/service/profile_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 
 class ProfileViewModel extends BaseViewModel {
   final ProfileService _profileService;
+  bool accurateTime = false;
+  Gender selectedGender;
+
+  handleSwitch(value) => accurateTime = value;
+
+  handleGenderSelection(gender) => selectedGender = gender;
 
 //  String _imageUrl;
 
@@ -17,15 +24,17 @@ class ProfileViewModel extends BaseViewModel {
 
   getLoggedInUser() async {
     setBusy(true);
-    await _profileService.getLoggedInUser();
+    UserModel user = await _profileService.getLoggedInUser();
+    accurateTime = user.accurateTime;
+    selectedGender=user.gender == "M" ? Gender.male : Gender.female;
     setBusy(false);
   }
 
-  Future<int> updateUser(UserModel user) async {
+  Future<UserModel> updateUser(UserModel user) async {
     setBusy(true);
-    var result = await _profileService.updateUser(user);
+    var userModel = await _profileService.updateUser(user);
     setBusy(false);
-    return result;
+    return userModel;
   }
 
   Future<ImageModel> upload(imageFile) async {

@@ -31,12 +31,16 @@ class ProfileService {
 
   Future<UserModel> getLoggedInUser() async {
     _user = await _db.getLoggedInUser();
+    print('User from db${jsonEncode(_user.toMapForDb())}');
     return _user;
   }
 
-  Future<int> updateUser(UserModel user) async {
-    print('the user model $jsonEncode(user)}');
-    return await _db.updateUser(user);
+  Future<UserModel> updateUser(UserModel user) async {
+    UserModel userModel = await _api.updateProfile(user);
+    if (userModel.errorMessage == null) {
+      _db.updateUser(userModel);
+    }
+    return userModel;
   }
 
   Future<ImageModel> upload(imageFile) async {

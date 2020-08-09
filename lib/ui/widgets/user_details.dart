@@ -6,7 +6,8 @@ import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:astrologer/core/view_model/view/profile_view_model.dart';
 import 'package:astrologer/core/view_model/view/signup_viewmodel.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
-import 'package:astrologer/ui/widgets/gender_selection.dart';
+import 'package:astrologer/ui/widgets/date_time_row.dart';
+import 'package:astrologer/ui/widgets/state_city_row.dart';
 import 'package:astrologer/ui/widgets/text_input.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -117,7 +118,12 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             keyboardType: TextInputType.number,
           ),
           UIHelper.verticalSpaceMedium,
-          _dateTimeRow(),
+          DateTimeRow(
+            dateController: _dateController,
+            timeController: _timeController,
+            dateFocusNode: _dateFocusNode,
+            timeFocusNode: _timeFocusNode,
+          ),
           UIHelper.verticalSpaceMedium,
           TextInput(
             title: "Country",
@@ -126,7 +132,12 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             validator: isEmptyValidation,
           ),
           UIHelper.verticalSpaceMedium,
-          _locationTextField(),
+          StateCityRow(
+            locationController: _locationController,
+            stateController: _stateController,
+            locationFocusNode: _locationFocusNode,
+            stateFocusNode: _stateFocusNode,
+          ),
           Container(
             margin: EdgeInsets.only(top: 32),
             alignment: Alignment.bottomRight,
@@ -161,177 +172,6 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
     selectedGender = gender;
   }
 
-  Widget _dateTimeRow() {
-    DateTime currentDate = DateTime.now();
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: <Widget>[
-        Flexible(
-          fit: FlexFit.loose,
-          flex: 2,
-          child: Container(
-            margin: EdgeInsets.all(2),
-            child: TextFormField(
-              readOnly: true,
-              validator: isEmptyValidation,
-              onFieldSubmitted: (_) =>
-                  FocusScope.of(context).requestFocus(_timeFocusNode),
-              focusNode: _dateFocusNode,
-              onTap: () async {
-                DateTime selectedDate = await showDatePicker(
-                    context: context,
-                    initialDate: currentDate,
-                    firstDate: DateTime(1980),
-                    lastDate: currentDate);
-                setState(() {
-                  if (selectedDate != null) date = selectedDate;
-                  _dateController.text = DateFormat.yMMMd().format(date);
-                });
-              },
-              decoration: InputDecoration(
-                prefixIcon: Icon(Icons.calendar_today),
-                isDense: true,
-                labelStyle:
-                    TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                labelText: 'Date of birth',
-              ),
-              maxLines: 1,
-              controller: _dateController,
-            ),
-          ),
-        ),
-        Flexible(
-          fit: FlexFit.loose,
-          flex: 1,
-          child: Container(
-            margin: EdgeInsets.all(2),
-            child: TextFormField(
-              readOnly: true,
-              validator: isEmptyValidation,
-              focusNode: _timeFocusNode,
-              onTap: () async {
-                TimeOfDay selectedTime = await showTimePicker(
-                    context: context, initialTime: TimeOfDay.now());
-                setState(() {
-                  if (selectedTime != null) {
-                    time = selectedTime;
-                    _timeController.text = DateFormat("hh:mm a").format(
-                        DateFormat("HH:mm").parse(time.format(context)));
-                  }
-                });
-              },
-              decoration: InputDecoration(
-                labelText: 'Time',
-                isDense: true,
-                labelStyle:
-                    TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-              ),
-              maxLines: 1,
-              controller: _timeController,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _accurateTimeSwitch() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: SwitchListTile(
-        title: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: const Text('Time is accurate'),
-        ),
-        value: _timeAccurate,
-        onChanged: (bool value) {
-//          widget.themeStream.addValue(value);
-          setState(() {
-            _timeAccurate = value;
-          });
-        },
-        secondary: const Icon(Icons.access_time),
-      ),
-    );
-  }
-
-  Widget _countryDropdown() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ListTile(
-        leading: Icon(Icons.my_location),
-        title: Container(
-          width: double.infinity,
-          child: DropdownButton<String>(
-            hint: Text('Select Country'),
-            underline: Container(
-              color: _countryDropDownValid
-                  ? Theme.of(context).disabledColor
-                  : Colors.red,
-              height: 1,
-              width: double.infinity,
-            ),
-            isExpanded: true,
-            value: _country,
-            onChanged: (String newValue) {
-              setState(() {
-                _country = newValue;
-              });
-            },
-            items: country.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _locationTextField() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Flexible(
-          flex: 1,
-          child: TextFormField(
-            onFieldSubmitted: (_) {
-              FocusScope.of(context).requestFocus(_locationFocusNode);
-            },
-            keyboardType: TextInputType.number,
-            validator: isEmptyValidation,
-            focusNode: _stateFocusNode,
-            decoration: InputDecoration(
-              prefixIcon: Icon(Icons.location_on),
-              labelText: 'State',
-              isDense: true,
-              labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-            maxLines: 1,
-            controller: _stateController,
-          ),
-        ),
-        UIHelper.horizontalSpaceSmall,
-        Flexible(
-          flex: 2,
-          child: TextFormField(
-            validator: isEmptyValidation,
-            focusNode: _locationFocusNode,
-            decoration: InputDecoration(
-              labelText: 'Location',
-              isDense: true,
-              labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-            maxLines: 1,
-            controller: _locationController,
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _registerButton(SignUpViewModel model, BuildContext context) {
     return AnimatedSwitcher(
@@ -392,7 +232,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
     }
   }
 
-  Future<bool> updateUser() async {
+  /*Future<bool> updateUser() async {
     if (validateForm()) {
       var result = await (model as ProfileViewModel).updateUser(
         UserModel(
@@ -420,7 +260,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
       }
     }
     return null;
-  }
+  }*/
 
   bool validateForm() {
     bool _isValid = formKey.currentState.validate();

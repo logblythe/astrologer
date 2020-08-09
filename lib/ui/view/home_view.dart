@@ -6,6 +6,7 @@ import 'package:astrologer/ui/shared/route_paths.dart';
 import 'package:astrologer/ui/view/ideas_view.dart';
 import 'package:astrologer/ui/view/profile_view.dart';
 import 'package:astrologer/ui/view/settings_view.dart';
+import 'package:astrologer/ui/widgets/no_user_dialog.dart';
 import 'package:astrologer/ui/widgets/profile_dialog.dart';
 import 'package:astrologer/ui/widgets/user_details.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -104,11 +105,6 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
             else
               showDialog(
                   context: context, builder: (context) => NoUserDialog());
-            break;
-          case 1:
-            if (await _formKey.currentState.updateUser()) {
-              _onDrawerTap(model, 0, shouldPop: false);
-            }
             break;
         }
       },

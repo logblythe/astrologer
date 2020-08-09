@@ -8,6 +8,7 @@ class TextInput extends StatelessWidget {
   final TextEditingController controller;
   final FormFieldValidator validator;
   final TextInputType keyboardType;
+  final String initialValue = "hello";
 
   const TextInput(
       {Key key,
@@ -17,7 +18,8 @@ class TextInput extends StatelessWidget {
       this.suffixIcon,
       this.controller,
       this.validator,
-      this.keyboardType})
+      this.keyboardType,
+      })
       : super(key: key);
 
   @override
@@ -25,12 +27,13 @@ class TextInput extends StatelessWidget {
     return TextFormField(
       validator: validator,
       decoration: InputDecoration(
-          isDense: true,
-          labelText: title,
-          labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          prefixIcon: prefixIcon,
-          suffix: suffixIcon),
-      obscureText: obscureText,
+        isDense: true,
+        labelText: title,
+        labelStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        prefixIcon: prefixIcon,
+        suffix: suffixIcon,
+      ),
+      obscureText: obscureText ?? false,
       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
       controller: controller,
       keyboardType: keyboardType,

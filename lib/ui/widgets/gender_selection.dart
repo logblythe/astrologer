@@ -18,10 +18,18 @@ class _GenderSelectionState extends State<GenderSelection> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     selectedGender = widget.selectedGender;
-    print('inside $selectedGender');
+  }
+
+  @override
+  void didUpdateWidget(GenderSelection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedGender != widget.selectedGender) {
+      setState(() {
+        selectedGender = widget.selectedGender;
+      });
+    }
   }
 
   @override

@@ -5,6 +5,7 @@ import 'package:astrologer/ui/shared/route_paths.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:astrologer/ui/widgets/message_item.dart';
 import 'package:astrologer/ui/widgets/no_message.dart';
+import 'package:astrologer/ui/widgets/no_user_dialog.dart';
 import 'package:astrologer/ui/widgets/profile_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -64,7 +65,7 @@ class _DashboardViewState extends State<DashboardView>
     return Expanded(
       child: model.fetchingList
           ? const Center(child: CircularProgressIndicator())
-          : model.messages==null|| model.messages.length == 0
+          : model.messages == null || model.messages.length == 0
               ? Center(
                   child: model.user == null
                       ? NoMessageWidget(
@@ -194,5 +195,3 @@ class _DashboardViewState extends State<DashboardView>
   @override
   bool get wantKeepAlive => true;
 }
-
-

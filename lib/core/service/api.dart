@@ -8,7 +8,6 @@ import 'package:async/async.dart';
 
 import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
-import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
@@ -45,6 +44,38 @@ class Api {
       }
     } catch (e) {
       print('we are here');
+      return UserModel.error(error: e.toString());
+    }
+  }
+
+  Future<UserModel> updateProfile(UserModel user) async {
+    try {
+      var token = await getToken;
+      var response = await client.post(UPDATE,
+          headers: {
+            "Content-Type": "application/json",
+            HttpHeaders.authorizationHeader: "Bearer $token"
+          },
+          body: jsonEncode(user.toMapForDb()));
+      print('Update profile response $response');
+      print('Update profile response ${jsonDecode(response.body)}');
+      switch (response.statusCode) {
+        case 200:
+          print('case 200');
+          return UserModel.fromJson(jsonDecode(response.body));
+        case 403:
+          print('case 403');
+          var result = UserModel.fromError(jsonDecode(response.body));
+          return result;
+        case 409:
+          print('case 409');
+          return UserModel.fromError(jsonDecode(response.body));
+        default:
+          return UserModel.error(
+              error: "Something went wrong. Please try again");
+      }
+    } catch (e) {
+      print('error during update profile ${e.toString()}');
       return UserModel.error(error: e.toString());
     }
   }
