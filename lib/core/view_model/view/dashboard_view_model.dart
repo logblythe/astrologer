@@ -5,8 +5,7 @@ import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/settings_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
+import 'package:flutter/material.dart';
 
 class DashboardViewModel extends BaseViewModel {
   HomeService _homeService;
@@ -25,8 +24,11 @@ class DashboardViewModel extends BaseViewModel {
   String _messageBox;
   bool _showSendBtn = false;
   bool _fetchingList = false;
+
   bool get fetchingList => _fetchingList;
+
   bool get showSendBtn => _showSendBtn;
+
   bool get darkModeEnabled => _settingsService.darkModeEnabled;
 
   set showSendBtn(bool value) {

@@ -1,6 +1,5 @@
 import 'package:astrologer/core/constants/what_to_ask.dart';
 import 'package:astrologer/core/data_model/idea_model.dart';
-import 'package:astrologer/core/view_model/view/idea_view_model.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:random_color/random_color.dart';

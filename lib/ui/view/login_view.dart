@@ -1,3 +1,4 @@
+import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/validator_mixin.dart';
 import 'package:astrologer/core/view_model/view/login_viewmodel.dart';
 import 'package:astrologer/ui/base_widget.dart';
@@ -192,7 +193,7 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
   _handleLoginPress(BuildContext context, LoginViewModel model) async {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      var loginResponse =
+      LoginResponse loginResponse =
           await model.login(_usernameController.text, _passwordController.text);
       if (loginResponse.token != null) {
         Navigator.pushReplacementNamed(

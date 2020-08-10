@@ -1,9 +1,7 @@
-import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/validator_mixin.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
-import 'package:astrologer/core/view_model/view/profile_view_model.dart';
 import 'package:astrologer/core/view_model/view/signup_viewmodel.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:astrologer/ui/widgets/date_time_row.dart';
@@ -36,8 +34,6 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
   UserModel user;
   String fcmToken;
   Gender selectedGender = Gender.male;
-  bool _timeAccurate = false;
-  String _country = "Select One";
   DateTime date = DateTime.now();
   TimeOfDay time = TimeOfDay.now();
   TextEditingController _nameController,
@@ -58,10 +54,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
       _emailFocusNode,
       _passwordFocusNode,
       _stateFocusNode,
-      _countryFocusNode,
       _phoneFocusNode;
-
-  bool _countryDropDownValid = true;
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +165,6 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
     selectedGender = gender;
   }
 
-
   Widget _registerButton(SignUpViewModel model, BuildContext context) {
     return AnimatedSwitcher(
       transitionBuilder: (Widget child, Animation<double> animation) =>
@@ -232,52 +224,6 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
     }
   }
 
-  /*Future<bool> updateUser() async {
-    if (validateForm()) {
-      var result = await (model as ProfileViewModel).updateUser(
-        UserModel(
-            firstName: _nameController.text.split(" ")[0],
-            lastName: _nameController.text.split(" ")[1],
-            email: _emailController.text,
-            phoneNumber: _phoneController.text,
-            gender: selectedGender == Gender.male ? MALE : FEMALE,
-            city: _locationController.text,
-            state: _stateController.text,
-            country: _country,
-            dateOfBirth: DateFormat("yyyy-MM-d")
-                .format(DateFormat('MMM d, yyyy').parse(_dateController.text)),
-            birthTime: DateFormat("HH:mm")
-                .format(DateFormat("hh:mm a").parse(_timeController.text)),
-            accurateTime: _timeAccurate),
-      );
-      if (result == null) {
-        Scaffold.of(context).showSnackBar(
-          SnackBar(content: Text('Please try again')),
-        );
-        return false;
-      } else {
-        return true;
-      }
-    }
-    return null;
-  }*/
-
-  bool validateForm() {
-    bool _isValid = formKey.currentState.validate();
-    if (_country == "Select One") {
-      setState(() {
-        _countryDropDownValid = false;
-      });
-      _isValid = false;
-    } else {
-      setState(() {
-        _countryDropDownValid = true;
-      });
-      _isValid = true;
-    }
-    return _isValid;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -314,8 +260,6 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
       _phoneController.text = user.phoneNumber;
       _stateController.text = user.state;
       selectedGender = user.gender == MALE ? Gender.male : Gender.female;
-      _timeAccurate = user.accurateTime;
-      _country = user.country;
     }
   }
 

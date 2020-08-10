@@ -47,6 +47,7 @@ class _MyAppState extends State<MyApp> {
     Stream purchaseUpdated =
         InAppPurchaseConnection.instance.purchaseUpdatedStream;
     _subscription = purchaseUpdated.listen((purchaseDetailsList) {
+      print('listening to updated purchase');
       _listenToPurchaseUpdated(purchaseDetailsList);
     }, onDone: () {
       _subscription.cancel();
@@ -165,7 +166,8 @@ class _MyAppState extends State<MyApp> {
       );
     }
 
-    return MaterialApp(
+    return MaterialApp
+      (
       home: Scaffold(
         appBar: AppBar(
           title: const Text('IAP Example'),
@@ -215,13 +217,13 @@ class _MyAppState extends State<MyApp> {
     }
     final ListTile productHeader = ListTile(title: Text('Products for Sale'));
     List<ListTile> productList = <ListTile>[];
-    if (_notFoundIds.isNotEmpty) {
-      productList.add(ListTile(
-          title: Text('[${_notFoundIds.join(", ")}] not found',
-              style: TextStyle(color: ThemeData.light().errorColor)),
-          subtitle: Text(
-              'This app needs special configuration to run. Please see example/README.md for instructions.')));
-    }
+//    if (_notFoundIds.isNotEmpty) {
+//      productList.add(ListTile(
+//          title: Text('[${_notFoundIds.join(", ")}] not found',
+//              style: TextStyle(color: ThemeData.light().errorColor)),
+//          subtitle: Text(
+//              'This app needs special configuration to run. Please see example/README.md for instructions.')));
+//    }
 
     // This loading previous purchases code is just a demo. Please do not use this as it is.
     // In your app you should always verify the purchase data using the `verificationData` inside the [PurchaseDetails] object before trusting it.

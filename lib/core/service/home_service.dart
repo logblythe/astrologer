@@ -7,8 +7,8 @@ import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
 import 'package:astrologer/core/utils/local_notification_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
+import 'package:astrologer/core/utils/purchase_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomeService {
@@ -16,12 +16,11 @@ class HomeService {
   final Api _api;
   final SharedPrefHelper _sharedPrefHelper;
   final LocalNotificationHelper _localNotificationHelper;
+  final PurchaseHelper _purchaseHelper;
 
   List<MessageModel> _messageList = [];
   List<AstrologerModel> _astrologers;
   int _id, _userId, _freeCount;
-  List<IAPItem> _iapList;
-  FlutterInappPurchase _iap;
   List<IdeaModel> _ideas;
 
   double _priceAfterDiscount;
@@ -33,11 +32,6 @@ class HomeService {
 
   Stream<MessageAndUpdate> get nStream => _newMessage.stream;
 
-  FlutterInappPurchase get iap => _iap;
-
-  // ignore: unnecessary_getters_setters
-  List<IAPItem> get iaps => _iapList;
-
   get ideas => _ideas;
 
   Stream<int> get freeCountStream => _freeCountStream.stream;
@@ -47,10 +41,6 @@ class HomeService {
   double get questionPrice => _questionPrice;
 
   double get discountInPercentage => _discountInPercentage;
-
-  set iaps(List<IAPItem> value) {
-    _iapList = value;
-  }
 
   addMsgToSink(String message, update) {
     _newMessage.sink.add(MessageAndUpdate(message, update));
@@ -65,10 +55,12 @@ class HomeService {
     @required Api api,
     @required SharedPrefHelper sharedPrefHelper,
     @required LocalNotificationHelper localNotificationHelper,
+    @required PurchaseHelper purchaseHelper,
   })  : _dbProvider = db,
         _api = api,
         _sharedPrefHelper = sharedPrefHelper,
-        _localNotificationHelper = localNotificationHelper {
+        _localNotificationHelper = localNotificationHelper,
+        _purchaseHelper = purchaseHelper {
     {
       _localNotificationHelper.onSelectionNotification = (payload) {
         print('hello world');
@@ -99,7 +91,6 @@ class HomeService {
   }
 
   Future<void> init({List<String> welcomeMessage}) async {
-//    _iap = FlutterInappPurchase.instance;
     _userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
     if (welcomeMessage != null) {
       welcomeMessage.forEach((element) {
@@ -125,7 +116,8 @@ class HomeService {
       MessageModel message, bool shouldCharge, double questionPrice) async {
     //    int prevQuesId = await _db.getUnclearedQuestionId();
     print('free count $_freeCount');
-    if (_freeCount == 0 && shouldCharge) await _purchase();
+//    if (_freeCount == 0 && shouldCharge) await _purchase();
+    _purchase();
     print('After purchase');
     Map<String, dynamic> messageResponse = await _api.askQuestion(
       _userId,
@@ -188,18 +180,7 @@ class HomeService {
   }
 
   Future<Null> _purchase() async {
-//    PurchasedItem _purchasedItem;
-//    print('the product id is ${_iapList[0].productId}');
-//    try {
-//      _purchasedItem = await _iap.requestPurchase(_iapList[0].productId);
-//      _iap.consumePurchaseAndroid(_purchasedItem.purchaseToken);
-//    } catch (e) {
-//      PlatformException p = e as PlatformException;
-//      print("exception ${p.code}");
-//      print("exception ${p.message}");
-//      print("exception ${p.details}");
-//    }
-//    print('Purchase success ${_purchasedItem.productId}');
+    _purchaseHelper.purchase();
     return;
   }
 

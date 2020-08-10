@@ -8,7 +8,6 @@ import 'package:astrologer/ui/view/settings_view.dart';
 import 'package:astrologer/ui/widgets/no_user_dialog.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 import 'package:provider/provider.dart';
 
 import 'astrologers_view.dart';
@@ -16,7 +15,7 @@ import 'dashboard_view.dart';
 
 final List<Map<String, dynamic>> _children = [
   {
-    'title': '  ',
+    'title': '',
     'action': Icons.person_pin,
   },
   {'title': 'Astrologers'},
@@ -44,7 +43,6 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
         _homeViewModel.getLoggedInUser();
         _homeViewModel.fetchQuestionPrice();
         initConnectivity(_homeViewModel);
-        _initIAPs(_homeViewModel);
       },
       builder: (context, HomeViewModel model, _) => Scaffold(
         drawer: _buildDrawer(model),
@@ -295,24 +293,6 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
     );
   }
 
-  void _initIAPs(HomeViewModel model) async {
-    print('Init iaps');
-    var _purchaseInstance = FlutterInappPurchase.instance;
-    var result = await _purchaseInstance.initConnection;
-    print("Established IAP Connection..." + result);
-    try {
-      print('purchase instance');
-      model.iaps = await _purchaseInstance.getProducts(["666"]);
-      print('purchase instance ${model.iaps.length}');
-      for (var i = 0; i < model.iaps.length; ++i) {
-        print("the title ${model.iaps[i].title}");
-        print("the price ${model.iaps[i].price}");
-      }
-    } catch (e) {
-      print('we have error');
-    }
-  }
-
   void initConnectivity(HomeViewModel model) {
     initializeConnectivity(onConnected: () {
       model.internetConnection = true;
@@ -338,6 +318,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
 
   _handleIdeaSelection(HomeViewModel model, String message) {
     model.addMessageSink(message);
+    model.index = 0;
     _pageController.jumpToPage(0);
   }
 }

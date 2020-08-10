@@ -36,15 +36,6 @@ class IdeaItem extends StatelessWidget {
     );
   }
 
-  Widget _buildTiles(IdeaModel idea, BuildContext context) {
-    if (idea.children.isEmpty) return ListTile(title: Text(idea.title));
-    return ExpansionTile(
-      key: PageStorageKey<IdeaModel>(idea),
-      title: Text(idea.title),
-      children: idea.children.map((str) => _buildString(str, context)).toList(),
-    );
-  }
-
   Widget _buildString(String str, BuildContext context) {
     return Container(
       decoration: BoxDecoration(

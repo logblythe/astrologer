@@ -2,11 +2,9 @@ import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/view_model/view/dashboard_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/route_paths.dart';
-import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:astrologer/ui/widgets/message_item.dart';
 import 'package:astrologer/ui/widgets/no_message.dart';
 import 'package:astrologer/ui/widgets/no_user_dialog.dart';
-import 'package:astrologer/ui/widgets/profile_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

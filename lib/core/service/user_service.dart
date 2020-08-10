@@ -1,11 +1,10 @@
-import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class UserService {
   final Api _api;

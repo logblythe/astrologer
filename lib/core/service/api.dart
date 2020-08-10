@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:alice/alice.dart';
 import 'package:astrologer/core/data_model/image_model.dart';
+import 'package:astrologer/core/service/navigation_service.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 
@@ -17,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Api {
   var client = http.Client();
   String token;
+  Alice _alice;
 
   Future<String> get getToken async {
     var sharedPref = await SharedPreferences.getInstance();
@@ -49,6 +52,11 @@ class Api {
   }
 
   Future<UserModel> updateProfile(UserModel user) async {
+    _alice = Alice(
+        showNotification: true,
+        showInspectorOnShake: true,
+        darkTheme: false,
+        navigatorKey: navigatorKey);
     try {
       var token = await getToken;
       var response = await client.post(UPDATE,
@@ -57,6 +65,7 @@ class Api {
             HttpHeaders.authorizationHeader: "Bearer $token"
           },
           body: jsonEncode(user.toMapForDb()));
+      _alice.onHttpResponse(response, body: jsonEncode(user.toMapForDb()));
       print('Update profile response $response');
       print('Update profile response ${jsonDecode(response.body)}');
       switch (response.statusCode) {

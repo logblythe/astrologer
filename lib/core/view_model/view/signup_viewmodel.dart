@@ -1,5 +1,4 @@
 import 'package:astrologer/core/data_model/user_model.dart';
-import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/service/navigation_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';

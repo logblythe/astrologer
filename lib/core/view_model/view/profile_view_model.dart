@@ -1,4 +1,3 @@
-import 'package:astrologer/core/data_model/image_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/enum/gender.dart';
 import 'package:astrologer/core/service/profile_service.dart';

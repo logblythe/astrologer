@@ -5,7 +5,6 @@ import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 
 class HomeViewModel extends BaseViewModel {
   final HomeService _homeService;
@@ -38,12 +37,6 @@ class HomeViewModel extends BaseViewModel {
   set index(int value) {
     _index = value;
     notifyListeners();
-  }
-
-  List<IAPItem> get iaps => _homeService.iaps;
-
-  set iaps(List<IAPItem> value) {
-    _homeService.iaps = value;
   }
 
   getLoggedInUser() => _userService.getLoggedInUser();

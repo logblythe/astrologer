@@ -5,7 +5,7 @@ final theme = ThemeStream();
 class ThemeStream {
   BehaviorSubject _controller = BehaviorSubject<bool>();
 
-  ValueObservable<bool> get themeStream => _controller.stream;
+  get themeStream => _controller.stream;
 
   bool get getTheme => _controller.value;
 

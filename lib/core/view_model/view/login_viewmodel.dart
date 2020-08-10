@@ -29,8 +29,8 @@ class LoginViewModel extends BaseViewModel {
     var loginResponse = await _userService.performLogin(email, password);
     if (loginResponse.token != null) {
       setBusy(false);
-      if (loginResponse.firstLogin)
-        _homeService.init(welcomeMessage: loginResponse.welcomeMessageList);
+//      if (loginResponse.firstLogin)
+      _homeService.init(welcomeMessage: loginResponse.welcomeMessageList);
     } else {
       setError(loginResponse.error);
     }

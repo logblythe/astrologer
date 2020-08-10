@@ -6,6 +6,7 @@ import 'package:astrologer/core/service/profile_service.dart';
 import 'package:astrologer/core/service/settings_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/utils/local_notification_helper.dart';
+import 'package:astrologer/core/utils/purchase_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:provider/provider.dart';
 
@@ -21,6 +22,7 @@ List<SingleChildCloneableWidget> independentServices = [
   Provider.value(value: DbProvider()),
   Provider.value(value: LocalNotificationHelper()),
   Provider.value(value: NavigationService()),
+  Provider.value(value: PurchaseHelper()),
 ];
 
 List<SingleChildCloneableWidget> dependentServices = [
@@ -33,15 +35,16 @@ List<SingleChildCloneableWidget> dependentServices = [
     builder: (context, api, dbProvider, prefHelper, profileService) =>
         ProfileService(api: api, db: dbProvider, prefHelper: prefHelper),
   ),
-  ProxyProvider4<Api, DbProvider, SharedPrefHelper, LocalNotificationHelper,
-      HomeService>(
+  ProxyProvider5<Api, DbProvider, SharedPrefHelper, LocalNotificationHelper,
+      PurchaseHelper, HomeService>(
     builder: (context, api, dbProvider, sharedPrefH, localNotificationH,
-            homeService) =>
+            purchaseHelper, homeService) =>
         HomeService(
             api: api,
             db: dbProvider,
             sharedPrefHelper: sharedPrefH,
-            localNotificationHelper: localNotificationH),
+            localNotificationHelper: localNotificationH,
+            purchaseHelper: purchaseHelper),
   ),
   ProxyProvider2<SharedPrefHelper, DbProvider, SettingsService>(
     builder: (context, sharedPrefHelper, dbProvider, homeService) =>
