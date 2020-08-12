@@ -201,8 +201,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
   void _handleButtonPress() async {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      var dob = DateFormat("yyyy-MM-d")
-          .format(DateFormat('MMM d, yyyy').parse(_dateController.text));
+      var dob = _dateController.text;
       user = UserModel();
       user.firstName = _nameController.text.split(" ").elementAt(0);
       user.lastName = _nameController.text.split(" ").elementAt(1) ?? "";
