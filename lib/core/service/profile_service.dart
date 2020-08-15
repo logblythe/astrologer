@@ -45,6 +45,7 @@ class ProfileService {
 
   Future<ImageModel> upload(imageFile) async {
     ImageModel model = await _api.upload(imageFile);
+    print('The response from image upload ${model.toJson()}');
     if (model != null) {
       _prefHelper.setString(KEY_IMAGE_URL, model.fileDownloadUri);
       _streamController.sink.add(model.fileDownloadUri);

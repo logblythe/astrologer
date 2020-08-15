@@ -206,8 +206,6 @@ class Api {
 
     // send
     var response = await request.send();
-    print(response.statusCode);
-
     var contents = new StringBuffer();
     var completer = new Completer<ImageModel>();
     // listen for response

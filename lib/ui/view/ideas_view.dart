@@ -96,45 +96,42 @@ class IdeasView extends StatelessWidget {
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(8.0))),
-        child: Container(
-          height: 600,
-          child: Column(
-            children: <Widget>[
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.all(Radius.circular(8.0))),
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  'Select your query',
-                  textAlign: TextAlign.center,
-                  textScaleFactor: 1.2,
-                ),
+        child: Column(
+          children: <Widget>[
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.all(Radius.circular(8.0))),
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Select your query',
+                textAlign: TextAlign.center,
+                textScaleFactor: 1.2,
               ),
-              Expanded(
-                child: ListView.separated(
-                    separatorBuilder: (context, index) => Divider(
-                          height: (index == _idea.children.length - 1) ? 0 : 1,
-                        ),
-                    shrinkWrap: true,
-                    itemCount: _idea.children.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(_idea.children[index]),
-                        trailing: const Icon(
-                          Icons.send,
-                          color: Colors.blue,
-                        ),
-                        onTap: () {
-                          Navigator.pop(context);
-                          onTap(_idea.children[index]);
-                        },
-                      );
-                    }),
-              ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: ListView.separated(
+                  separatorBuilder: (context, index) => Divider(
+                        height: (index == _idea.children.length - 1) ? 0 : 1,
+                      ),
+                  shrinkWrap: true,
+                  itemCount: _idea.children.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(_idea.children[index]),
+                      trailing: const Icon(
+                        Icons.send,
+                        color: Colors.blue,
+                      ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        onTap(_idea.children[index]);
+                      },
+                    );
+                  }),
+            ),
+          ],
         ),
       ),
       context: context,

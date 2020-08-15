@@ -78,13 +78,6 @@ class HomeService {
 
   List<AstrologerModel> get astrologers => _astrologers;
 
-  Future<void> fetchIdeas() async {
-    if (_ideas == null) {
-      _ideas = [];
-      _ideas.addAll(ideaModelList);
-    }
-  }
-
   Future getFreeQuesCount() async {
     _freeCount = await _sharedPrefHelper.getInteger(KEY_FREE_QUES_COUNT) ?? 0;
     addFreeCountToSink(_freeCount);
