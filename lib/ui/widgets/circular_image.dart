@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
 
 class CircularImage extends StatefulWidget {
@@ -31,11 +33,12 @@ class _CircularImageState extends State<CircularImage> {
                 ? Container(
                     width: 190.0,
                     height: 190.0,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            fit: BoxFit.fill,
-                            image: NetworkImage(widget.imageUrl))))
+                    decoration: new BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: new DecorationImage(
+                          fit: BoxFit.fill, image: NetworkImage(_imageUrl)),
+                    ),
+                  )
                 : _image == null
                     ? Icon(Icons.person_outline)
                     : Container(
@@ -84,25 +87,18 @@ class _CircularImageState extends State<CircularImage> {
   void initState() {
     super.initState();
     _imageUrl = widget.imageUrl;
-    print('Image url is $_imageUrl');
   }
 
   @override
   void didUpdateWidget(CircularImage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.imageUrl != widget.imageUrl) {
-      print('Image url  did update widget is ${widget.imageUrl}');
-
       setState(() {
         _imageUrl = widget.imageUrl;
       });
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   Future getImage(ImageSource source) async {
     var image = await ImagePicker.pickImage(source: source);
