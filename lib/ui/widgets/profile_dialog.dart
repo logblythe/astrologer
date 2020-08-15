@@ -19,12 +19,10 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
   final TextEditingController locationController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
   final TextEditingController stateController = TextEditingController();
   final TextEditingController countryController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final FocusNode nameFocusNode = FocusNode();
-  final FocusNode emailFocusNode = FocusNode();
   final FocusNode locationFocusNode = FocusNode();
   final FocusNode dateFocusNode = FocusNode();
   final FocusNode timeFocusNode = FocusNode();
@@ -74,14 +72,6 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
                         prefixIcon: Icon(Icons.person),
                         controller: nameController,
                         validator: isEmptyValidation,
-                      ),
-                      UIHelper.verticalSpaceMedium,
-                      TextInput(
-                        title: "EMAIL",
-                        prefixIcon: Icon(Icons.email),
-                        controller: emailController,
-                        validator: validateEmail,
-                        keyboardType: TextInputType.emailAddress,
                       ),
                       UIHelper.verticalSpaceMedium,
                       TextInput(
@@ -181,7 +171,6 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
       UserModel user = UserModel();
       user.firstName = nameController.text.split(" ").elementAt(0);
       user.lastName = nameController.text.split(" ").elementAt(1) ?? "";
-      user.email = emailController.text;
       user.phoneNumber = phoneController.text;
       user.city = locationController.text;
       user.state = stateController.text;
@@ -215,7 +204,6 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
     locationController.text = user.city;
     dateController.text = user.dateOfBirth;
     timeController.text = user.birthTime;
-    emailController.text = user.email;
     stateController.text = user.state;
     countryController.text = user.country;
     phoneController.text = user.phoneNumber;
