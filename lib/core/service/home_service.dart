@@ -91,8 +91,7 @@ class HomeService {
       });
     } else {
       List<MessageModel> messagesFromDb = await _dbProvider.getAllMessages();
-      messagesFromDb.forEach((msg) =>
-          print('message status ${msg.id} ${msg.status} ${msg.questionId}'));
+      _messageList.clear();
       _messageList.addAll(messagesFromDb);
     }
   }

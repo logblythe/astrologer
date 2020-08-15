@@ -91,6 +91,8 @@ class _CircularImageState extends State<CircularImage> {
   void didUpdateWidget(CircularImage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.imageUrl != widget.imageUrl) {
+      print('Image url  did update widget is ${widget.imageUrl}');
+
       setState(() {
         _imageUrl = widget.imageUrl;
       });

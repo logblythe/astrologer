@@ -189,5 +189,5 @@ class _DashboardViewState extends State<DashboardView>
   }
 
   @override
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive => false;
 }
