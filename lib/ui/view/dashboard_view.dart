@@ -186,14 +186,6 @@ class _DashboardViewState extends State<DashboardView>
   void initState() {
     super.initState();
     _messageController = TextEditingController();
-    _messageFocusNode = FocusNode()
-      ..addListener(() {
-        if (_messageFocusNode.hasFocus) {
-          _dashboardViewModel.showSendBtn = true;
-        } else {
-          _dashboardViewModel.showSendBtn = false;
-        }
-      });
   }
 
   @override

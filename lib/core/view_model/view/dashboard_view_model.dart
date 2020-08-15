@@ -22,7 +22,7 @@ class DashboardViewModel extends BaseViewModel {
 
   int _messageId;
   String _messageBox;
-  bool _showSendBtn = false;
+  bool _showSendBtn = true;
   bool _fetchingList = false;
 
   bool get fetchingList => _fetchingList;

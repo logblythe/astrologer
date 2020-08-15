@@ -70,7 +70,10 @@ class _CircularImageState extends State<CircularImage> {
           top: 38,
           left: 38,
           child: widget.busy
-              ? CircularProgressIndicator(strokeWidth: 4,backgroundColor: Colors.white54,)
+              ? CircularProgressIndicator(
+                  strokeWidth: 4,
+                  backgroundColor: Colors.white54,
+                )
               : Container(),
         )
       ],
@@ -81,6 +84,7 @@ class _CircularImageState extends State<CircularImage> {
   void initState() {
     super.initState();
     _imageUrl = widget.imageUrl;
+    print('Image url is $_imageUrl');
   }
 
   @override
