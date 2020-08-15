@@ -91,7 +91,16 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
           TextInput(
             title: "PASSWORD",
             prefixIcon: Icon(Icons.lock),
-            suffixIcon: Icon(Icons.remove_red_eye),
+            suffixIcon: GestureDetector(
+              child: Icon(
+                Icons.remove_red_eye,
+                color: model.obscureText
+                    ? Theme.of(context).primaryColor
+                    : Theme.of(context).disabledColor,
+              ),
+              onTap: model.toggleObscureText,
+            ),
+            obscureText: model.obscureText,
             controller: _passwordController,
             validator: isEmptyValidation,
           ),
@@ -99,6 +108,16 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
           TextInput(
             title: "CONFIRM PASSWORD",
             prefixIcon: Icon(Icons.lock),
+            suffixIcon: GestureDetector(
+              child: Icon(
+                Icons.remove_red_eye,
+                color: model.obscureText
+                    ? Theme.of(context).primaryColor
+                    : Theme.of(context).disabledColor,
+              ),
+              onTap: model.toggleObscureText,
+            ),
+            obscureText: model.obscureText,
             controller: _conPasswordController,
             validator: isEmptyValidation,
           ),
