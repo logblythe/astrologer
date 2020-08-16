@@ -308,7 +308,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
   }
 
   void _onDrawerTap(HomeViewModel model, int index, {bool shouldPop = true}) {
-    FocusScope.of(context).unfocus();
+    FocusScope.of(context).requestFocus(FocusNode());
     model.index = index;
     _pageController.jumpToPage(model.index);
     if (shouldPop) {

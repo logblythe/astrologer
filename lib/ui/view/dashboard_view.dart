@@ -30,9 +30,9 @@ class _DashboardViewState extends State<DashboardView>
       model: _dashboardViewModel,
       onModelReady: (DashboardViewModel model) => model.init(),
       builder: (context, DashboardViewModel model, child) {
-        if (model.messageBox != null) {
-          FocusScope.of(context).requestFocus(_messageFocusNode);
-        }
+//        if (model.messageBox != null && !_messageFocusNode.hasFocus) {
+//          FocusScope.of(context).requestFocus(_messageFocusNode);
+//        }
         _messageController
           ..text = model.messageBox
           ..selection =
@@ -186,8 +186,9 @@ class _DashboardViewState extends State<DashboardView>
   void initState() {
     super.initState();
     _messageController = TextEditingController();
+    _messageFocusNode = FocusNode();
   }
 
   @override
-  bool get wantKeepAlive => false;
+  bool get wantKeepAlive => true;
 }
