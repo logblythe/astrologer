@@ -12,14 +12,14 @@ class ProfileViewModel extends BaseViewModel {
 
   handleGenderSelection(gender) => selectedGender = gender;
 
-//  String _imageUrl;
+  String _imageUrl;
 
   ProfileViewModel({ProfileService profileService})
       : this._profileService = profileService;
 
   UserModel get user => _profileService.user;
 
-//  get imageUrl => _imageUrl;
+  get imageUrl => _imageUrl;
 
   getLoggedInUser() async {
     setBusy(true);
@@ -42,9 +42,7 @@ class ProfileViewModel extends BaseViewModel {
     setUploadingImage(false);
   }
 
-/*getImageUrl() async {
-    setBusy(true);
-    _imageUrl = await _profileService.imageUrl();
-    setBusy(false);
-  }*/
+  getImageUrl() async {
+    _imageUrl = await _profileService.getImageUrl();
+  }
 }

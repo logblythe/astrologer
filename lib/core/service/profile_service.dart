@@ -27,11 +27,15 @@ class ProfileService {
         this._api = api,
         this._prefHelper = prefHelper;
 
-//  imageUrl() async => _prefHelper.getString(KEY_IMAGE_URL);
+  getImageUrl() async {
+    String imageUrl = await _prefHelper.getString(KEY_IMAGE_URL);
+    if (imageUrl != null) {
+      _streamController.sink.add(imageUrl);
+    }
+  }
 
   Future<UserModel> getLoggedInUser() async {
     _user = await _db.getLoggedInUser();
-    print('User from db${jsonEncode(_user.toMapForDb())}');
     return _user;
   }
 
@@ -45,7 +49,6 @@ class ProfileService {
 
   Future<ImageModel> upload(imageFile) async {
     ImageModel model = await _api.upload(imageFile);
-    print('The response from image upload ${model.toJson()}');
     if (model != null) {
       _prefHelper.setString(KEY_IMAGE_URL, model.fileDownloadUri);
       _streamController.sink.add(model.fileDownloadUri);

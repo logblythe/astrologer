@@ -1,5 +1,4 @@
 import 'package:astrologer/core/constants/end_points.dart';
-import 'package:astrologer/core/constants/what_to_ask.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/data_model/idea_model.dart';
 import 'package:astrologer/core/data_model/message_model.dart';

@@ -40,6 +40,7 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
         model: ProfileViewModel(profileService: Provider.of(context)),
         onModelReady: (model) async {
           await model.getLoggedInUser();
+          await model.getImageUrl();
           initializeValue(model);
         },
         builder: (ctx, model, _) {
