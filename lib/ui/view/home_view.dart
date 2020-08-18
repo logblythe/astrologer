@@ -15,7 +15,7 @@ import 'dashboard_view.dart';
 
 final List<Map<String, dynamic>> _children = [
   {
-    'title': '',
+    'title': 'Cosmos',
     'action': Icons.person_pin,
   },
   {'title': 'Astrologers'},

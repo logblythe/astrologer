@@ -114,7 +114,16 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
 
   Widget _buildErrorText(LoginViewModel model) {
     return model.hasError
-        ? Text(model.errorMessage, style: TextStyle(color: Colors.red))
+        ? Card(
+            color: Colors.grey[100].withOpacity(1),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child:
+                  Text(model.errorMessage, style: TextStyle(color: Colors.red)),
+            ),
+          )
         : Container();
   }
 
@@ -191,6 +200,7 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
   }
 
   _handleLoginPress(BuildContext context, LoginViewModel model) async {
+    FocusScope.of(context).requestFocus(FocusNode());
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       LoginResponse loginResponse =

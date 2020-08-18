@@ -156,7 +156,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             child: _registerButton(model, context),
           ),
           Container(
-            margin: EdgeInsets.only(top: 120),
+            margin: EdgeInsets.only(top: 24,bottom: 24),
             alignment: Alignment.center,
             child: RichText(
               text: TextSpan(
@@ -167,7 +167,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
                     .copyWith(color: Theme.of(context).disabledColor),
                 children: <TextSpan>[
                   TextSpan(
-                      text: 'Sign in',
+                      text: ' Sign in',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).primaryColor)),
@@ -211,13 +211,14 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
                   )
                 ],
               ),
-              onPressed: _handleButtonPress,
+              onPressed: ()=>_handleButtonPress(context),
               color: Theme.of(context).primaryColor,
             ),
     );
   }
 
-  void _handleButtonPress() async {
+  void _handleButtonPress(BuildContext context) async {
+    FocusScope.of(context).requestFocus(FocusNode());
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
       var dob = _dateController.text;

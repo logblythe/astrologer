@@ -40,7 +40,8 @@ class MessageItem extends StatelessWidget {
               : CircleAvatar(
                   child: Text(
                       message?.astrologer?.substring(0, 1)?.toUpperCase() ??
-                          "*")),
+                          "*"),
+                ),
           Padding(
             padding: message.sent ? EdgeInsets.zero : EdgeInsets.only(left: 20),
             child: _buildMessageColumn(context),
@@ -86,7 +87,10 @@ class MessageItem extends StatelessWidget {
                     DateTime.fromMillisecondsSinceEpoch(message.createdAt)),
                 style: TextStyle(color: Colors.grey, fontSize: 10)),
             SizedBox(height: 8),
-            Text(message.message ?? 'no message')
+            Text(
+              message.message ?? 'no message',
+              style: TextStyle(fontSize: 16),
+            ),
           ],
         ),
       ),
