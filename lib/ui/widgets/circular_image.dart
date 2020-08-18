@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
@@ -49,24 +50,7 @@ class _CircularImageState extends State<CircularImage> {
                         ),
                       ),
           ),
-          onTap: () => getImage(ImageSource.camera),
-        ),
-        Positioned(
-          bottom: 8,
-          right: 8,
-          child: Container(
-            padding: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-                shape: BoxShape.circle, color: Theme.of(context).accentColor),
-            child: InkWell(
-              child: Icon(
-                Icons.file_upload,
-                size: 18,
-                color: Theme.of(context).backgroundColor,
-              ),
-              onTap: () => getImage(ImageSource.gallery),
-            ),
-          ),
+          onTap: () => _handleCircleAvatarClick(context),
         ),
         Positioned(
           top: 38,
@@ -98,7 +82,6 @@ class _CircularImageState extends State<CircularImage> {
     }
   }
 
-
   Future getImage(ImageSource source) async {
     var image = await ImagePicker.pickImage(source: source);
     if (image != null) {
@@ -108,5 +91,55 @@ class _CircularImageState extends State<CircularImage> {
       });
       widget.onImageCaptured(image);
     }
+  }
+
+  void _handleCircleAvatarClick(BuildContext context) {
+    showBottomSheet(
+      context: context,
+      builder: (context) => Card(
+        child: Container(
+          padding: EdgeInsets.only(top: 16),
+          height: 200,
+          width: double.infinity,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                    blurRadius: 10, color: Colors.grey[300], spreadRadius: 5)
+              ]),
+          child: Column(
+            children: <Widget>[
+              Text("Select your avatar"),
+              UIHelper.verticalSpaceSmall,
+              Divider(
+                color: Colors.red,
+              ),
+              UIHelper.verticalSpaceSmall,
+              InkWell(
+                child: Text("Take a picture"),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  getImage(ImageSource.camera);
+                },
+              ),
+              UIHelper.verticalSpaceMedium,
+              InkWell(
+                child: Text("Select from files"),
+                onTap: () {
+                  Navigator.of(context).pop();
+                  getImage(ImageSource.gallery);
+                },
+              ),
+              UIHelper.verticalSpaceMedium,
+              InkWell(
+                child: Text("Cancel"),
+                onTap: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
