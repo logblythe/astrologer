@@ -16,7 +16,8 @@ class LoginViewModel extends BaseViewModel {
     @required UserService userService,
     @required HomeService homeService,
     @required NavigationService navigationService,
-  })  : this._userService = userService,
+  })
+      : this._userService = userService,
         this._homeService = homeService,
         this._navigationService = navigationService;
 
@@ -44,5 +45,26 @@ class LoginViewModel extends BaseViewModel {
 
   navigateToSignUp() {
     _navigationService.navigateTo(RoutePaths.signup);
+  }
+
+  requestOTP(String email) async {
+    setBusy(true);
+    var result = await _userService.requestOTP(email);
+    setBusy(false);
+    return result;
+  }
+
+  validateOTP(String otp) async {
+    setBusy(true);
+    var result = await _userService.validateOTP(otp);
+    setBusy(false);
+    return result;
+  }
+
+  void savePassword(String password) async {
+    setBusy(true);
+    var result = await _userService.validateOTP(password);
+    setBusy(false);
+    return result;
   }
 }

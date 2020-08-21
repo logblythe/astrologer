@@ -4,6 +4,7 @@ import 'package:astrologer/core/view_model/view/login_viewmodel.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/route_paths.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
+import 'package:astrologer/ui/widgets/animated_button.dart';
 import 'package:astrologer/ui/widgets/text_input.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -98,7 +99,11 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
                           Align(
                               alignment: Alignment.center,
                               child: _buildErrorText(model)),
-                          _buildAnimatedSwitcher(model, context)
+                          Builder(
+                            builder: (con) {
+                              return _buildAnimatedSwitcher(model, con);
+                            },
+                          )
                         ],
                       ),
                     ),
@@ -116,12 +121,15 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
     return model.hasError
         ? Card(
             color: Colors.grey[100].withOpacity(1),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(24.0),
-              child:
-                  Text(model.errorMessage, style: TextStyle(color: Colors.red)),
+              child: Text(
+                model.errorMessage,
+                style: TextStyle(color: Colors.red),
+              ),
             ),
           )
         : Container();
@@ -140,7 +148,8 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
             )
           : RaisedButton(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32)),
+                borderRadius: BorderRadius.circular(32),
+              ),
               focusNode: _buttonNode,
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
               child: Row(
@@ -159,7 +168,7 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
                   ),
                 ],
               ),
-              onPressed: () => _handleLoginPress(context, model),
+              onPressed: () => _handleLogin(context, model),
               color: Theme.of(context).primaryColor,
             ),
     );
@@ -174,32 +183,44 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
       child: model.busy
           ? Container()
           : Container(
-              margin: EdgeInsets.only(top: 120),
+              margin: EdgeInsets.only(top: 60),
               alignment: Alignment.center,
-              child: InkWell(
-                child: RichText(
-                  text: TextSpan(
-                    text: "Don\'t have an account? ",
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyText1
-                        .copyWith(color: Theme.of(context).disabledColor),
-                    children: <TextSpan>[
-                      TextSpan(
-                          text: 'Sign up',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).primaryColor)),
-                    ],
+              child: Column(
+                children: <Widget>[
+                  InkWell(
+                    child: Text('Forgot password?',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor)),
+                    onTap: () => _handleForgotPassword(context, model),
                   ),
-                ),
-                onTap: model.navigateToSignUp,
+                  UIHelper.verticalSpaceMedium,
+                  InkWell(
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Don\'t have an account? ",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Theme.of(context).disabledColor),
+                        children: <TextSpan>[
+                          TextSpan(
+                              text: 'Sign up',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).primaryColor)),
+                        ],
+                      ),
+                    ),
+                    onTap: model.navigateToSignUp,
+                  ),
+                ],
               ),
             ),
     );
   }
 
-  _handleLoginPress(BuildContext context, LoginViewModel model) async {
+  _handleLogin(BuildContext context, LoginViewModel model) async {
     FocusScope.of(context).requestFocus(FocusNode());
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
@@ -212,5 +233,228 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
         );
       }
     }
+  }
+
+  void _handleForgotPassword(BuildContext ctx, LoginViewModel model) {
+    TextEditingController _controller = TextEditingController();
+    showBottomSheet(
+      context: (ctx),
+      builder: (ctx) {
+        return BaseWidget<LoginViewModel>(
+          model: LoginViewModel(
+            userService: Provider.of(ctx),
+            homeService: Provider.of(ctx),
+            navigationService: Provider.of(ctx),
+          ),
+          builder: (context, model, child) {
+            return Container(
+              padding: const EdgeInsets.all(32),
+              height: 400,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(32),
+                boxShadow: [
+                  BoxShadow(
+                      blurRadius: 10, color: Colors.grey[300], spreadRadius: 5)
+                ],
+              ),
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    "Reset Password",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24.0,
+                    ),
+                  ),
+                  UIHelper.verticalSpaceLarge,
+                  TextInput(
+                    title: "Email",
+                    keyboardType: TextInputType.emailAddress,
+                    controller: _controller,
+                    obscureText: true,
+                    prefixIcon: const Icon(Icons.mail_outline),
+                  ),
+                  model.errorMessage != null
+                      ? Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            "Something went wrong. Please try again",
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor),
+                          ),
+                        )
+                      : Container(),
+                  UIHelper.verticalSpaceLarge,
+                  AnimatedButton(
+                    label: "Reset",
+                    busy: model.busy,
+                    onPress: () async {
+                      if (_controller.text != "") {
+                        bool success = await model.requestOTP(_controller.text);
+                        if (success) {
+                          Navigator.of(context).pop();
+                          _handleValidateOTP(ctx, model);
+                        }
+                      }
+                    },
+                  )
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _handleValidateOTP(BuildContext ctx, LoginViewModel model) {
+    TextEditingController _controller = TextEditingController();
+    showBottomSheet(
+      context: (ctx),
+      builder: (ctx) {
+        return BaseWidget<LoginViewModel>(
+          model: LoginViewModel(
+            userService: Provider.of(ctx),
+            homeService: Provider.of(ctx),
+            navigationService: Provider.of(ctx),
+          ),
+          builder: (context, model, child) {
+            return Container(
+              padding: const EdgeInsets.all(32),
+              height: 400,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(32),
+                boxShadow: [
+                  BoxShadow(
+                      blurRadius: 10, color: Colors.grey[300], spreadRadius: 5)
+                ],
+              ),
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    "Validate OTP",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24.0,
+                    ),
+                  ),
+                  UIHelper.horizontalSpaceSmall,
+                  Text(
+                    "Please check your email and enter the OTP.",
+                  ),
+                  UIHelper.verticalSpaceLarge,
+                  TextInput(
+                    title: "OTP",
+                    controller: _controller,
+                    obscureText: true,
+                    prefixIcon: const Icon(Icons.offline_bolt),
+                  ),
+                  model.errorMessage != null
+                      ? Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            "Something went wrong. Please try again",
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor),
+                          ),
+                        )
+                      : Container(),
+                  UIHelper.verticalSpaceLarge,
+                  AnimatedButton(
+                    label: "Validate",
+                    busy: model.busy,
+                    onPress: () async {
+                      if (_controller.text != "") {
+                        var success = await model.validateOTP(_controller.text);
+                        if (success) {
+                          Navigator.of(context).pop();
+                          _handleSavePassword(ctx, model);
+                        }
+                      }
+                    },
+                  )
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _handleSavePassword(BuildContext ctx, LoginViewModel model) {
+    TextEditingController _controller = TextEditingController();
+    showBottomSheet(
+      context: (ctx),
+      builder: (ctx) {
+        return BaseWidget<LoginViewModel>(
+          model: LoginViewModel(
+            userService: Provider.of(ctx),
+            homeService: Provider.of(ctx),
+            navigationService: Provider.of(ctx),
+          ),
+          builder: (context, model, child) {
+            return Container(
+              padding: const EdgeInsets.all(32),
+              height: 400,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(32),
+                  boxShadow: [
+                    BoxShadow(
+                        blurRadius: 10,
+                        color: Colors.grey[300],
+                        spreadRadius: 5)
+                  ]),
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    "Save Password",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24.0,
+                    ),
+                  ),
+                  UIHelper.verticalSpaceLarge,
+                  TextInput(
+                    title: "New password",
+                    controller: _controller,
+                    obscureText: true,
+                    prefixIcon: const Icon(Icons.verified_user),
+                  ),
+                  model.errorMessage != null
+                      ? Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            "Something went wrong. Please try again",
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor),
+                          ),
+                        )
+                      : Container(),
+                  UIHelper.verticalSpaceLarge,
+                  AnimatedButton(
+                    label: "Save",
+                    busy: model.busy,
+                    onPress: () {
+                      if (_controller.text != "")
+                        model.savePassword(_controller.text);
+                    },
+                  )
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }

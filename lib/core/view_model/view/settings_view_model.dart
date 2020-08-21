@@ -1,3 +1,5 @@
+import 'package:astrologer/core/data_model/api_response.dart';
+import 'package:astrologer/core/data_model/password_changed_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/settings_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
@@ -19,6 +21,16 @@ class SettingsViewModel extends BaseViewModel {
 
   toggleDarkMode(bool enable) async =>
       await _settingsService.toggleDarkMode(enable);
+
+  changePassword({Map<String, dynamic> body}) async {
+    ApiResponse.loading("Changing password");
+    try {
+      PasswordChangeModel res = await _settingsService.changePassword(body);
+      ApiResponse.completed(res);
+    } catch (e) {
+      ApiResponse.error(e.toString());
+    }
+  }
 
   Future logout() async {
     await _settingsService.logout();

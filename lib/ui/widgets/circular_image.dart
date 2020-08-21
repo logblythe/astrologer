@@ -99,25 +99,36 @@ class _CircularImageState extends State<CircularImage> {
       builder: (context) => Card(
         child: Container(
           padding: EdgeInsets.only(top: 16),
-          height: 200,
+          height: 300,
           width: double.infinity,
           decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(32),
               boxShadow: [
                 BoxShadow(
                     blurRadius: 10, color: Colors.grey[300], spreadRadius: 5)
               ]),
           child: Column(
             children: <Widget>[
-              Text("Select your avatar"),
-              UIHelper.verticalSpaceSmall,
-              Divider(
-                color: Colors.red,
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Text(
+                  "Select your avatar",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24.0,
+                  ),
+                ),
               ),
               UIHelper.verticalSpaceSmall,
+              Divider(color: Colors.red),
+              UIHelper.verticalSpaceSmall,
               InkWell(
-                child: Text("Take a picture"),
+                child: Text(
+                  "Take a picture",
+                  style: TextStyle(fontSize: 18),
+                ),
                 onTap: () {
                   Navigator.of(context).pop();
                   getImage(ImageSource.camera);
@@ -125,7 +136,10 @@ class _CircularImageState extends State<CircularImage> {
               ),
               UIHelper.verticalSpaceMedium,
               InkWell(
-                child: Text("Select from files"),
+                child: Text(
+                  "Select from files",
+                  style: TextStyle(fontSize: 18),
+                ),
                 onTap: () {
                   Navigator.of(context).pop();
                   getImage(ImageSource.gallery);
@@ -133,7 +147,10 @@ class _CircularImageState extends State<CircularImage> {
               ),
               UIHelper.verticalSpaceMedium,
               InkWell(
-                child: Text("Cancel"),
+                child: Text(
+                  "Cancel",
+                  style: TextStyle(fontSize: 18),
+                ),
                 onTap: () => Navigator.of(context).pop(),
               ),
             ],

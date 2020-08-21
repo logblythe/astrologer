@@ -2,6 +2,7 @@ import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
+import 'package:astrologer/core/utils/api_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -71,5 +72,20 @@ class UserService {
 //      }
     }
     return _loginResponse;
+  }
+
+  Future<bool> requestOTP(String email) async {
+    ApiBaseHelper api = ApiBaseHelper();
+    return Future.delayed(Duration(seconds: 3)).then((value) => true);
+  }
+
+  validateOTP(String otp) async {
+    ApiBaseHelper api = ApiBaseHelper();
+    return Future.delayed(Duration(seconds: 3)).then((value) => true);
+  }
+
+  savePassword(String password) async {
+    ApiBaseHelper api = ApiBaseHelper();
+    return Future.delayed(Duration(seconds: 3)).then((value) => true);
   }
 }

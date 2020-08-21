@@ -4,6 +4,7 @@ import 'package:astrologer/core/validator_mixin.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:astrologer/core/view_model/view/signup_viewmodel.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
+import 'package:astrologer/ui/widgets/animated_button.dart';
 import 'package:astrologer/ui/widgets/date_time_row.dart';
 import 'package:astrologer/ui/widgets/state_city_row.dart';
 import 'package:astrologer/ui/widgets/text_input.dart';
@@ -156,7 +157,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             child: _registerButton(model, context),
           ),
           Container(
-            margin: EdgeInsets.only(top: 24,bottom: 24),
+            margin: EdgeInsets.only(top: 24, bottom: 24),
             alignment: Alignment.center,
             child: RichText(
               text: TextSpan(
@@ -211,7 +212,7 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
                   )
                 ],
               ),
-              onPressed: ()=>_handleButtonPress(context),
+              onPressed: () => _handleButtonPress(context),
               color: Theme.of(context).primaryColor,
             ),
     );
@@ -236,11 +237,67 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
       user.accurateTime = true;
       var response = await model.register(user: user);
       if (response.errorMessage != null) {
-        Scaffold.of(context).showSnackBar(SnackBar(
-          content: Text(response.errorMessage),
-        ));
+        Scaffold.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response.errorMessage),
+          ),
+        );
+      }else{
+        showSuccessDialog(context);
       }
     }
+  }
+
+  showSuccessDialog(_context){
+    showDialog(
+      context: _context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Center(
+                child: Image.asset(
+                  "assets/images/ic_question.png",
+                  height: 160,
+                ),
+              ),
+              UIHelper.verticalSpaceMedium,
+              Text(
+                'Account created',
+                style: Theme.of(context).textTheme.bodyText1,
+              ),
+              UIHelper.verticalSpaceSmall,
+              Text(
+                "Please Check your email and verify your email. After email verification you can proceed to login.",
+                style: Theme.of(context).textTheme.bodyText1.copyWith(
+                    color: Theme.of(context).disabledColor,
+                    fontWeight: FontWeight.w400),
+              ),
+              UIHelper.verticalSpaceSmall,
+              Align(
+                alignment: Alignment.bottomRight,
+                child: RaisedButton(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32)),
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+                    color: Theme.of(context).primaryColor,
+                    child: Text(
+                      'Ok',
+                      style: TextStyle(color: Colors.white),
+                      textAlign: TextAlign.left,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    }),
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override

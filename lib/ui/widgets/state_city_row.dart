@@ -38,7 +38,6 @@ class _StateCityRowState extends State<StateCityRow> with ValidationMixing {
             onFieldSubmitted: (_) {
               FocusScope.of(context).requestFocus(widget.locationFocusNode);
             },
-            keyboardType: TextInputType.number,
             validator: isEmptyValidation,
             focusNode: widget.stateFocusNode,
             decoration: InputDecoration(
