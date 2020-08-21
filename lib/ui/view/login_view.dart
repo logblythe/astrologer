@@ -1,4 +1,5 @@
 import 'package:astrologer/core/data_model/login_response.dart';
+import 'package:astrologer/core/data_model/response.dart';
 import 'package:astrologer/core/validator_mixin.dart';
 import 'package:astrologer/core/view_model/view/login_viewmodel.dart';
 import 'package:astrologer/ui/base_widget.dart';
@@ -19,6 +20,7 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final _buttonNode = FocusNode();
+  String _otp;
 
   @override
   Widget build(BuildContext context) {
@@ -274,14 +276,13 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
                     title: "Email",
                     keyboardType: TextInputType.emailAddress,
                     controller: _controller,
-                    obscureText: true,
                     prefixIcon: const Icon(Icons.mail_outline),
                   ),
                   model.errorMessage != null
                       ? Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Text(
-                            "Something went wrong. Please try again",
+                           model.errorMessage?? "Something went wrong. Please try again",
                             style: TextStyle(
                                 color: Theme.of(context).primaryColor),
                           ),
@@ -293,8 +294,8 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
                     busy: model.busy,
                     onPress: () async {
                       if (_controller.text != "") {
-                        bool success = await model.requestOTP(_controller.text);
-                        if (success) {
+                        Response response = await model.requestOTP(_controller.text);
+                        if (response.status=="OK") {
                           Navigator.of(context).pop();
                           _handleValidateOTP(ctx, model);
                         }
@@ -358,7 +359,7 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
                   model.errorMessage != null
                       ? Padding(
                           padding: const EdgeInsets.all(16.0),
-                          child: Text(
+                          child: Text(model.errorMessage??
                             "Something went wrong. Please try again",
                             style: TextStyle(
                                 color: Theme.of(context).primaryColor),
@@ -371,8 +372,9 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
                     busy: model.busy,
                     onPress: () async {
                       if (_controller.text != "") {
-                        var success = await model.validateOTP(_controller.text);
-                        if (success) {
+                        _otp=_controller.text;
+                        Response response = await model.validateOTP(_controller.text);
+                        if (response?.status=="OK") {
                           Navigator.of(context).pop();
                           _handleSavePassword(ctx, model);
                         }
@@ -434,7 +436,7 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
                       ? Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Text(
-                            "Something went wrong. Please try again",
+                            model.errorMessage??"Something went wrong. Please try again",
                             style: TextStyle(
                                 color: Theme.of(context).primaryColor),
                           ),
@@ -446,7 +448,7 @@ class _LoginViewState extends State<LoginView> with ValidationMixing {
                     busy: model.busy,
                     onPress: () {
                       if (_controller.text != "")
-                        model.savePassword(_controller.text);
+                        model.savePassword(_otp,_controller.text);
                     },
                   )
                 ],

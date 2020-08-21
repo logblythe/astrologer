@@ -3,17 +3,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:alice/alice.dart';
-import 'package:astrologer/core/data_model/image_model.dart';
-import 'package:astrologer/core/service/navigation_service.dart';
-import 'package:path/path.dart';
-import 'package:async/async.dart';
-
 import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
+import 'package:astrologer/core/data_model/image_model.dart';
 import 'package:astrologer/core/data_model/login_response.dart';
+import 'package:astrologer/core/data_model/response.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
+import 'package:astrologer/core/service/navigation_service.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
+import 'package:async/async.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Api {
@@ -52,11 +52,11 @@ class Api {
   }
 
   Future<UserModel> updateProfile(UserModel user) async {
-    _alice = Alice(
+  /*  _alice = Alice(
         showNotification: true,
         showInspectorOnShake: true,
         darkTheme: false,
-        navigatorKey: navigatorKey);
+        navigatorKey: navigatorKey);*/
     try {
       var token = await getToken;
       var response = await client.post(UPDATE,
@@ -65,7 +65,7 @@ class Api {
             HttpHeaders.authorizationHeader: "Bearer $token"
           },
           body: jsonEncode(user.toMapForDb()));
-      _alice.onHttpResponse(response, body: jsonEncode(user.toMapForDb()));
+//      _alice.onHttpResponse(response, body: jsonEncode(user.toMapForDb()));
       print('Update profile response $response');
       print('Update profile response ${jsonDecode(response.body)}');
       switch (response.statusCode) {
@@ -219,5 +219,56 @@ class Api {
       },
     );
     return completer.future;
+  }
+
+  requestOTP(String email) async {
+    try {
+      var response = await client.post(
+        '$baseUrl/reset-password?email=$email',
+        headers: {
+          "Content-Type": "application/json",
+        },
+      );
+      return Response.fromJson(jsonDecode(response.body));
+    } catch (e) {
+      print('FETCH otp the response exception $e}');
+//      return AstrologerModel.withError(e.toString());
+      return null;
+    }
+  }
+
+  validateOtp(String otp) async {
+    try {
+      var response = await client.post(
+        '$baseUrl/validate-otp',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "token":otp
+        })
+      );
+      return Response.fromJson(jsonDecode(response.body));
+    } catch (e) {
+      throw Exception(['Something went wrong']);
+    }
+  }
+
+  savePassword(String otp,String password) async {
+    try {
+      var response = await client.post(
+        '$baseUrl/save-password',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: jsonEncode({
+          "token":otp,
+          "newPassword": password
+        })
+      );
+      return Response.fromJson(jsonDecode(response.body));
+    } catch (e) {
+      throw Exception(['Something went wrong']);
+    }
   }
 }

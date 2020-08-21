@@ -4,7 +4,6 @@ import 'package:astrologer/core/validator_mixin.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:astrologer/core/view_model/view/signup_viewmodel.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
-import 'package:astrologer/ui/widgets/animated_button.dart';
 import 'package:astrologer/ui/widgets/date_time_row.dart';
 import 'package:astrologer/ui/widgets/state_city_row.dart';
 import 'package:astrologer/ui/widgets/text_input.dart';

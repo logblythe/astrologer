@@ -74,18 +74,9 @@ class UserService {
     return _loginResponse;
   }
 
-  Future<bool> requestOTP(String email) async {
-    ApiBaseHelper api = ApiBaseHelper();
-    return Future.delayed(Duration(seconds: 3)).then((value) => true);
-  }
+  requestOTP(String email) => _api.requestOTP(email);
 
-  validateOTP(String otp) async {
-    ApiBaseHelper api = ApiBaseHelper();
-    return Future.delayed(Duration(seconds: 3)).then((value) => true);
-  }
+  validateOTP(String otp) => _api.validateOtp(otp);
 
-  savePassword(String password) async {
-    ApiBaseHelper api = ApiBaseHelper();
-    return Future.delayed(Duration(seconds: 3)).then((value) => true);
-  }
+  savePassword(String otp,String password) => _api.savePassword(otp, password) ;
 }

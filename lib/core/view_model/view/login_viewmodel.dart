@@ -16,8 +16,7 @@ class LoginViewModel extends BaseViewModel {
     @required UserService userService,
     @required HomeService homeService,
     @required NavigationService navigationService,
-  })
-      : this._userService = userService,
+  })  : this._userService = userService,
         this._homeService = homeService,
         this._navigationService = navigationService;
 
@@ -49,22 +48,44 @@ class LoginViewModel extends BaseViewModel {
 
   requestOTP(String email) async {
     setBusy(true);
-    var result = await _userService.requestOTP(email);
-    setBusy(false);
-    return result;
+    var result;
+    try {
+      result = await _userService.requestOTP(email);
+      if(result.status!="Ok"){
+        setError(result.message);
+      }
+      return result;
+    } catch (e) {
+      setError(e.toString());
+    }
+
   }
 
   validateOTP(String otp) async {
     setBusy(true);
-    var result = await _userService.validateOTP(otp);
-    setBusy(false);
-    return result;
+    var result;
+    try {
+       result = await _userService.validateOTP(otp);
+       if(result.status!="Ok"){
+         setError(result.message);
+       }
+       return result;
+    } catch (e) {
+      setError(e.toString());
+    }
   }
 
-  void savePassword(String password) async {
+  void savePassword(String otp,String password) async {
     setBusy(true);
-    var result = await _userService.validateOTP(password);
-    setBusy(false);
-    return result;
+    var result;
+    try {
+      result = await _userService.savePassword(otp,password);
+      if(result.status!="Ok"){
+        setError(result.message);
+      }
+      return result;
+    } catch (e) {
+      setError(e.toString());
+    }
   }
 }
