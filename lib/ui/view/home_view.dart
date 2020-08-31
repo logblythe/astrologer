@@ -44,17 +44,27 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
         _homeViewModel.fetchQuestionPrice();
         initConnectivity(_homeViewModel);
       },
-      builder: (context, HomeViewModel model, _) => Scaffold(
-        drawer: _buildDrawer(model),
-        appBar: AppBar(
-          centerTitle: true,
-          elevation: 0,
-          title: Text(_children[model.index]['title']),
-          actions: <Widget>[_buildIconButton(model)],
-        ),
-        body: _buildWillPopScope(model),
-      ),
+      builder: (context, HomeViewModel model, _) =>
+          Scaffold(
+            drawer: _buildDrawer(model),
+            appBar: AppBar(
+              centerTitle: true,
+              elevation: 0,
+              title: titleWidget(model),
+              actions: <Widget>[_buildIconButton(model)],
+            ),
+            body: _buildWillPopScope(model),
+          ),
     );
+  }
+
+  titleWidget(model) {
+    if (model.index == 0) {
+      return Container(
+          padding:EdgeInsets.all(32),child: Image.asset('assets/images/app_bar.png'));
+    } else {
+      Text(_children[model.index]['title']);
+    }
   }
 
   @override
@@ -117,24 +127,24 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
           model.internetConnection
               ? Container()
               : AnimatedContainer(
-                  duration: Duration(milliseconds: 2000),
-                  padding: const EdgeInsets.all(8.0),
-                  child: Material(
-                    borderRadius: BorderRadius.circular(16),
-                    type: MaterialType.card,
-                    animationDuration: Duration(milliseconds: 500),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 12),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text('NO INTERNET CONNECTION'),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
+            duration: Duration(milliseconds: 2000),
+            padding: const EdgeInsets.all(8.0),
+            child: Material(
+              borderRadius: BorderRadius.circular(16),
+              type: MaterialType.card,
+              animationDuration: Duration(milliseconds: 500),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0, vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('NO INTERNET CONNECTION'),
+                  ],
+                ),
+              ),
+            ),
+          )
         ],
       ),
     );
@@ -147,8 +157,9 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
       return null;
     } else {
       return showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
+        context: context,
+        builder: (context) =>
+            AlertDialog(
               title: Text('Are you sure?'),
               content: Text('Do you want to exit an App'),
               actions: <Widget>[
@@ -165,7 +176,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
                 ),
               ],
             ),
-          ) ??
+      ) ??
           false;
     }
   }
@@ -187,12 +198,15 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
-          Container(height: 80, color: Theme.of(context).primaryColor),
           Container(
-            color: Theme.of(context).primaryColor,
+                height: 160, child: Image.asset("assets/images/nav_bar.jpg",fit: BoxFit.fitHeight,)),
+          Container(
+            color: Theme
+                .of(context)
+                .primaryColor,
             child: ListTile(
               title:
-                  Text('Free questions', style: TextStyle(color: Colors.white)),
+              Text('Free questions', style: TextStyle(color: Colors.white)),
               trailing: Text(freeCount != null ? freeCount?.toString() : "-",
                   style: TextStyle(color: Colors.white)),
             ),
@@ -211,41 +225,46 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
                 model.discountInPercentage == null
                     ? Container()
                     : model.discountInPercentage.toInt() > 0
-                        ? RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              children: <TextSpan>[
-                                TextSpan(
-                                    text: '\$ ${model.priceAfterDiscount}\n',
-                                    style: TextStyle(height: 1.5)),
-                                TextSpan(
-                                  text: ' \$ ${model.questionPrice} ',
-                                  style: TextStyle(
-                                    decoration: TextDecoration.lineThrough,
-                                    height: 1.5,
-                                  ),
-                                ),
-                                TextSpan(
-                                    text:
-                                        '  (${model.discountInPercentage}% off)  ',
-                                    style: TextStyle(color: Colors.black45)),
-                              ],
-                            ),
-                          )
-                        : Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text('\$ ${model.priceAfterDiscount}'),
-                          )
+                    ? RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    children: <TextSpan>[
+                      TextSpan(
+                          text: '\$ ${model.priceAfterDiscount}\n',
+                          style: TextStyle(height: 1.5)),
+                      TextSpan(
+                        text: ' \$ ${model.questionPrice} ',
+                        style: TextStyle(
+                          decoration: TextDecoration.lineThrough,
+                          height: 1.5,
+                        ),
+                      ),
+                      TextSpan(
+                          text:
+                          '  (${model.discountInPercentage}% off)  ',
+                          style: TextStyle(color: Colors.black45)),
+                    ],
+                  ),
+                )
+                    : Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text('\$ ${model.priceAfterDiscount}'),
+                )
               ],
             ),
           ),
           ListTile(
               title: Text('About Astrology',
-                  style: TextStyle(color: Theme.of(context).disabledColor))),
+                  style: TextStyle(color: Theme
+                      .of(context)
+                      .disabledColor))),
           ListTile(
             title: Text(
               'Dashboard',
-              style: Theme.of(context).textTheme.bodyText1,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .bodyText1,
             ),
             leading: Icon(Icons.developer_board),
             onTap: () => _onDrawerTap(model, 0),
@@ -253,7 +272,10 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
           ListTile(
             title: Text(
               'Astrologers',
-              style: Theme.of(context).textTheme.bodyText1,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .bodyText1,
             ),
             leading: Icon(Icons.people),
             onTap: () => _onDrawerTap(model, 1),
@@ -261,7 +283,10 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
           ListTile(
             title: Text(
               'What to ask?',
-              style: Theme.of(context).textTheme.bodyText1,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .bodyText1,
             ),
             leading: Icon(Icons.help),
             onTap: () => _onDrawerTap(model, 2),
@@ -269,7 +294,9 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
           ListTile(
             title: Text(
               'Help &, Settings',
-              style: TextStyle(color: Theme.of(context).disabledColor),
+              style: TextStyle(color: Theme
+                  .of(context)
+                  .disabledColor),
             ),
           ),
           ListTile(
@@ -287,7 +314,10 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
           ListTile(
               title: Text(
                   'Our mission is to make Cosmic astrology accessible to all people to help them attain positive changes in their lives.',
-                  style: Theme.of(context).textTheme.bodyText1)),
+                  style: Theme
+                      .of(context)
+                      .textTheme
+                      .bodyText1)),
         ],
       ),
     );

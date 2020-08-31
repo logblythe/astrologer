@@ -1,8 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'dart:io';
-import '../../consumable_store.dart';
 
 const String _kConsumableId = 'com.cosmos_nepal.question01';
 
@@ -18,6 +17,11 @@ class PurchaseHelper {
   bool isAvailable = false;
   StreamSubscription<List<PurchaseDetails>> _subscription;
   List<ProductDetails> _products = [];
+
+  InAppPurchaseConnection get connection => _connection;
+  StreamController _purchaseStream = StreamController.broadcast();
+
+  Stream get purchaseStream => _purchaseStream.stream;
 
   PurchaseHelper() {
     initStoreInfo();
@@ -38,6 +42,23 @@ class PurchaseHelper {
     ProductDetailsResponse productDetailResponse =
         await _connection.queryProductDetails(_kProductIds.toSet());
     _products = productDetailResponse.productDetails;
+
+    final QueryPurchaseDetailsResponse purchaseResponse =
+        await _connection.queryPastPurchases();
+    if (purchaseResponse.error == null) {
+      PurchaseDetails purchaseDetails =
+          purchaseResponse.pastPurchases.elementAt(0);
+      if (Platform.isAndroid) {
+        if (purchaseDetails.productID == _kConsumableId) {
+          await InAppPurchaseConnection.instance
+              .consumePurchase(purchaseDetails);
+        }
+      }
+      if (purchaseDetails.pendingCompletePurchase) {
+        await InAppPurchaseConnection.instance
+            .completePurchase(purchaseDetails);
+      }
+    }
   }
 
   purchase() {
@@ -62,10 +83,10 @@ class PurchaseHelper {
   void _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) {
     purchaseDetailsList.forEach((PurchaseDetails purchaseDetails) async {
       if (purchaseDetails.status == PurchaseStatus.pending) {
-//        showPendingUI();
+        _purchaseStream.sink.add(PurchaseStatus.pending);
       } else {
         if (purchaseDetails.status == PurchaseStatus.error) {
-//          handleError(purchaseDetails.error);
+          _purchaseStream.sink.add(PurchaseStatus.error);
         } else if (purchaseDetails.status == PurchaseStatus.purchased) {
           bool valid = await _verifyPurchase(purchaseDetails);
           if (valid) {
@@ -76,7 +97,7 @@ class PurchaseHelper {
           }
         }
         if (Platform.isAndroid) {
-          if (!kAutoConsume && purchaseDetails.productID == _kConsumableId) {
+          if (purchaseDetails.productID == _kConsumableId) {
             await InAppPurchaseConnection.instance
                 .consumePurchase(purchaseDetails);
           }
@@ -98,7 +119,8 @@ class PurchaseHelper {
   void deliverProduct(PurchaseDetails purchaseDetails) async {
     // IMPORTANT!! Always verify a purchase purchase details before delivering the product.
     if (purchaseDetails.productID == _kConsumableId) {
-      await ConsumableStore.save(purchaseDetails.purchaseID);
+      _purchaseStream.sink.add(PurchaseStatus.purchased);
+      // await ConsumableStore.save(purchaseDetails.purchaseID);
 //      List<String> consumables = await ConsumableStore.load();
 //      setState(() {
 //        _purchasePending = false;
@@ -114,5 +136,9 @@ class PurchaseHelper {
 
   void _handleInvalidPurchase(PurchaseDetails purchaseDetails) {
     // handle invalid purchase here if  _verifyPurchase` failed.
+  }
+
+  dispose() {
+    _purchaseStream.close();
   }
 }

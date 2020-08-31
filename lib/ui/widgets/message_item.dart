@@ -34,7 +34,7 @@ class MessageItem extends StatelessWidget {
           message.sent ? EdgeInsets.only(left: 24) : EdgeInsets.only(right: 24),
       child: Column(
         children: <Widget>[
-          _buildQuestionId(),
+         // _buildQuestionId(),
           message.sent
               ? SizedBox.shrink()
               : CircleAvatar(

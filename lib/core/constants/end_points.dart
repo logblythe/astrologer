@@ -16,6 +16,7 @@ const List<String> country = [
 ];
 
 class QuestionStatus {
+  static const NOT_DELIVERED = "NOT DELIVERED";
   static const DELIVERED = "DELIVERED";
   static const UNCLEAR = "UNCLEAR";
   static const CLEAR = "CLEAR";

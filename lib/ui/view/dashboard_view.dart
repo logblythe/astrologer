@@ -115,7 +115,9 @@ class _DashboardViewState extends State<DashboardView>
         child: Row(children: [
           Expanded(
             child: TextField(
-              onChanged: (text) => model.addMsgToSink(text, false),
+              keyboardType: TextInputType.multiline,
+              minLines: 1,//Normal textInputField will be displayed
+              maxLines: 5,//              onChanged: (text) => model.addMsgToSink(text, false),
               focusNode: _messageFocusNode,
               controller: _messageController,
               decoration: InputDecoration(

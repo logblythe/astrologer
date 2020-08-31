@@ -1,3 +1,4 @@
+import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
@@ -6,6 +7,7 @@ import 'package:astrologer/core/service/settings_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 
 class DashboardViewModel extends BaseViewModel {
   HomeService _homeService;
@@ -49,6 +51,8 @@ class DashboardViewModel extends BaseViewModel {
 
   UserModel get user => _userService.user;
 
+  MessageModel _question;
+
   init() async {
     setBusy(true);
     _fetchingList = true;
@@ -62,18 +66,19 @@ class DashboardViewModel extends BaseViewModel {
   void setupListeners() {
     nMsgStream.listen((MessageAndUpdate data) {
       _messageBox = data.message;
-//      if (data.update) notifyListeners();
     });
-//    FlutterInappPurchase.purchaseError.listen((PurchaseResult event) async {
-//      print("purchase error ${event.message}");
-//      await updateQuestionStatusById(NOT_DELIVERED);
-//    });
-//    FlutterInappPurchase.purchaseUpdated.listen((PurchasedItem item) async {
-//      var result =
-//          await _homeService.iap.consumePurchaseAndroid(item.purchaseToken);
-//      print('purchase listener $result');
-//      await askQuestion(_message, shouldCharge: false);
-//    });
+    _homeService.purchaseHelper.purchaseStream.listen((purchaseStatus) {
+      if (purchaseStatus == PurchaseStatus.pending) {
+        //todo handle pending status
+      } else if (purchaseStatus == PurchaseStatus.purchased) {
+        setBusy(true);
+        _homeService.makeQuestionRequest(_question).then((value) {
+          setBusy(false);
+        });
+      } else if (purchaseStatus == PurchaseStatus.error) {
+        updateQuestionStatusById(QuestionStatus.NOT_DELIVERED);
+      }
+    });
   }
 
   Future<void> addMessage(MessageModel message) async {
@@ -83,11 +88,14 @@ class DashboardViewModel extends BaseViewModel {
     setBusy(false);
   }
 
-  Future<void> askQuestion(MessageModel message,
-      {bool shouldCharge = true}) async {
+  askQuestion(MessageModel message) async {
+    _question = message;
     setBusy(true);
-    await _homeService.askQuestion(
-        message, shouldCharge, _homeService.priceAfterDiscount);
+    if (_homeService.isFree) {
+      await _homeService.makeQuestionRequest(_question);
+    } else {
+      _homeService.purchaseHelper.purchase();
+    }
     setBusy(false);
   }
 

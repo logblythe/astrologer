@@ -1,5 +1,4 @@
 import 'package:astrologer/core/service/db_provider.dart';
-import 'package:astrologer/core/utils/api_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:astrologer/ui/shared/theme_stream.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,10 +30,6 @@ class SettingsService {
     theme.changeValue(enable);
   }
 
-  changePassword(Map<String, dynamic> body) async {
-    ApiBaseHelper _helper = ApiBaseHelper();
-    final response = await _helper.get("movie/popular");
-  }
 
   Future<void> logout() async {
     await _dbProvider.deleteAllTables();

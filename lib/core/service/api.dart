@@ -2,14 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:alice/alice.dart';
 import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/data_model/image_model.dart';
 import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/data_model/response.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
-import 'package:astrologer/core/service/navigation_service.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:async/async.dart';
 import 'package:http/http.dart' as http;
@@ -19,7 +17,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Api {
   var client = http.Client();
   String token;
-  Alice _alice;
 
   Future<String> get getToken async {
     var sharedPref = await SharedPreferences.getInstance();
@@ -52,7 +49,7 @@ class Api {
   }
 
   Future<UserModel> updateProfile(UserModel user) async {
-  /*  _alice = Alice(
+    /*  _alice = Alice(
         showNotification: true,
         showInspectorOnShake: true,
         darkTheme: false,
@@ -89,8 +86,8 @@ class Api {
     }
   }
 
-  Future<LoginResponse> performLogin(
-      String email, String password, String fcmToken) async {
+  Future<LoginResponse> performLogin(String email, String password,
+      String fcmToken) async {
     print(login);
     try {
       var response = await client.post(
@@ -111,8 +108,8 @@ class Api {
     }
   }
 
-  Future<Map<String, dynamic>> askQuestion(
-      int userId, String question, double questionPrice,
+  Future<Map<String, dynamic>> askQuestion(int userId, String question,
+      double questionPrice,
       {int prevQuestionId}) async {
     try {
       var token = await getToken;
@@ -170,7 +167,8 @@ class Api {
         },
       );
       print(
-          'response fetch question price ${response.statusCode} \n ${response.body}');
+          'response fetch question price ${response.statusCode} \n ${response
+              .body}');
       return jsonDecode(response.body);
     } catch (e) {
       print('FETCHQUESTION PRICE the response exception $e}');
@@ -186,7 +184,7 @@ class Api {
 
     // open a bytestream
     var stream =
-        new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
     // get file length
     var length = await imageFile.length();
 
@@ -210,7 +208,7 @@ class Api {
     var completer = new Completer<ImageModel>();
     // listen for response
     response.stream.transform(utf8.decoder).listen(
-      (value) {
+          (value) {
         contents.write(value);
       },
       onDone: () {
@@ -240,13 +238,13 @@ class Api {
   validateOtp(String otp) async {
     try {
       var response = await client.post(
-        '$baseUrl/validate-otp',
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: jsonEncode({
-          "token":otp
-        })
+          '$baseUrl/validate-otp',
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: jsonEncode({
+            "token": otp
+          })
       );
       return Response.fromJson(jsonDecode(response.body));
     } catch (e) {
@@ -254,21 +252,39 @@ class Api {
     }
   }
 
-  savePassword(String otp,String password) async {
+  savePassword(String otp, String password) async {
     try {
       var response = await client.post(
-        '$baseUrl/save-password',
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: jsonEncode({
-          "token":otp,
-          "newPassword": password
-        })
+          '$baseUrl/save-password',
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: jsonEncode({
+            "token": otp,
+            "newPassword": password
+          })
       );
       return Response.fromJson(jsonDecode(response.body));
     } catch (e) {
       throw Exception(['Something went wrong']);
     }
   }
+
+  changePassword(Map<String, String> map) async {
+    var token = await getToken;
+    try {
+      var response = await client.post(
+          '$baseUrl/change-password',
+          headers: {
+            "Content-Type": "application/json",
+            HttpHeaders.authorizationHeader: "Bearer $token"
+          },
+          body: jsonEncode(map)
+      );
+      return Response.fromJson(jsonDecode(response.body));
+    } catch (e) {
+      throw Exception(['Something went wrong']);
+    }
+  }
+
 }

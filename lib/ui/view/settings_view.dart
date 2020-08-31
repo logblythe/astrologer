@@ -8,10 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SettingsView extends StatelessWidget {
+  final passwordController = TextEditingController();
+  final passwordNewController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return BaseWidget<SettingsViewModel>(
       model: SettingsViewModel(
+        userService: Provider.of(context),
         settingsService: Provider.of(context),
         homeService: Provider.of(context),
       ),
@@ -55,11 +59,14 @@ class SettingsView extends StatelessWidget {
               ),
             ),
             UIHelper.verticalSpaceMedium,
-            /* Text(
-              'Here are some settings that can be changed to match your preference.',
-              style: Theme.of(context).textTheme.subhead,
-              softWrap: true,
-            ),*/
+             Padding(
+               padding: const EdgeInsets.all(8.0),
+               child: Text(
+                'Here are some settings that can be changed to match your preference.',
+                style: Theme.of(context).textTheme.subtitle1,
+                softWrap: true,
+            ),
+             ),
           ],
         ),
       ),
@@ -107,49 +114,73 @@ class SettingsView extends StatelessWidget {
     showBottomSheet(
       context: (context),
       builder: (context) {
-        return Container(
-          padding: EdgeInsets.all(32),
-          height: 400,
-          width: double.infinity,
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(32),
-              boxShadow: [
-                BoxShadow(
-                    blurRadius: 10, color: Colors.grey[300], spreadRadius: 5)
-              ]),
-          child: Column(
-            children: <Widget>[
-              Text(
-                "Change Password",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24.0,
-                ),
-              ),
-              UIHelper.verticalSpaceLarge,
-              TextInput(
-                title: "Old Password",
-                obscureText: true,
-                prefixIcon: Icon(Icons.lock),
-              ),
-              UIHelper.verticalSpaceMedium,
-              TextInput(
-                title: "New Password",
-                obscureText: true,
-                prefixIcon: Icon(Icons.verified_user),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 40.0),
-                child: AnimatedButton(
-                  label: "Change",
-                  busy: false,
-                  onPress: () => Navigator.of(context).pop,
-                ),
-              )
-            ],
+        return BaseWidget<SettingsViewModel>(
+          model: SettingsViewModel(
+            userService: Provider.of(context),
+            settingsService: Provider.of(context),
+            homeService: Provider.of(context),
           ),
+          builder: (context, model, child) {
+            return Container(
+              padding: EdgeInsets.all(32),
+              height: 400,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(32),
+                  boxShadow: [
+                    BoxShadow(
+                        blurRadius: 10,
+                        color: Colors.grey[300],
+                        spreadRadius: 5)
+                  ]),
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    "Change Password",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24.0,
+                    ),
+                  ),
+                  UIHelper.verticalSpaceLarge,
+                  TextInput(
+                    controller: passwordController,
+                    title: "Old Password",
+                    obscureText: true,
+                    prefixIcon: Icon(Icons.lock),
+                  ),
+                  UIHelper.verticalSpaceMedium,
+                  TextInput(
+                    controller: passwordNewController,
+                    title: "New Password",
+                    obscureText: true,
+                    prefixIcon: Icon(Icons.verified_user),
+                  ),
+                  model.errorMessage != null
+                      ? Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      model.errorMessage??"Something went wrong. Please try again",
+                      style: TextStyle(
+                          color: Theme.of(context).primaryColor),
+                    ),
+                  )
+                      : Container(),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: AnimatedButton(
+                      label: "Change",
+                      busy: model.busy,
+                      onPress: () => model.changePassword(
+                          passwordController.text, passwordNewController.text),
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
         );
       },
     );
