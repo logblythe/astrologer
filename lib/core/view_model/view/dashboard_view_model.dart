@@ -61,6 +61,7 @@ class DashboardViewModel extends BaseViewModel {
     setupListeners();
     _fetchingList = false;
     setBusy(false);
+    print('user service loginresponse ${_userService.loginResponse}');
   }
 
   void setupListeners() {

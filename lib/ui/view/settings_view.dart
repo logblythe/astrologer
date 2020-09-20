@@ -7,9 +7,16 @@ import 'package:astrologer/ui/widgets/text_input.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SettingsView extends StatelessWidget {
+class SettingsView extends StatefulWidget {
+  @override
+  _SettingsViewState createState() => _SettingsViewState();
+}
+
+class _SettingsViewState extends State<SettingsView> {
   final passwordController = TextEditingController();
   final passwordNewController = TextEditingController();
+  bool oldPasswordVisible = false;
+  bool newPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +30,9 @@ class SettingsView extends StatelessWidget {
         return AnimatedContainer(
           duration: Duration(milliseconds: 500),
           decoration: BoxDecoration(
-            color: Theme.of(context).backgroundColor,
+            color: Theme
+                .of(context)
+                .backgroundColor,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
@@ -59,14 +68,17 @@ class SettingsView extends StatelessWidget {
               ),
             ),
             UIHelper.verticalSpaceMedium,
-             Padding(
-               padding: const EdgeInsets.all(8.0),
-               child: Text(
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
                 'Here are some settings that can be changed to match your preference.',
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .subtitle1,
                 softWrap: true,
+              ),
             ),
-             ),
           ],
         ),
       ),
@@ -146,25 +158,40 @@ class SettingsView extends StatelessWidget {
                   ),
                   UIHelper.verticalSpaceLarge,
                   TextInput(
+                    suffixIcon: InkWell(
+                      child: Icon(Icons.remove_red_eye),
+                      onTap: () {
+                        model.oldPasswordVisible = !model.oldPasswordVisible;
+                      },
+                    ),
                     controller: passwordController,
                     title: "Old Password",
-                    obscureText: true,
+                    obscureText: model.oldPasswordVisible ? false : true,
                     prefixIcon: Icon(Icons.lock),
                   ),
                   UIHelper.verticalSpaceMedium,
                   TextInput(
+                    suffixIcon: InkWell(
+                      child: Icon(Icons.remove_red_eye),
+                      onTap: () {
+                        model.newPasswordVisible = !model.newPasswordVisible;
+                      },
+                    ),
                     controller: passwordNewController,
                     title: "New Password",
-                    obscureText: true,
+                    obscureText: model.newPasswordVisible ? false : true,
                     prefixIcon: Icon(Icons.verified_user),
                   ),
                   model.errorMessage != null
                       ? Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
-                      model.errorMessage??"Something went wrong. Please try again",
+                      model.errorMessage ??
+                          "Something went wrong. Please try again",
                       style: TextStyle(
-                          color: Theme.of(context).primaryColor),
+                          color: Theme
+                              .of(context)
+                              .primaryColor),
                     ),
                   )
                       : Container(),
@@ -173,8 +200,10 @@ class SettingsView extends StatelessWidget {
                     child: AnimatedButton(
                       label: "Change",
                       busy: model.busy,
-                      onPress: () => model.changePassword(
-                          passwordController.text, passwordNewController.text),
+                      onPress: () =>
+                          model.changePassword(
+                              passwordController.text,
+                              passwordNewController.text),
                     ),
                   )
                 ],

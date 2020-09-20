@@ -10,6 +10,8 @@ class SettingsViewModel extends BaseViewModel {
   HomeService _homeService;
 
   bool get darkModeEnabled => _settingsService.darkModeEnabled;
+  bool _oldPasswordVisible = false;
+  bool _newPasswordVisible = false;
 
   SettingsViewModel({
     @required UserService userService,
@@ -42,5 +44,19 @@ class SettingsViewModel extends BaseViewModel {
   Future logout() async {
     await _settingsService.logout();
     _homeService.dispose();
+  }
+
+  bool get oldPasswordVisible => _oldPasswordVisible;
+
+  set oldPasswordVisible(bool value) {
+    _oldPasswordVisible = value;
+    notifyListeners();
+  }
+
+  bool get newPasswordVisible => _newPasswordVisible;
+
+  set newPasswordVisible(bool value) {
+    _newPasswordVisible = value;
+    notifyListeners();
   }
 }

@@ -58,8 +58,7 @@ class UserService {
 
   Future<LoginResponse> performLogin(String email, String password) async {
     String fcmToken = await _getFcmToken();
-    LoginResponse _loginResponse =
-        await _api.performLogin(email, password, fcmToken);
+    _loginResponse = await _api.performLogin(email, password, fcmToken);
     if (_loginResponse.token != null) {
       await _db.addUser(_loginResponse.userDetails);
       await _sharedPrefHelper.setString(KEY_TOKEN, _loginResponse.token);
@@ -77,7 +76,7 @@ class UserService {
 
   validateOTP(String otp) => _api.validateOtp(otp);
 
-  savePassword(String otp,String password) => _api.savePassword(otp, password) ;
+  savePassword(String otp, String password) => _api.savePassword(otp, password);
 
-  changePassword(Map<String, String> map) =>_api.changePassword(map);
+  changePassword(Map<String, String> map) => _api.changePassword(map);
 }
