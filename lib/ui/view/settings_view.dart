@@ -15,8 +15,6 @@ class SettingsView extends StatefulWidget {
 class _SettingsViewState extends State<SettingsView> {
   final passwordController = TextEditingController();
   final passwordNewController = TextEditingController();
-  bool oldPasswordVisible = false;
-  bool newPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +28,7 @@ class _SettingsViewState extends State<SettingsView> {
         return AnimatedContainer(
           duration: Duration(milliseconds: 500),
           decoration: BoxDecoration(
-            color: Theme
-                .of(context)
-                .backgroundColor,
+            color: Theme.of(context).backgroundColor,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
@@ -72,10 +68,7 @@ class _SettingsViewState extends State<SettingsView> {
               padding: const EdgeInsets.all(8.0),
               child: Text(
                 'Here are some settings that can be changed to match your preference.',
-                style: Theme
-                    .of(context)
-                    .textTheme
-                    .subtitle1,
+                style: Theme.of(context).textTheme.subtitle1,
                 softWrap: true,
               ),
             ),
@@ -184,26 +177,22 @@ class _SettingsViewState extends State<SettingsView> {
                   ),
                   model.errorMessage != null
                       ? Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      model.errorMessage ??
-                          "Something went wrong. Please try again",
-                      style: TextStyle(
-                          color: Theme
-                              .of(context)
-                              .primaryColor),
-                    ),
-                  )
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            model.errorMessage ??
+                                "Something went wrong. Please try again",
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor),
+                          ),
+                        )
                       : Container(),
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0),
                     child: AnimatedButton(
                       label: "Change",
                       busy: model.busy,
-                      onPress: () =>
-                          model.changePassword(
-                              passwordController.text,
-                              passwordNewController.text),
+                      onPress: () => model.changePassword(
+                          passwordController.text, passwordNewController.text),
                     ),
                   )
                 ],
