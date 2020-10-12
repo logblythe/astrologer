@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "766439820410",
-    "firebase_url": "https://astrologer-629b3.firebaseio.com",
-    "project_id": "astrologer-629b3",
-    "storage_bucket": "astrologer-629b3.appspot.com"
+    "project_number": "570031811254",
+    "firebase_url": "https://cosmos-astrology.firebaseio.com",
+    "project_id": "cosmos-astrology",
+    "storage_bucket": "cosmos-astrology.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:766439820410:android:6cea5f95709b186b32bfc3",
+        "mobilesdk_app_id": "1:570031811254:android:65834e456bb2b9c9159417",
         "android_client_info": {
           "package_name": "com.cosmosNepal.cosmos"
         }
       },
       "oauth_client": [
         {
-          "client_id": "766439820410-cam39n5hvsikcenh2tl4jibb1mpms5o9.apps.googleusercontent.com",
+          "client_id": "570031811254-4vhue5qn44a5phj5cbuhg8dacb27o8g3.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBbkMG32uwLpi3OQdLyhcHrPplWmUp1_dg"
+          "current_key": "AIzaSyAcspfk8md5BSu8z4f6crCJqSW9eVkGA7c"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "766439820410-cam39n5hvsikcenh2tl4jibb1mpms5o9.apps.googleusercontent.com",
+              "client_id": "570031811254-4vhue5qn44a5phj5cbuhg8dacb27o8g3.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

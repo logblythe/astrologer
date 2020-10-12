@@ -116,8 +116,10 @@ class _DashboardViewState extends State<DashboardView>
           Expanded(
             child: TextField(
               keyboardType: TextInputType.multiline,
-              minLines: 1,//Normal textInputField will be displayed
-              maxLines: 5,//              onChanged: (text) => model.addMsgToSink(text, false),
+              minLines: 1,
+              //Normal textInputField will be displayed
+              maxLines: 5,
+              //              onChanged: (text) => model.addMsgToSink(text, false),
               focusNode: _messageFocusNode,
               controller: _messageController,
               decoration: InputDecoration(
@@ -169,7 +171,7 @@ class _DashboardViewState extends State<DashboardView>
         if (_listState != null)
           _listState.insertItem(0, duration: Duration(milliseconds: 500));
         await model.addMessage(_message);
-        await model.askQuestion(_message);
+        await model.askQuestion(_message, context);
       }
     }
   }

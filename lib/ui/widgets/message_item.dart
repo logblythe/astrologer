@@ -82,10 +82,13 @@ class MessageItem extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+
             Text(
                 DateFormat("MMM d, yyyy hh:mm a").format(
                     DateTime.fromMillisecondsSinceEpoch(message.createdAt)),
-                style: TextStyle(color: Colors.grey, fontSize: 10)),
+                style: TextStyle(color: Colors.black54, fontSize: 10)),
+            message.sent?SizedBox.shrink():Text(message.astrologer??"Cosmos astrology",
+                style: TextStyle(color: Colors.black54, fontSize: 10)),
             SizedBox(height: 8),
             Text(
               message.message ?? 'no message',

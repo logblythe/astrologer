@@ -17,6 +17,8 @@ class HomeService {
   final LocalNotificationHelper _localNotificationHelper;
   final PurchaseHelper _purchaseHelper;
 
+  int _prevQuesId;
+
   HomeService({
     @required DbProvider db,
     @required Api api,
@@ -29,17 +31,15 @@ class HomeService {
         _localNotificationHelper = localNotificationHelper,
         _purchaseHelper = purchaseHelper;
 
+  PublishSubject<MessageAndUpdate> _newMessage = PublishSubject();
+  PublishSubject<int> _freeCountStream = PublishSubject();
   List<MessageModel> _messageList = [];
   List<AstrologerModel> _astrologers;
   int _id, _userId, _freeCount;
   List<IdeaModel> _ideas;
-
   double _priceAfterDiscount;
   double _questionPrice;
   double _discountInPercentage;
-
-  PublishSubject<MessageAndUpdate> _newMessage = PublishSubject();
-  PublishSubject<int> _freeCountStream = PublishSubject();
 
   Stream<MessageAndUpdate> get nStream => _newMessage.stream;
 
@@ -105,9 +105,12 @@ class HomeService {
         _messageList[i].status = status;
         await _dbProvider.updateQuestionStatus(questionId, status);
         if (status == QuestionStatus.UNCLEAR) {
+          _prevQuesId = questionId;
           _freeCount = _freeCount + 1;
           _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, _freeCount);
           addFreeCountToSink(_freeCount);
+        } else {
+          _prevQuesId = null;
         }
       }
     }
@@ -153,11 +156,10 @@ class HomeService {
     Map<String, dynamic> messageResponse = await _api.askQuestion(
       _userId,
       messageModel.message,
-      questionPrice,
-//      prevQuestionId: prevQuesId,
+      _priceAfterDiscount,
+      prevQuestionId: _prevQuesId,
     );
     if (messageResponse == null) {
-      print('message response error ');
       messageModel.status = NOT_DELIVERED;
     } else {
       messageModel.status = messageResponse['questionStatus'] ?? DELIVERED;
@@ -167,7 +169,6 @@ class HomeService {
         await _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, _freeCount);
         addFreeCountToSink(_freeCount);
       }
-      print('message response updated');
     }
     await _dbProvider.updateMessage(messageModel, _id);
   }
