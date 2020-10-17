@@ -171,7 +171,7 @@ class _DashboardViewState extends State<DashboardView>
         if (_listState != null)
           _listState.insertItem(0, duration: Duration(milliseconds: 500));
         await model.addMessage(_message);
-        await model.askQuestion(_message, context);
+        await model.askQuestion(_message);
       }
     }
   }

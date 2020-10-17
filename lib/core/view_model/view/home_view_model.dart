@@ -47,8 +47,6 @@ class HomeViewModel extends BaseViewModel {
 
   onNotificationReceived(NotificationModel answer) async {
     var data = answer.data;
-    _homeService.updateQuestionStatusN(
-        int.parse(data.engQuestionId), data.status);
     if (answer.data.message != null) {
       await _homeService.addMessage(MessageModel(
           sent: false,
@@ -57,6 +55,8 @@ class HomeViewModel extends BaseViewModel {
           questionId: 0,
           astrologer: data.repliedBy));
     }
+    await _homeService.updateQuestionStatusN(
+        int.parse(data.engQuestionId), data.status);
   }
 
   getFreeQuesCount() => _homeService.getFreeQuesCount();

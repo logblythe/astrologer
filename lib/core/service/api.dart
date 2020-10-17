@@ -123,7 +123,7 @@ class Api {
           {
             'engQuestion': question,
             'userId': userId,
-            'prevQuestionId': prevQuestionId,
+            'prevEngQuesId': prevQuestionId,
             'questionPrice': questionPrice,
           },
         ),

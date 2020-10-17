@@ -99,7 +99,7 @@ class HomeService {
     return _id;
   }
 
-  Future<void> updateQuestionStatusN(int questionId, String status) async {
+  updateQuestionStatusN(int questionId, String status) async {
     for (int i = 0; i < _messageList.length; i++) {
       if (_messageList[i].questionId == questionId) {
         _messageList[i].status = status;
@@ -156,7 +156,7 @@ class HomeService {
     Map<String, dynamic> messageResponse = await _api.askQuestion(
       _userId,
       messageModel.message,
-      _priceAfterDiscount,
+      isFree ? 0 : _priceAfterDiscount,
       prevQuestionId: _prevQuesId,
     );
     if (messageResponse == null) {
