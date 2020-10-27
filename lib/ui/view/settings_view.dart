@@ -97,8 +97,26 @@ class _SettingsViewState extends State<SettingsView> {
           ),
           leading: Icon(Icons.swap_horiz),
           onTap: () async {
-            await model.logout();
-            Navigator.popAndPushNamed(context, RoutePaths.login);
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text('Logout?'),
+                content: Text('Do you want to logout from Cosmos Astrology'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('No'),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                  FlatButton(
+                    child: Text('Yes'),
+                    onPressed: () async {
+                      await model.logout();
+                      Navigator.popAndPushNamed(context, RoutePaths.login);
+                    },
+                  ),
+                ],
+              ),
+            );
           },
         ),
         ListTile(
@@ -107,9 +125,7 @@ class _SettingsViewState extends State<SettingsView> {
             child: Text('Change password'),
           ),
           leading: Icon(Icons.lock_outline),
-          onTap: () {
-            _handleChangePassword(context, model);
-          },
+          onTap: () => _handleChangePassword(context, model),
         ),
       ],
     );

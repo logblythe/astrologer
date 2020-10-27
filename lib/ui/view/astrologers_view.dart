@@ -1,9 +1,7 @@
-import 'package:astrologer/core/constants/what_to_ask.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/view_model/view/astrologer_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
-import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,8 +9,8 @@ class AstrologersView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseWidget<AstrologerViewModel>(
-      model: AstrologerViewModel(homeService: Provider.of(context),
-      userService: Provider.of(context)),
+      model: AstrologerViewModel(
+          homeService: Provider.of(context), userService: Provider.of(context)),
       onModelReady: (model) => model.fetchAstrologers(),
       builder: (context, model, child) {
         return Container(
@@ -26,7 +24,6 @@ class AstrologersView extends StatelessWidget {
           child: ListView(
             children: <Widget>[
               _buildHeader(context),
-              _buildCard(context),
               _buildAstrologerList(model, context),
             ],
           ),
@@ -59,35 +56,6 @@ class AstrologersView extends StatelessWidget {
               softWrap: true,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Card _buildCard(BuildContext context) {
-    return Card(
-      semanticContainer: false,
-      margin: EdgeInsets.all(12.0),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: ExpandablePanel(
-          header: Row(
-            children: <Widget>[
-              Image.asset('assets/images/fortune_teller.png'),
-              Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Text(
-                  'Why COSMOS?',
-                  style: Theme.of(context).textTheme.headline5,
-                ),
-              ),
-            ],
-          ),
-          expanded: Text(
-            whyCosmos,
-            style: TextStyle(height: 1.5),
-          ),
-          hasIcon: false,
         ),
       ),
     );

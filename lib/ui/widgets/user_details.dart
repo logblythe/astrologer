@@ -155,25 +155,28 @@ class UserDetailsState<T extends BaseViewModel> extends State<UserDetails>
             alignment: Alignment.bottomRight,
             child: _registerButton(model, context),
           ),
-          Container(
-            margin: EdgeInsets.only(top: 24, bottom: 24),
-            alignment: Alignment.center,
-            child: RichText(
-              text: TextSpan(
-                text: 'Already have a account?',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyText1
-                    .copyWith(color: Theme.of(context).disabledColor),
-                children: <TextSpan>[
-                  TextSpan(
-                      text: ' Sign in',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).primaryColor)),
-                ],
+          InkWell(
+            child: Container(
+              margin: EdgeInsets.only(top: 24, bottom: 24),
+              alignment: Alignment.center,
+              child: RichText(
+                text: TextSpan(
+                  text: 'Already have a account?',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1
+                      .copyWith(color: Theme.of(context).disabledColor),
+                  children: <TextSpan>[
+                    TextSpan(
+                        text: ' Sign in',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor)),
+                  ],
+                ),
               ),
             ),
+            onTap: ()=>Navigator.of(context).pop(),
           )
         ],
       ),

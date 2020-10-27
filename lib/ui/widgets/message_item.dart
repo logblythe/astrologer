@@ -40,7 +40,7 @@ class MessageItem extends StatelessWidget {
               : CircleAvatar(
                   child: Text(
                       message?.astrologer?.substring(0, 1)?.toUpperCase() ??
-                          "*"),
+                          "C"),
                 ),
           Padding(
             padding: message.sent ? EdgeInsets.zero : EdgeInsets.only(left: 20),
