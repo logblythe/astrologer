@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:astrologer/core/service/navigation_service.dart';
 import 'package:astrologer/provider_setup.dart';
-import 'package:astrologer/router.dart';
+import 'package:astrologer/router.dart' as astro_router;
 import 'package:astrologer/ui/shared/theme_stream.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:astrologer/ui/view/home_view.dart';
@@ -58,7 +58,8 @@ class _MyAppState extends State<MyApp> {
 //              title: "Purchase test",
 //            ),
             home: HomeView(),
-            onGenerateRoute: (settings) => Router.generateRoute(settings),
+            onGenerateRoute: (settings) =>
+                astro_router.Router.generateRoute(settings),
             navigatorKey: navigatorKey,
 //              initialRoute: RoutePaths.login, //commenting this cause it shows black screen initially
           ),
