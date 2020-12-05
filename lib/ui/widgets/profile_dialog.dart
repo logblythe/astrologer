@@ -173,15 +173,11 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
       UserModel response = await model.updateUser(user);
       if (response.errorMessage != null) {
         Scaffold.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response.errorMessage),
-          ),
+          SnackBar(content: Text(response.errorMessage)),
         );
       } else {
         Scaffold.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Updated successfully'),
-          ),
+          SnackBar(content: Text('Updated successfully')),
         );
       }
     }

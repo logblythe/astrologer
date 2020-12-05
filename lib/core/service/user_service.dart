@@ -17,6 +17,10 @@ class UserService {
 
   UserModel get user => _user;
 
+  set user(UserModel user) {
+    _user = user;
+  }
+
   UserService({
     @required Api api,
     @required DbProvider dbProvider,
