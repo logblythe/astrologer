@@ -69,14 +69,14 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
                       ),
                       UIHelper.verticalSpaceMedium,
                       TextInput(
-                        title: "FULL NAME",
+                        title: "Name",
                         prefixIcon: Icon(Icons.person),
                         controller: nameController,
                         validator: isEmptyValidation,
                       ),
                       UIHelper.verticalSpaceMedium,
                       TextInput(
-                        title: "PHONE",
+                        title: "Phone",
                         prefixIcon: Icon(Icons.phone_android),
                         controller: phoneController,
                         validator: isEmptyValidation,
@@ -92,7 +92,7 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
                       UIHelper.verticalSpaceSmall,
                       AccurateTimeSwitch(
                         onSwitch: model.handleSwitch,
-                        value: model.accurateTime,
+                        value: model.accurateTime ?? false,
                       ),
                       UIHelper.verticalSpaceSmall,
                       TextInput(
@@ -144,21 +144,9 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(32)),
               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text(
-                    'UPDATE',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_forward,
-                    color: Colors.white,
-                  )
-                ],
+              child: Text(
+                'SAVE',
+                style: TextStyle(color: Colors.white, fontSize: 16.0),
               ),
               onPressed: () => handleUpdateClick(model, context),
               color: Theme.of(context).primaryColor,
@@ -201,12 +189,14 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
 
   void initializeValue(ProfileViewModel model) {
     UserModel user = model.user;
-    nameController.text = "${user.firstName} ${user.lastName}";
-    locationController.text = user.city;
-    dateController.text = user.dateOfBirth;
-    timeController.text = user.birthTime;
-    stateController.text = user.state;
-    countryController.text = user.country;
-    phoneController.text = user.phoneNumber;
+    if (user != null) {
+      nameController.text = "${user.firstName} ${user.lastName}";
+      locationController.text = user.city;
+      dateController.text = user.dateOfBirth;
+      timeController.text = user.birthTime;
+      stateController.text = user.state;
+      countryController.text = user.country;
+      phoneController.text = user.phoneNumber;
+    }
   }
 }

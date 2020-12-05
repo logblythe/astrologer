@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 const String KEY_USER_ID = "key_user_id";
 const String KEY_TOKEN = "key_token";
 const String KEY_FREE_QUES_COUNT = "key_free_question_count";
-const String KEY_DARK_MODE_ENABLED = "key_dark_mode_enabled";
 const String KEY_IMAGE_URL = "key_image_url";
 
 class SharedPrefHelper {

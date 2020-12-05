@@ -24,8 +24,8 @@ class ProfileViewModel extends BaseViewModel {
   getLoggedInUser() async {
     setBusy(true);
     UserModel user = await _profileService.getLoggedInUser();
-    accurateTime = user.accurateTime;
-    selectedGender = user.gender == "M" ? Gender.male : Gender.female;
+    accurateTime = user?.accurateTime;
+    selectedGender = user?.gender == "M" ? Gender.male : Gender.female;
     setBusy(false);
   }
 

@@ -3,7 +3,6 @@ import 'package:astrologer/core/service/db_provider.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/navigation_service.dart';
 import 'package:astrologer/core/service/profile_service.dart';
-import 'package:astrologer/core/service/settings_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/utils/local_notification_helper.dart';
 import 'package:astrologer/core/utils/purchase_helper.dart';
@@ -45,13 +44,6 @@ List<SingleChildCloneableWidget> dependentServices = [
             sharedPrefHelper: sharedPrefH,
             localNotificationHelper: localNotificationH,
             purchaseHelper: purchaseHelper),
-  ),
-  ProxyProvider2<SharedPrefHelper, DbProvider, SettingsService>(
-    builder: (context, sharedPrefHelper, dbProvider, homeService) =>
-        SettingsService(
-      dbProvider: dbProvider,
-      sharedPrefHelper: sharedPrefHelper,
-    ),
   ),
 ];
 

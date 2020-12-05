@@ -27,7 +27,7 @@ class _AccurateTimeSwitchState extends State<AccurateTimeSwitch> {
   @override
   void didUpdateWidget(AccurateTimeSwitch oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if(oldWidget.value!=widget.value){
+    if (oldWidget.value != widget.value) {
       setState(() {
         _accurate = widget.value;
       });
@@ -57,7 +57,7 @@ class _AccurateTimeSwitchState extends State<AccurateTimeSwitch> {
                 'Accurate birth time',
                 style: TextStyle(
                     color: Colors.black54,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w700,
                     fontSize: 14),
               ),
               value: _accurate,

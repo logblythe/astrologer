@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:astrologer/core/enum/gender.dart';
+import 'package:flutter/material.dart';
 
 class GenderTile extends StatelessWidget {
   final Gender character;
@@ -33,8 +33,12 @@ class GenderTile extends StatelessWidget {
             Text(
               genderText,
               style: (isSelected)
-                  ? TextStyle(color: Theme.of(context).primaryColor)
-                  : TextStyle(color: Theme.of(context).disabledColor),
+                  ? TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.w700)
+                  : TextStyle(
+                      color: Theme.of(context).disabledColor,
+                      fontWeight: FontWeight.w700),
             ),
           ],
         ),

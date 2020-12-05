@@ -25,10 +25,12 @@ class _GenderSelectionState extends State<GenderSelection> {
   @override
   void didUpdateWidget(GenderSelection oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectedGender != widget.selectedGender) {
-      setState(() {
-        selectedGender = widget.selectedGender;
-      });
+    if (oldWidget.selectedGender != null && widget.selectedGender != null) {
+      if (oldWidget.selectedGender != widget.selectedGender) {
+        setState(() {
+          selectedGender = widget.selectedGender;
+        });
+      }
     }
   }
 

@@ -1,9 +1,7 @@
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/view_model/view/dashboard_view_model.dart';
 import 'package:astrologer/ui/base_widget.dart';
-import 'package:astrologer/ui/shared/route_paths.dart';
 import 'package:astrologer/ui/widgets/message_item.dart';
-import 'package:astrologer/ui/widgets/no_message.dart';
 import 'package:astrologer/ui/widgets/no_user_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,9 +28,6 @@ class _DashboardViewState extends State<DashboardView>
       model: _dashboardViewModel,
       onModelReady: (DashboardViewModel model) => model.init(),
       builder: (context, DashboardViewModel model, child) {
-//        if (model.messageBox != null && !_messageFocusNode.hasFocus) {
-//          FocusScope.of(context).requestFocus(_messageFocusNode);
-//        }
         _messageController
           ..text = model.messageBox
           ..selection =
@@ -66,43 +61,23 @@ class _DashboardViewState extends State<DashboardView>
     return Expanded(
       child: model.fetchingList
           ? const Center(child: CircularProgressIndicator())
-          : model.messages == null || model.messages.length == 0
-              ? Center(
-                  child: model.user == null
-                      ? NoMessageWidget(
-                          buttonTitle: "Ok! Let me login",
-                          buttonTap: () {
-                            Navigator.pushNamedAndRemoveUntil(
-                                context,
-                                RoutePaths.login,
-                                ModalRoute.withName(RoutePaths.home));
-                          },
-                        )
-                      : NoMessageWidget(
-                          buttonTitle: "Ok! Lets chat",
-                          buttonTap: () {
-                            FocusScope.of(context)
-                                .requestFocus(_messageFocusNode);
-                          },
-                        ),
-                )
-              : AnimatedList(
-                  key: widget.listKey,
-                  initialItemCount: model.messages?.length,
-                  reverse: true,
-                  shrinkWrap: true,
-                  padding: EdgeInsets.all(8.0),
-                  itemBuilder: (context, index, animation) {
-                    MessageModel _message = model.messages[index];
-                    return MessageItem(
-                      darkMode: model.darkModeEnabled,
-                      message: _message,
-                      animation: animation,
-                      item: index,
-                      onTap: () {},
-                    );
-                  },
-                ),
+          : AnimatedList(
+              key: widget.listKey,
+              initialItemCount: model.messages?.length,
+              reverse: true,
+              shrinkWrap: true,
+              padding: EdgeInsets.all(8.0),
+              itemBuilder: (context, index, animation) {
+                MessageModel _message = model.messages[index];
+                return MessageItem(
+                  darkMode: false,
+                  message: _message,
+                  animation: animation,
+                  item: index,
+                  onTap: () {},
+                );
+              },
+            ),
     );
   }
 
@@ -117,9 +92,7 @@ class _DashboardViewState extends State<DashboardView>
             child: TextField(
               keyboardType: TextInputType.multiline,
               minLines: 1,
-              //Normal textInputField will be displayed
               maxLines: 5,
-              //              onChanged: (text) => model.addMsgToSink(text, false),
               focusNode: _messageFocusNode,
               controller: _messageController,
               decoration: InputDecoration(
@@ -157,14 +130,14 @@ class _DashboardViewState extends State<DashboardView>
   }
 
   void addMessage(DashboardViewModel model) async {
-    if (model.user == null) {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return NoUserDialog();
-          });
-    } else {
-      if (_messageController.text != "") {
+    if (_messageController.text.isNotEmpty) {
+      if (model.user == null) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return NoUserDialog();
+            });
+      } else {
         var _message =
             MessageModel(message: _messageController.text, sent: true);
         final _listState = widget.listKey.currentState;
@@ -182,7 +155,6 @@ class _DashboardViewState extends State<DashboardView>
     _dashboardViewModel = DashboardViewModel(
       homeService: Provider.of(context),
       userService: Provider.of(context),
-      settingsService: Provider.of(context),
     );
   }
 

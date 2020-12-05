@@ -5,8 +5,6 @@ import 'package:astrologer/ui/base_widget.dart';
 import 'package:astrologer/ui/shared/route_paths.dart';
 import 'package:astrologer/ui/shared/ui_helpers.dart';
 import 'package:astrologer/ui/view/ideas_view.dart';
-import 'package:astrologer/ui/view/settings_view.dart';
-import 'package:astrologer/ui/widgets/no_user_dialog.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +46,6 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
       builder: (context, HomeViewModel model, _) => Scaffold(
         drawer: _buildDrawer(model),
         appBar: AppBar(
-          centerTitle: true,
           elevation: 0,
           title: titleWidget(model),
           actions: <Widget>[_buildIconButton(model)],
@@ -64,7 +61,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
           padding: EdgeInsets.all(32),
           child: Image.asset('assets/images/app_bar.png'));
     } else {
-      Text(_children[model.index]['title']);
+      return Text(_children[model.index]['title']);
     }
   }
 
@@ -103,11 +100,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
       onPressed: () async {
         switch (model.index) {
           case 0:
-            if (model.userModel != null)
-              Navigator.pushNamed(context, RoutePaths.profile);
-            else
-              showDialog(
-                  context: context, builder: (context) => NoUserDialog());
+            Navigator.pushNamed(context, RoutePaths.profile);
             break;
         }
       },
@@ -166,7 +159,6 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
                 FlatButton(
                   onPressed: () async {
                     Navigator.of(context).pop(false);
-//                    model.showLocalNotification("title", "body");
                   },
                   child: Text('No'),
                 ),
@@ -188,7 +180,6 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
       IdeasView(
         onTap: (idea) => _handleIdeaSelection(model, idea),
       ),
-      SettingsView(),
     ];
   }
 
@@ -288,11 +279,6 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
             onTap: _showWhyCosmosDialog,
           ),
           ListTile(
-            title: Text('Settings'),
-            leading: Icon(Icons.settings),
-            onTap: () => _onDrawerTap(model, 3),
-          ),
-          ListTile(
               title: Text(
                   'Our mission is to make Cosmic astrology accessible to all people to help them attain positive changes in their lives.',
                   style: Theme.of(context).textTheme.bodyText1)),
@@ -351,7 +337,7 @@ class _HomeViewState extends State<HomeView> with ConnectivityMixin {
                 UIHelper.verticalSpaceMedium,
                 Text(
                   "Astrology claims divine information about human affairs and terrestrial events by studying the movements and relative positions of celestial bodies.It still needs more study and research about astrology however based on our learning and research we find the influence of other celestial bodies on earth as well as on us. With the natal chart we can analyse the influence of planets on us,how they support us and what effects can be seen. Cosmos helps to judge relationship compatibility, understand friendship dynamics and make life decisions.",
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.bodyText1,
                 ),
               ],
             ),

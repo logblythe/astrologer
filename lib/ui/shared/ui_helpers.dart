@@ -27,7 +27,7 @@ class UIHelper {
       SizedBox(width: _HorizontalSpaceLarge);
 
   static ThemeData darkTheme = ThemeData(
-    primaryColor: Colors.black,
+  primaryColor: Colors.black,
     backgroundColor: Colors.grey[700],
     brightness: Brightness.dark,
   );

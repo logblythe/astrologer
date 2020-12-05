@@ -10,7 +10,7 @@ class AstrologersView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BaseWidget<AstrologerViewModel>(
       model: AstrologerViewModel(
-          homeService: Provider.of(context), userService: Provider.of(context)),
+          homeService: Provider.of(context)),
       onModelReady: (model) => model.fetchAstrologers(),
       builder: (context, model, child) {
         return Container(

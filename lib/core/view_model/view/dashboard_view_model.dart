@@ -3,7 +3,6 @@ import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
-import 'package:astrologer/core/service/settings_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/view_model/base_view_model.dart';
 import 'package:flutter/material.dart';
@@ -12,15 +11,12 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 class DashboardViewModel extends BaseViewModel {
   HomeService _homeService;
   UserService _userService;
-  SettingsService _settingsService;
 
   DashboardViewModel({
     @required HomeService homeService,
     @required UserService userService,
-    @required SettingsService settingsService,
   })  : this._homeService = homeService,
-        this._userService = userService,
-        this._settingsService = settingsService;
+        this._userService = userService;
 
   int _messageId;
   String _messageBox;
@@ -30,8 +26,6 @@ class DashboardViewModel extends BaseViewModel {
   bool get fetchingList => _fetchingList;
 
   bool get showSendBtn => _showSendBtn;
-
-  bool get darkModeEnabled => _settingsService.darkModeEnabled;
 
   set showSendBtn(bool value) {
     _showSendBtn = value;

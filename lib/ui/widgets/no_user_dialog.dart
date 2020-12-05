@@ -19,12 +19,12 @@ class NoUserDialog extends StatelessWidget {
           ),
           UIHelper.verticalSpaceMedium,
           Text(
-            'LOG IN & CONTINUE ?',
+            'Information required!',
             style: Theme.of(context).textTheme.bodyText1,
           ),
           UIHelper.verticalSpaceSmall,
           Text(
-            "Looks like you haven\'t logged into our system. Would you like to log in and continue",
+            "Please provide us your information so that we can make accurate predictions",
             style: Theme.of(context).textTheme.bodyText1.copyWith(
                 color: Theme.of(context).disabledColor,
                 fontWeight: FontWeight.w400),
@@ -38,13 +38,13 @@ class NoUserDialog extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 12, horizontal: 32),
                 color: Theme.of(context).primaryColor,
                 child: Text(
-                  'Ok! Let me login',
+                  'Ok',
                   style: TextStyle(color: Colors.white),
                   textAlign: TextAlign.left,
                 ),
                 onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(context, RoutePaths.login,
-                      ModalRoute.withName(RoutePaths.home));
+                  Navigator.pop(context);
+                  Navigator.pushNamed(context, RoutePaths.profile);
                 }),
           )
         ],
