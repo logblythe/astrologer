@@ -1,5 +1,4 @@
 import 'package:astrologer/core/constants/end_points.dart';
-import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/home_service.dart';
@@ -39,7 +38,6 @@ class DashboardViewModel extends BaseViewModel {
   void addMsgToSink(message, update) =>
       _homeService.addMsgToSink(message, update);
 
-  LoginResponse get loginResponse => _userService.loginResponse;
 
   List<MessageModel> get messages => _homeService.messages?.reversed?.toList();
 
@@ -55,7 +53,6 @@ class DashboardViewModel extends BaseViewModel {
     setupListeners();
     _fetchingList = false;
     setBusy(false);
-    print('user service loginresponse ${_userService.loginResponse}');
   }
 
   void setupListeners() {

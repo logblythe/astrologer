@@ -1,4 +1,3 @@
-import 'package:astrologer/core/data_model/login_response.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
@@ -10,14 +9,11 @@ class UserService {
   final Api _api;
   final DbProvider _db;
   final SharedPrefHelper _sharedPrefHelper;
-  LoginResponse _loginResponse;
   UserModel _user;
   String _fcmToken;
   int _userId;
 
   int get userId => _userId;
-
-  LoginResponse get loginResponse => _loginResponse;
 
   UserModel get user => _user;
 
@@ -55,28 +51,4 @@ class UserService {
     UserModel userModel = await _api.registerUser(user);
     return userModel;
   }
-
-  Future<LoginResponse> performLogin(String email, String password) async {
-    String fcmToken = await _getFcmToken();
-    _loginResponse = await _api.performLogin(email, password, fcmToken);
-    if (_loginResponse.token != null) {
-      await _db.addUser(_loginResponse.userDetails);
-      await _sharedPrefHelper.setString(KEY_TOKEN, _loginResponse.token);
-      await _sharedPrefHelper.setInt(
-          KEY_USER_ID, _loginResponse.userDetails.userId);
-      //todo no free question at first
-//      if (_loginResponse.firstLogin) {
-//        await _sharedPrefHelper.setInt(KEY_FREE_QUES_COUNT, 1);
-//      }
-    }
-    return _loginResponse;
-  }
-
-  requestOTP(String email) => _api.requestOTP(email);
-
-  validateOTP(String otp) => _api.validateOtp(otp);
-
-  savePassword(String otp, String password) => _api.savePassword(otp, password);
-
-  changePassword(Map<String, String> map) => _api.changePassword(map);
 }

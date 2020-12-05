@@ -1,4 +1,0 @@
-class PasswordChangeModel{
-  String message;
-
-}
