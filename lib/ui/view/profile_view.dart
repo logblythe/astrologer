@@ -13,31 +13,49 @@ import 'package:astrologer/ui/widgets/text_input.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ProfileDialog extends StatelessWidget with ValidationMixing {
+class ProfileView extends StatefulWidget {
+  @override
+  _ProfileViewState createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> with ValidationMixing {
   final formKey = GlobalKey<FormState>();
+
   final TextEditingController nameController = TextEditingController();
+
   final TextEditingController locationController = TextEditingController();
+
   final TextEditingController dateController = TextEditingController();
+
   final TextEditingController timeController = TextEditingController();
+
   final TextEditingController stateController = TextEditingController();
+
   final TextEditingController countryController = TextEditingController();
+
   final TextEditingController phoneController = TextEditingController();
+
   final FocusNode nameFocusNode = FocusNode();
+
   final FocusNode locationFocusNode = FocusNode();
+
   final FocusNode dateFocusNode = FocusNode();
+
   final FocusNode timeFocusNode = FocusNode();
+
   final FocusNode stateFocusNode = FocusNode();
+
   final FocusNode countryFocusNode = FocusNode();
+
   final FocusNode phoneFocusNode = FocusNode();
+  UserModel user;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Profile'),
-      ),
+      appBar: AppBar(title: Text('Profile')),
       body: BaseWidget<ProfileViewModel>(
-        model: ProfileViewModel(profileService: Provider.of(context)),
+        model: ProfileViewModel(userService: Provider.of(context)),
         onModelReady: (model) async {
           await model.getLoggedInUser();
           await model.getImageUrl();
@@ -81,6 +99,7 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
                         controller: phoneController,
                         validator: isEmptyValidation,
                         keyboardType: TextInputType.number,
+                        maxLength: 10,
                       ),
                       UIHelper.verticalSpaceMedium,
                       DateTimeRow(
@@ -157,7 +176,6 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
   handleUpdateClick(ProfileViewModel model, BuildContext context) async {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      UserModel user = UserModel();
       user.firstName = nameController.text.split(" ").elementAt(0);
       user.lastName = nameController.text.split(" ").elementAt(1) ?? "";
       user.phoneNumber = phoneController.text;
@@ -184,7 +202,7 @@ class ProfileDialog extends StatelessWidget with ValidationMixing {
   }
 
   void initializeValue(ProfileViewModel model) {
-    UserModel user = model.user;
+    user = model.user;
     if (user != null) {
       nameController.text = "${user.firstName} ${user.lastName}";
       locationController.text = user.city;

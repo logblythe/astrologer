@@ -38,7 +38,6 @@ class DashboardViewModel extends BaseViewModel {
   void addMsgToSink(message, update) =>
       _homeService.addMsgToSink(message, update);
 
-
   List<MessageModel> get messages => _homeService.messages?.reversed?.toList();
 
   UserModel get user => _userService.user;
@@ -82,12 +81,13 @@ class DashboardViewModel extends BaseViewModel {
 
   askQuestion(MessageModel message) async {
     _question = message;
+    await _homeService.makeQuestionRequest(_question);
     setBusy(true);
-    if (_homeService.isFree) {
+   /* if (_homeService.isFree) {
       await _homeService.makeQuestionRequest(_question);
     } else {
       _homeService.purchaseHelper.purchase();
-    }
+    }*/
     setBusy(false);
   }
 

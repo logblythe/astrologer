@@ -2,8 +2,6 @@ class UserModel {
   int userId;
   String firstName;
   String lastName;
-  String password;
-  String email;
   String phoneNumber;
   String gender;
   String city;
@@ -14,13 +12,13 @@ class UserModel {
   String birthTime;
   bool accurateTime;
   String errorMessage;
+  String profileImageUrl;
+  String deviceToken;
 
   UserModel({
     this.userId,
     this.firstName,
     this.lastName,
-    this.password,
-    this.email,
     this.phoneNumber,
     this.gender,
     this.city,
@@ -30,6 +28,8 @@ class UserModel {
     this.dateOfBirth,
     this.birthTime,
     this.accurateTime,
+    this.profileImageUrl,
+    this.deviceToken,
   });
 
   UserModel.error({String error}) {
@@ -43,8 +43,6 @@ class UserModel {
       : userId = json['userId'],
         firstName = json['firstName'],
         lastName = json['lastName'],
-        password = json['password'],
-        email = json['email'],
         phoneNumber = json['phoneNumber'],
         gender = json['gender'],
         city = json['city'],
@@ -54,14 +52,14 @@ class UserModel {
         dateOfBirth = json['dateOfBirth'],
         birthTime = json['birthTime'],
         accurateTime = json['accurateTime'] ?? false,
-        errorMessage = json['message'];
+        errorMessage = json['message'],
+        profileImageUrl = json['profileImageUrl'],
+        deviceToken = json['deviceToken'];
 
   UserModel.fromDb(Map<String, dynamic> json)
       : userId = json['userId'] as int,
         firstName = json['firstName'],
         lastName = json['lastName'],
-        email = json['email'],
-        password = json['password'],
         phoneNumber = json['phoneNumber'],
         gender = json['gender'],
         city = json['city'],
@@ -70,15 +68,15 @@ class UserModel {
         role = json['role'],
         dateOfBirth = json['dateOfBirth'],
         birthTime = json['birthTime'],
-        accurateTime = json['accurateTime'] == 1;
+        accurateTime = json['accurateTime'] == 1,
+        deviceToken = json['deviceToken'],
+        profileImageUrl = json['profileImageUrl'];
 
   Map<String, dynamic> toMapForDb() => {
         "userId": userId,
         "firstName": firstName,
         "lastName": lastName,
-        "email": email,
         "phoneNumber": phoneNumber,
-        "password": password,
         "gender": gender,
         "city": city,
         "state": state,
@@ -87,6 +85,8 @@ class UserModel {
         "dateOfBirth": dateOfBirth,
         "birthTime": birthTime,
         "accurateTime": accurateTime,
+        "deviceToken": deviceToken,
+        "profileImageUrl": profileImageUrl
       };
 
   @override

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:astrologer/core/data_model/image_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
@@ -9,17 +12,15 @@ class UserService {
   final Api _api;
   final DbProvider _db;
   final SharedPrefHelper _sharedPrefHelper;
+
+  final StreamController _streamController = StreamController<String>();
+
+  Stream<String> get profilePic => _streamController.stream;
+
   UserModel _user;
   String _fcmToken;
-  int _userId;
-
-  int get userId => _userId;
 
   UserModel get user => _user;
-
-  set user(UserModel user) {
-    _user = user;
-  }
 
   UserService({
     @required Api api,
@@ -32,7 +33,6 @@ class UserService {
   }
 
   init() async {
-    _userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
     _getFcmToken();
   }
 
@@ -40,19 +40,45 @@ class UserService {
     if (_fcmToken == null) {
       _fcmToken = await FirebaseMessaging().getToken();
     }
-    print('FCM TOKEN $_fcmToken');
     return _fcmToken;
   }
-
-  Future<bool> userExists() => _db.userExists();
 
   Future<UserModel> getLoggedInUser() async {
     _user = await _db.getLoggedInUser();
     return _user;
   }
 
-  Future<UserModel> register({UserModel user, String fcmToken}) async {
+  Future<UserModel> updateUser(UserModel user, bool newUser) async {
+    if (newUser) user.userId = 0;
     UserModel userModel = await _api.registerUser(user);
+    if (userModel.errorMessage == null) {
+      if (newUser) {
+        _db.addUser(userModel);
+      } else {
+        _db.updateUser(userModel);
+      }
+    }
+    _user = userModel;
     return userModel;
+  }
+
+  Future<ImageModel> upload(imageFile) async {
+    ImageModel model = await _api.upload(imageFile);
+    if (model != null) {
+      _sharedPrefHelper.setString(KEY_IMAGE_URL, model.fileDownloadUri);
+      _streamController.sink.add(model.fileDownloadUri);
+    }
+    return model;
+  }
+
+  getImageUrl() async {
+    String imageUrl = await _sharedPrefHelper.getString(KEY_IMAGE_URL);
+    if (imageUrl != null) {
+      _streamController.sink.add(imageUrl);
+    }
+  }
+
+  void dispose() {
+    _streamController.close();
   }
 }

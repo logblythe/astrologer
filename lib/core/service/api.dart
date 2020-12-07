@@ -6,20 +6,13 @@ import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/data_model/image_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
-import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:async/async.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Api {
   var client = http.Client();
   String token;
-
-  Future<String> get getToken async {
-    var sharedPref = await SharedPreferences.getInstance();
-    return sharedPref.getString(KEY_TOKEN);
-  }
 
   Future<UserModel> registerUser(UserModel user) async {
     try {
@@ -48,11 +41,9 @@ class Api {
 
   Future<UserModel> updateProfile(UserModel user) async {
     try {
-      var token = await getToken;
       var response = await client.post(UPDATE,
           headers: {
             "Content-Type": "application/json",
-            HttpHeaders.authorizationHeader: "Bearer $token"
           },
           body: jsonEncode(user.toMapForDb()));
       print('Update profile response $response');
@@ -82,13 +73,9 @@ class Api {
       int userId, String question, double questionPrice,
       {int prevQuestionId}) async {
     try {
-      var token = await getToken;
       var response = await client.post(
         askQuestionUrl,
-        headers: {
-          "Content-Type": "application/json",
-          HttpHeaders.authorizationHeader: "Bearer $token"
-        },
+        headers: {"Content-Type": "application/json"},
         body: jsonEncode(
           {
             'engQuestion': question,
@@ -108,12 +95,10 @@ class Api {
 
   fetchAstrologers() async {
     try {
-      var token = await getToken;
       var response = await client.get(
         fetchAstrologersUrl,
         headers: {
           "Content-Type": "application/json",
-          HttpHeaders.authorizationHeader: "Bearer $token"
         },
       );
       print('response fetchAstrologers ${response.statusCode}${response.body}');
@@ -128,28 +113,23 @@ class Api {
 
   Future<Map<String, dynamic>> fetchQuestionPrice() async {
     try {
-      var token = await getToken;
       var response = await client.get(
         fetchQuestionPriceUrl,
         headers: {
           "Content-Type": "application/json",
-          HttpHeaders.authorizationHeader: "Bearer $token"
         },
       );
       print(
           'response fetch question price ${response.statusCode} \n ${response.body}');
       return jsonDecode(response.body);
     } catch (e) {
-      print('FETCHQUESTION PRICE the response exception $e}');
+      print('FETCH QUESTION PRICE the response exception $e}');
       return null;
     }
   }
 
   Future<ImageModel> upload(File imageFile) async {
-    var token = await getToken;
-    Map<String, String> headers = {
-      HttpHeaders.authorizationHeader: "Bearer $token"
-    };
+    Map<String, String> headers = {};
 
     // open a bytestream
     var stream =

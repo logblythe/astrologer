@@ -9,18 +9,19 @@ class TextInput extends StatelessWidget {
   final FormFieldValidator validator;
   final TextInputType keyboardType;
   final String initialValue = "hello";
+  final int maxLength;
 
-  const TextInput(
-      {Key key,
-      this.title,
-      this.prefixIcon,
-      this.obscureText,
-      this.suffixIcon,
-      this.controller,
-      this.validator,
-      this.keyboardType,
-      })
-      : super(key: key);
+  const TextInput({
+    Key key,
+    this.title,
+    this.prefixIcon,
+    this.obscureText,
+    this.suffixIcon,
+    this.controller,
+    this.validator,
+    this.keyboardType,
+    this.maxLength,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +38,7 @@ class TextInput extends StatelessWidget {
       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
       controller: controller,
       keyboardType: keyboardType,
+      maxLength: maxLength,
     );
   }
 }

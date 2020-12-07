@@ -21,6 +21,8 @@ const String ROLE = "role";
 const String DOB = "dateOfBirth";
 const String BIRTH_TIME = "birthTime";
 const String ACC_TIME = "accurateTime";
+const String PROFILE_IMAGE = "profileImageUrl";
+const String DEVICE_TOKEN = "deviceToken";
 
 class DbProvider {
   Database db;
@@ -31,16 +33,13 @@ class DbProvider {
     return db;
   }
 
-  List<String> migrationsScripts = [];
+  List<String> migrationsScripts = [
+    '''ALTER TABLE USER ADD deviceToken TEXT, profileImageUrl TEXT''',
+  ];
 
-  Future<Database> init() async {
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    final path = join(documentsDirectory.path, 'eventus.db');
-    db = await openDatabase(path, version: 1,
-        onCreate: (database, version) async {
-      Batch batch = database.batch();
-      batch.execute(""" 
-       create table if not exists user(
+  void _createTableUserV1(Batch batch) {
+    batch.execute('DROP TABLE IF EXISTS user');
+    batch.execute('''create table if not exists user(
          $ID integer primary key autoincrement,
          $USER_ID integer,
          $FIRST_NAME text,
@@ -55,9 +54,12 @@ class DbProvider {
          $ROLE text,
          $DOB text,
          $BIRTH_TIME text,
-         $ACC_TIME integer
-        )""");
-      batch.execute(""" 
+         $ACC_TIME integer)''');
+  }
+
+  void _createTableMessageV1(Batch batch) {
+    batch.execute('DROP TABLE IF EXISTS messages');
+    batch.execute(""" 
        create table if not exists messages(
          $ID integer primary key not null,
          $MESSAGE text,
@@ -68,14 +70,56 @@ class DbProvider {
          $UPDATED_AT integer,
          $ASTROLOGER text
         )""");
-      await batch.commit();
-    }, onUpgrade: (database, int oldVersion, int newVersion) async {
-      print('old version $oldVersion new version $newVersion');
-      for (int i = oldVersion - 1; i < newVersion - 1; i++) {
-        await database.execute(migrationsScripts[i]);
-        print("Migration successful");
-      }
-    }, onConfigure: onConfigure, onDowngrade: onDatabaseDowngradeDelete);
+  }
+
+  void _createTableUserV2(Batch batch) {
+    batch.execute('DROP TABLE IF EXISTS user');
+    batch.execute('''create table if not exists user(
+         $ID integer primary key autoincrement,
+         $USER_ID integer,
+         $FIRST_NAME text,
+         $LAST_NAME text,
+         $EMAIL text,
+         $PASSWORD text,
+         $PHONE text,
+         $GENDER text,
+         $CITY text,
+         $STATE text,
+         $COUNTRY text,
+         $ROLE text,
+         $DOB text,
+         $BIRTH_TIME text,
+         $ACC_TIME integer,
+         $PROFILE_IMAGE text,
+         $DEVICE_TOKEN text)''');
+  }
+
+  void _updateTableUserV1toV2(Batch batch) {
+    batch.execute(
+        '''ALTER TABLE USER ADD $PROFILE_IMAGE TEXT, $DEVICE_TOKEN TEXT''');
+  }
+
+  Future<Database> init() async {
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    final path = join(documentsDirectory.path, 'eventus.db');
+    db = await openDatabase(
+      path,
+      version: 2,
+      onCreate: (database, version) async {
+        Batch batch = database.batch();
+        _createTableUserV2(batch);
+        _createTableMessageV1(batch);
+        await batch.commit();
+      },
+      onUpgrade: (database, int oldVersion, int newVersion) async {
+        Batch batch = database.batch();
+        if (oldVersion == 1) {
+          _updateTableUserV1toV2(batch);
+        }
+      },
+      onConfigure: onConfigure,
+      onDowngrade: onDatabaseDowngradeDelete,
+    );
     return db;
   }
 

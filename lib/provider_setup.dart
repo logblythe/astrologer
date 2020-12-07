@@ -2,7 +2,6 @@ import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
 import 'package:astrologer/core/service/home_service.dart';
 import 'package:astrologer/core/service/navigation_service.dart';
-import 'package:astrologer/core/service/profile_service.dart';
 import 'package:astrologer/core/service/user_service.dart';
 import 'package:astrologer/core/utils/local_notification_helper.dart';
 import 'package:astrologer/core/utils/purchase_helper.dart';
@@ -30,10 +29,6 @@ List<SingleChildCloneableWidget> dependentServices = [
         UserService(
             api: api, dbProvider: dbProvider, sharedPrefHelper: sharedPrefH),
   ),
-  ProxyProvider3<Api, DbProvider, SharedPrefHelper, ProfileService>(
-    builder: (context, api, dbProvider, prefHelper, profileService) =>
-        ProfileService(api: api, db: dbProvider, prefHelper: prefHelper),
-  ),
   ProxyProvider5<Api, DbProvider, SharedPrefHelper, LocalNotificationHelper,
       PurchaseHelper, HomeService>(
     builder: (context, api, dbProvider, sharedPrefH, localNotificationH,
@@ -56,7 +51,7 @@ List<SingleChildCloneableWidget> uiConsumableProviders = [
   ),
   StreamProvider<String>(
     builder: (context) =>
-        Provider.of<ProfileService>(context, listen: false).profilePic,
+        Provider.of<UserService>(context, listen: false).profilePic,
     updateShouldNotify: (_, __) => true,
   ),
   /*

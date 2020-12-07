@@ -1,6 +1,6 @@
 import 'package:astrologer/ui/view/home_view.dart';
 import 'package:astrologer/ui/shared/route_paths.dart';
-import 'package:astrologer/ui/widgets/profile_dialog.dart';
+import 'package:astrologer/ui/view/profile_view.dart';
 import 'package:flutter/material.dart';
 
 class Router {
@@ -12,7 +12,7 @@ class Router {
             builder: (_) => HomeView());
       case RoutePaths.profile:
         return MaterialPageRoute(
-            builder: (_) => ProfileDialog());
+            builder: (_) => ProfileView());
       case RoutePaths.example:
 //        return MaterialPageRoute(builder: (_) => DashboardView2());
       default:
