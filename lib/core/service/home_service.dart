@@ -2,6 +2,7 @@ import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/data_model/idea_model.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
+import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
 import 'package:astrologer/core/utils/local_notification_helper.dart';
@@ -35,7 +36,8 @@ class HomeService {
   PublishSubject<int> _freeCountStream = PublishSubject();
   List<MessageModel> _messageList = [];
   List<AstrologerModel> _astrologers;
-  int _id, _userId, _freeCount;
+  UserModel _user;
+  int _id, _freeCount;
   List<IdeaModel> _ideas;
   double _priceAfterDiscount;
   double _questionPrice;
@@ -79,7 +81,7 @@ class HomeService {
   }
 
   Future<void> init() async {
-    _userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
+    _user = await _dbProvider.getLoggedInUser();
     List<MessageModel> messagesFromDb = await _dbProvider.getAllMessages();
     if(messagesFromDb.isNotEmpty){
       _messageList.clear();
@@ -155,7 +157,7 @@ class HomeService {
 
   makeQuestionRequest(messageModel) async {
     Map<String, dynamic> messageResponse = await _api.askQuestion(
-      _userId,
+      _user.userId,
       messageModel.message,
       isFree ? 0 : _priceAfterDiscount,
       prevQuestionId: _prevQuesId,
