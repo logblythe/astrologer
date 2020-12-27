@@ -176,6 +176,9 @@ class _ProfileViewState extends State<ProfileView> with ValidationMixing {
   handleUpdateClick(ProfileViewModel model, BuildContext context) async {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
+      if(user == null){
+        user = new UserModel();
+      }
       user.firstName = nameController.text.split(" ").elementAt(0);
       user.lastName = nameController.text.split(" ").elementAt(1) ?? "";
       user.phoneNumber = phoneController.text;

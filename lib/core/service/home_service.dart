@@ -78,16 +78,17 @@ class HomeService {
     addFreeCountToSink(_freeCount);
   }
 
-  Future<void> init({List<String> welcomeMessage}) async {
+  Future<void> init() async {
     _userId = await _sharedPrefHelper.getInteger(KEY_USER_ID);
-    if (welcomeMessage != null) {
+    List<MessageModel> messagesFromDb = await _dbProvider.getAllMessages();
+    if(messagesFromDb.isNotEmpty){
+      _messageList.clear();
+      _messageList.addAll(messagesFromDb);
+    }else{
+      List<String> welcomeMessage = await _api.fetchWelcomeMessages();
       welcomeMessage.forEach((element) {
         addMessage(MessageModel(message: element, sent: false));
       });
-    } else {
-      List<MessageModel> messagesFromDb = await _dbProvider.getAllMessages();
-      _messageList.clear();
-      _messageList.addAll(messagesFromDb);
     }
   }
 

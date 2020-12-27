@@ -6,6 +6,7 @@ import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/data_model/image_model.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
+import 'package:astrologer/core/data_model/welcome_messages.dart';
 import 'package:async/async.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
@@ -13,6 +14,14 @@ import 'package:path/path.dart';
 class Api {
   var client = http.Client();
   String token;
+
+  Future<List<String>> fetchWelcomeMessages() async {
+    var response = await client
+        .get(welcomeMessages, headers: {"Content-Type": "application/json"});
+    WelcomeModel messages =
+        WelcomeModel.fromJson(jsonDecode(response.body));
+    return messages.welcomeMessages;
+  }
 
   Future<UserModel> registerUser(UserModel user) async {
     try {

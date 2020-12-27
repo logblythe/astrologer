@@ -47,7 +47,7 @@ class DashboardViewModel extends BaseViewModel {
   init() async {
     setBusy(true);
     _fetchingList = true;
-    _homeService.init();
+    await _homeService.init();
     await _userService.getLoggedInUser();
     setupListeners();
     _fetchingList = false;
