@@ -1,5 +1,6 @@
 const String baseUrl = "http://144.91.121.115:8082/api";
 const String welcomeMessages = "$baseUrl/user/welcome-messages";
+const String userHistory = "$baseUrl/user/previous-history";
 const String register = "$baseUrl/user/register";
 const String UPDATE = "$baseUrl/user/update-profile";
 const String askQuestionUrl = "$baseUrl/user/ask-question";

@@ -34,14 +34,24 @@ class MessageItem extends StatelessWidget {
           message.sent ? EdgeInsets.only(left: 24) : EdgeInsets.only(right: 24),
       child: Column(
         children: <Widget>[
-         // _buildQuestionId(),
+          // _buildQuestionId(),
           message.sent
               ? SizedBox.shrink()
-              : CircleAvatar(
-                  child: Text(
-                      message?.astrologer?.substring(0, 1)?.toUpperCase() ??
+              : message.astrologerUrl!=null && message.astrologerUrl.isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(360),
+                      child: Image.network(
+                        message.astrologerUrl,
+                        height: 42,
+                        width: 42,
+                      ))
+                  : CircleAvatar(
+                      child: Text(message?.astrologer
+                              ?.trim()
+                              ?.substring(0, 1)
+                              ?.toUpperCase() ??
                           "C"),
-                ),
+                    ),
           Padding(
             padding: message.sent ? EdgeInsets.zero : EdgeInsets.only(left: 20),
             child: _buildMessageColumn(context),
@@ -82,13 +92,14 @@ class MessageItem extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-
             Text(
                 DateFormat("MMM d, yyyy hh:mm a").format(
                     DateTime.fromMillisecondsSinceEpoch(message.createdAt)),
                 style: TextStyle(color: Colors.black54, fontSize: 10)),
-            message.sent?SizedBox.shrink():Text(message.astrologer??"Cosmos astrology",
-                style: TextStyle(color: Colors.black54, fontSize: 10)),
+            message.sent
+                ? SizedBox.shrink()
+                : Text(message.astrologer ?? "Cosmos astrology",
+                    style: TextStyle(color: Colors.black54, fontSize: 10)),
             SizedBox(height: 8),
             Text(
               message.message ?? 'no message',

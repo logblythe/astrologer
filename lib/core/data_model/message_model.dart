@@ -13,6 +13,7 @@ const String CREATED_AT = "createdAt";
 const String DELETED_AT = "deletedAt";
 const String UPDATED_AT = "updatedAt";
 const String ASTROLOGER = "astrologer";
+const String ASTROLOGER_URL = "astrologerUrl";
 
 class MessageModel {
   int id;
@@ -24,6 +25,7 @@ class MessageModel {
   int createdAt;
   int updatedAt;
   String astrologer;
+  String astrologerUrl;
 
   MessageModel(
       {this.id,
@@ -34,7 +36,8 @@ class MessageModel {
       this.error,
       this.createdAt,
       this.updatedAt,
-      this.astrologer});
+      this.astrologer,
+      this.astrologerUrl});
 
   MessageModel.fromJson(Map<String, dynamic> json)
       : message = json[MESSAGE],
@@ -42,7 +45,8 @@ class MessageModel {
         status = json[STATUS] ?? "",
         questionId = json[QUESTION_ID],
         error = json["error"],
-        astrologer = json[ASTROLOGER];
+        astrologer = json[ASTROLOGER],
+        astrologerUrl = json[ASTROLOGER_URL];
 
   MessageModel.fromNotification(Map<String, dynamic> json)
       : message = json[MESSAGE],

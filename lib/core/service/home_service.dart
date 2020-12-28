@@ -2,6 +2,8 @@ import 'package:astrologer/core/constants/end_points.dart';
 import 'package:astrologer/core/data_model/astrologer_model.dart';
 import 'package:astrologer/core/data_model/idea_model.dart';
 import 'package:astrologer/core/data_model/message_model.dart';
+import 'package:astrologer/core/data_model/qa_history_list.dart';
+import 'package:astrologer/core/data_model/user_history.dart';
 import 'package:astrologer/core/data_model/user_model.dart';
 import 'package:astrologer/core/service/api.dart';
 import 'package:astrologer/core/service/db_provider.dart';
@@ -9,6 +11,8 @@ import 'package:astrologer/core/utils/local_notification_helper.dart';
 import 'package:astrologer/core/utils/purchase_helper.dart';
 import 'package:astrologer/core/utils/shared_pref_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:platform_device_id/platform_device_id.dart';
 import 'package:rxdart/rxdart.dart';
 
 class HomeService {
@@ -42,6 +46,7 @@ class HomeService {
   double _priceAfterDiscount;
   double _questionPrice;
   double _discountInPercentage;
+  String _deviceId;
 
   Stream<MessageAndUpdate> get nStream => _newMessage.stream;
 
@@ -75,23 +80,59 @@ class HomeService {
 
   List<AstrologerModel> get astrologers => _astrologers;
 
+  Future<void> initPlatformState() async {
+    try {
+      _deviceId = await PlatformDeviceId.getDeviceId;
+    } on PlatformException {
+      _deviceId = '';
+    }
+  }
+
   Future getFreeQuesCount() async {
     _freeCount = await _sharedPrefHelper.getInteger(KEY_FREE_QUES_COUNT) ?? 0;
     addFreeCountToSink(_freeCount);
   }
 
   Future<void> init() async {
+    _messageList.clear();
     _user = await _dbProvider.getLoggedInUser();
-    List<MessageModel> messagesFromDb = await _dbProvider.getAllMessages();
-    if(messagesFromDb.isNotEmpty){
-      _messageList.clear();
-      _messageList.addAll(messagesFromDb);
-    }else{
-      List<String> welcomeMessage = await _api.fetchWelcomeMessages();
-      welcomeMessage.forEach((element) {
-        addMessage(MessageModel(message: element, sent: false));
-      });
+    await initPlatformState();
+    UserHistory history = await _api.fetchUserHistory(deviceId: _deviceId);
+    if (_user == null && history.userDetailsWithQA != null) {
+      UserModel user = UserModel(
+        userId: history.userDetailsWithQA.userId,
+        firstName: history.userDetailsWithQA.firstName,
+        lastName: history.userDetailsWithQA.lastName,
+        phoneNumber: history.userDetailsWithQA.phoneNumber,
+        gender: history.userDetailsWithQA.gender,
+        city: history.userDetailsWithQA.city,
+        state: history.userDetailsWithQA.state,
+        country: history.userDetailsWithQA.country,
+        dateOfBirth: history.userDetailsWithQA.dateOfBirth,
+        birthTime: history.userDetailsWithQA.birthTime,
+        accurateTime: history.userDetailsWithQA.accurateTime,
+        profileImageUrl: history.userDetailsWithQA.profileImageUrl,
+      );
+      _dbProvider.addUser(user);
     }
+    List<String> welcomeMessage = history.welcomeMessages;
+    welcomeMessage.forEach((element) {
+      addMessage(MessageModel(message: element, sent: false));
+    });
+    List<QuestionAnswerHistory> qaList =
+        history.userDetailsWithQA?.questionAnswerHistoryList;
+    qaList?.forEach((qa) {
+      addMessage(MessageModel(
+        message: qa.engQuestion,
+        sent: true,
+        status: qa.answer.isNotEmpty ? DELIVERED : NOT_DELIVERED,
+      ));
+      addMessage(MessageModel(
+          message: qa.answer,
+          sent: false,
+          astrologer: qa.repliedBy,
+          astrologerUrl: qa.profileImgUrl));
+    });
   }
 
   Future<int> addMessage(MessageModel message) async {
