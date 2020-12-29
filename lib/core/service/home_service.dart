@@ -197,6 +197,7 @@ class HomeService {
   }
 
   makeQuestionRequest(messageModel) async {
+    _user = await _dbProvider.getLoggedInUser();
     Map<String, dynamic> messageResponse = await _api.askQuestion(
       _user.userId,
       messageModel.message,
